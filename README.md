@@ -1,8 +1,28 @@
-# emdt-dash
-Management dashboards for eMDT monitoring
+# eMDT Dash
+Management dashboards for enhanced MDT coordination and patient care monitoring in secondary healthcare.
+This project aggregates patient and operational data to produce real-time dashboards for clinical teams, analysts, and administrators.
+
+## 📚 Table of Contents
+
+- [Features](#features)
+- [Metrics](#metrics)
+  - [Patient Flow & Operational Metrics](#patient-flow--operational-metrics)
+  - [Treatment Pathway Metrics](#treatment-pathway-metrics)
+  - [MDT Coordination Metrics](#mdt-coordination-metrics)
+  - [Administrative & Utilization Metrics](#administrative--utilization-metrics)
+  - [Coming Soon](#coming-soon)
+- [Project Structure](#project-structure)
+- [Data Flow Overview](#data-flow-overview)
+- [Getting Started](#getting-started)
+
+## Features
+* Automated aggregation of key healthcare metrics 
+* FastAPI backend for efficient API serving 
+* Dash (by Plotly) for interactive, customizable frontend dashboards 
+* Dual-database architecture separating raw data and metrics 
+* Celery + Redis (optional) for background task scheduling
 
 ## Metrics
-
 ### Patient Flow & Operational Metrics
 
 * Number of admissions/discharges per day/week/month
@@ -38,7 +58,7 @@ Management dashboards for eMDT monitoring
   * Imaging, lab tests, treatment slots 
   * Referral source breakdown (e.g., primary care, ED, internal transfer)
 
-### To be added in the next phase 
+### Coming Soon 
 #### Patient-Centered Metrics (data not yet available)
 * Patient satisfaction scores 
 * Patient-reported outcomes (PROMs)
@@ -49,7 +69,7 @@ Management dashboards for eMDT monitoring
 * Early warning flags from lab/vital sign trends 
 * Forecasted resource demands (beds, staff)
 
-## Project structure
+## Project Structure
 
 ```text
 fastapi_dash_metrics/
@@ -117,3 +137,20 @@ fastapi_dash_metrics/
                           │ Dash App (UI frontend) │
                           └────────────────────────┘
 
+
+## Getting Started
+```bash
+# 1. Create virtual env and install dependencies
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+
+# 2. Set up environment variables
+cp .env.example .env  # Edit DB URIs, secrets
+
+# 3. Run backend and dashboard
+python run.py
+
+# 4. (Optional) Run background metrics aggregation
+celery -A app.tasks.worker worker --loglevel=info
+
+```
