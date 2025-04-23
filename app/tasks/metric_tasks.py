@@ -1,5 +1,5 @@
 
-from app.services.aggregations import calculate_metrics
+from app.services.metrics.aggregator import calculate_metrics
 from .worker import celery
 
 @celery.task
