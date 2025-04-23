@@ -14,10 +14,14 @@ fastapi_dash_metrics/
 │   │   ├── primary.py           # Engine/session for source DB
 │   │   └── metrics.py           # Engine/session for metrics DB
 │   │
-│   ├── models/
+│   ├── models/ # ORM models
 │   │   ├── __init__.py
-│   │   ├── patient.py           # ORM models from primary DB
-│   │   └── metrics.py           # ORM models for metrics
+│   │   ├── patient.py
+│   │   └── appointments.py
+│   │   └── mdt.py
+│   │   └── metrics.py
+│   │   └── metrics.py
+│   │   └── metrics.py
 │   │
 │   ├── api/
 │   │   ├── __init__.py
