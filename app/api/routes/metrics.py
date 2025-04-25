@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter
-from app.services.aggregations import calculate_metrics
+from app.services.metrics.aggregator import calculate_metrics
 
 router = APIRouter()
 
