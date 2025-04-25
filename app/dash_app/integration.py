@@ -1,9 +1,10 @@
 
-from fastapi import FastAPI
 from dash import Dash
-import dash_html_components as html
+from fastapi import FastAPI
 from starlette.middleware.wsgi import WSGIMiddleware
+
 from .dashboard import create_dashboard
+
 
 def mount_dash(app: FastAPI):
     dash_app = Dash(__name__, server=False)
