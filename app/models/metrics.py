@@ -1,8 +1,7 @@
 
 from sqlalchemy import Column, Integer, Float, Date
-from sqlalchemy.ext.declarative import declarative_base
+from app.database.metrics import Base
 
-Base = declarative_base()
 
 class PatientMetrics(Base):
     __tablename__ = "patient_metrics"
@@ -10,3 +9,5 @@ class PatientMetrics(Base):
     date = Column(Date)
     avg_length_of_stay = Column(Float)
     admission_count = Column(Integer)
+
+
