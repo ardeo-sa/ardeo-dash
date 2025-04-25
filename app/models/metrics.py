@@ -1,6 +1,8 @@
 
 from sqlalchemy import Column, Integer, Float, Date, String
 from sqlalchemy.ext.declarative import declarative_base
+from app.database.metrics import Base
+
 
 class PatientMetrics(Base):
     __tablename__ = "patient_metrics"

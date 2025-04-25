@@ -2,7 +2,7 @@
 
 from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from app.database.base import Base
+from app.database.metrics import Base
 
 class MDTMeeting(Base):
     __tablename__ = "mdt_meetings"
@@ -21,8 +21,7 @@ class MDTParticipant(Base):
 
     id = Column(Integer, primary_key=True)
     meeting_id = Column(Integer, ForeignKey("mdt_meetings.id"))
-    clinician_id = Column(Integer, ForeignKey("clinicians.id"))
-
+    clinician_id = Column(Integer, ForeignKey("users.id"))
     meeting = relationship("MDTMeeting", back_populates="participants")
 
 

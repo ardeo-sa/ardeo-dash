@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, DateTime, ForeignKey, Boolean
-from sqlalchemy.ext.declarative import declarative_base
+from app.database.metrics import Base
 
-Base = declarative_base()
 
 class Appointment(Base):
     __tablename__ = "appointments"

@@ -3,7 +3,7 @@ from sqlalchemy import func
 from datetime import datetime
 from app.database.primary import PrimarySessionLocal
 from app.database.metrics import MetricsSessionLocal
-from app.models.admission import Admission
+from app.models.admissions import ReferralAdmission
 from app.models.mdt import MDTMeeting
 from app.models.appointments import Appointment
 from app.models.metrics import OperationalMetrics
@@ -13,11 +13,11 @@ def aggregate_operational_metrics():
 
     with PrimarySessionLocal() as session:
         # 1. Daily Admissions/Discharges
-        daily_admissions = session.query(func.count()).filter(func.date(Admission.admit_time) == today).scalar()
-        daily_discharges = session.query(func.count()).filter(func.date(Admission.discharge_time) == today).scalar()
+        daily_admissions = session.query(func.count()).filter(func.date(ReferralAdmission.admit_time) == today).scalar()
+        daily_discharges = session.query(func.count()).filter(func.date(ReferralAdmission.discharge_time) == today).scalar()
 
         # 2. Average Length of Stay
-        stays = session.query(Admission).filter(Admission.discharge_time.isnot(None)).all()
+        stays = session.query(ReferralAdmission).filter(ReferralAdmission.discharge_time.isnot(None)).all()
         los_list = [(a.discharge_time - a.admit_time).days for a in stays if a.admit_time and a.discharge_time]
         avg_los = sum(los_list) / len(los_list) if los_list else 0
 
@@ -29,7 +29,7 @@ def aggregate_operational_metrics():
 
         # 4. Readmissions within 30 days
         readmissions = 0
-        admissions = session.query(Admission).order_by(Admission.patient_id, Admission.admit_time).all()
+        admissions = session.query(ReferralAdmission).order_by(ReferralAdmission.patient_id, ReferralAdmission.admit_time).all()
         last_admit = {}
         for a in admissions:
             if a.patient_id in last_admit:
