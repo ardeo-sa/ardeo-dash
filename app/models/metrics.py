@@ -3,6 +3,7 @@ from sqlalchemy import Column, Integer, Float, Date, String
 from sqlalchemy.ext.declarative import declarative_base
 from app.database.metrics import Base
 
+
 class PatientMetrics(Base):
     __tablename__ = "patient_metrics"
     id = Column(Integer, primary_key=True, index=True)
@@ -17,4 +18,5 @@ class OperationalMetrics(Base):
     metric_name = Column(String)
     value = Column(Float)
     unit = Column(String)
+
 

@@ -1,5 +1,4 @@
 
-from fastapi import FastAPI
 from dash import Dash
 from starlette.middleware.wsgi import WSGIMiddleware
 from app.dash_app.dashboard import create_dashboard
