@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, Enum, ForeignKey
 from sqlalchemy.orm import relationship
-from app.database import Base
+from app.database.metrics import Base
 import enum
 
 # Enum for different admission statuses
@@ -27,8 +27,8 @@ class ReferralAdmission(Base):
 
     # Relationships
     patient = relationship('Patient', back_populates='referral_admissions')
-    clinician = relationship('User', back_populates='referral_admissions')
-    treatment_plan = relationship('Treatment', back_populates='referral_admissions')
+    clinician = relationship('Clinician', back_populates='referral_admissions')
+    treatment_plan = relationship('Treatments', back_populates='referral_admissions')
 
     def __repr__(self):
         return f"<ReferralAdmission(id={self.id}, patient_id={self.patient_id}, referral_status={self.referral_status}, referral_type={self.referral_type})>"

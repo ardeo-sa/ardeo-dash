@@ -18,6 +18,11 @@ def get_data():
 
 def create_dashboard():
     df = get_data()
+    if df.empty:
+        return html.Div([
+            html.H1("Patient Metrics Dashboard"),
+            html.P("No data available.")
+        ])
     return html.Div([
         html.H1("Patient Metrics Dashboard"),
         dcc.Graph(
