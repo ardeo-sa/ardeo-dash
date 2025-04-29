@@ -1,12 +1,14 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import func
 from datetime import datetime
-from app.database.primary import PrimarySessionLocal
+
+from sqlalchemy import func
+
 from app.database.metrics import MetricsSessionLocal
+from app.database.primary import PrimarySessionLocal
 from app.models.admissions import ReferralAdmission
-from app.models.mdt import MDTMeeting
 from app.models.appointments import Appointment
+from app.models.mdt import MDTMeeting
 from app.models.metrics import OperationalMetrics
+
 
 def aggregate_operational_metrics():
     today = datetime.today().date()
@@ -14,7 +16,8 @@ def aggregate_operational_metrics():
     with PrimarySessionLocal() as session:
         # 1. Daily Admissions/Discharges
         daily_admissions = session.query(func.count()).filter(func.date(ReferralAdmission.admit_time) == today).scalar()
-        daily_discharges = session.query(func.count()).filter(func.date(ReferralAdmission.discharge_time) == today).scalar()
+        daily_discharges = session.query(func.count()).filter(
+            func.date(ReferralAdmission.discharge_time) == today).scalar()
 
         # 2. Average Length of Stay
         stays = session.query(ReferralAdmission).filter(ReferralAdmission.discharge_time.isnot(None)).all()
@@ -23,13 +26,14 @@ def aggregate_operational_metrics():
 
         # 3. MDT Referral to Review Wait Time
         wait_times = session.query(MDTMeeting).filter(MDTMeeting.referral_time.isnot(None),
-                                                       MDTMeeting.review_time.isnot(None)).all()
+                                                      MDTMeeting.review_time.isnot(None)).all()
         mdt_waits = [(m.review_time - m.referral_time).days for m in wait_times]
         avg_mdt_wait = sum(mdt_waits) / len(mdt_waits) if mdt_waits else 0
 
         # 4. Readmissions within 30 days
         readmissions = 0
-        admissions = session.query(ReferralAdmission).order_by(ReferralAdmission.patient_id, ReferralAdmission.admit_time).all()
+        admissions = session.query(ReferralAdmission).order_by(ReferralAdmission.patient_id,
+                                                               ReferralAdmission.admit_time).all()
         last_admit = {}
         for a in admissions:
             if a.patient_id in last_admit:

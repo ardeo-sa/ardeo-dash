@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship
 
 from app.database.metrics import Base
 
+
 class Treatments(Base):
     __tablename__ = "treatments"
     id = Column(Integer, primary_key=True)

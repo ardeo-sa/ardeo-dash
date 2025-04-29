@@ -1,13 +1,14 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import func
 from datetime import datetime
-from typing import Tuple, List
+from typing import Tuple
 
 from app.models.admission import Admission
-from app.models.mdt import MDTMeeting
+from sqlalchemy import func
+from sqlalchemy.orm import Session
+
 from app.models.appointments import Appointment
-from app.models.treatments import Treatment  # Assuming this exists
+from app.models.mdt import MDTMeeting
 from app.models.metrics import OperationalMetrics
+from app.models.treatments import Treatment  # Assuming this exists
 
 TOTAL_BEDS = 100  # Placeholder for real-time config or DB-driven count
 

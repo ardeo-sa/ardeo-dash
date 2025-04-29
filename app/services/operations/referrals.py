@@ -1,7 +1,7 @@
 from datetime import date
 
-from app.models.patient import Patient
 from app.models.admissions import ReferralAdmission, ReferralStatusEnum
+from app.models.patient import Patient
 
 # Assuming you have the patient and clinician objects loaded
 new_referral_in = ReferralAdmission(

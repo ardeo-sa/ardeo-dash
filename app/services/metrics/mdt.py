@@ -1,10 +1,12 @@
 # app/services/metrics/mdt.py
 
-from sqlalchemy.orm import Session
-from sqlalchemy import func
 from datetime import date
+
+from sqlalchemy import func
+from sqlalchemy.orm import Session
+
 from app.models.mdt import MDTMeeting, MDTParticipant, MDTAction
-from app.models.metrics import OperationalMetrics
+
 
 def aggregate_mdt_metrics(session: Session):
     today = date.today()

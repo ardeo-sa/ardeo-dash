@@ -1,9 +1,11 @@
 # app/services/metrics/pathway.py
 
-from sqlalchemy.orm import Session
 from datetime import date
+
+from sqlalchemy.orm import Session
+
 from app.models.pathway import PathwayProgress
-from app.models.metrics import OperationalMetrics
+
 
 def aggregate_pathway_metrics(session: Session):
     today = date.today()
