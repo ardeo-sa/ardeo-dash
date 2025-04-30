@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
+from app.models.primary.parser.BandingDataParser import parse_banding_data
 
 Base = declarative_base()
 
@@ -105,3 +106,7 @@ class FormField(AFObject):
     formField_required = Column(String)
     formField_style = Column(String)
     formField_syncWithReference = Column(String)
+
+    @property
+    def banding_data(self):
+        return parse_banding_data(self.formField_bandingDataXmlValue)

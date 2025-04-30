@@ -40,7 +40,6 @@ pathway_formsummary_map_order = Table(
 
 class ReferralsDefinition(Base):
     __tablename__ = 'pathways'
-
     pathway_id = Column(Integer, primary_key=True, nullable=False)
     title = Column(String(100), nullable=False)
     speciality = Column(String)

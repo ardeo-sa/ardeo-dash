@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
+from app.models.primary.parser.AfFormDataValuesParser import parse_form_values
+
 Base = declarative_base()
 
 class AfFormData(Base):
@@ -24,3 +26,7 @@ class AfFormData(Base):
     created_user = Column(Integer, ForeignKey('users.user_id'))
     modified_user = Column(Integer, ForeignKey('users.user_id'))
     users = relationship('Users')
+
+    @property
+    def values(self):
+        return parse_form_values(self.xml)

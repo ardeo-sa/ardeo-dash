@@ -4,10 +4,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-db_user = os.getenv("DB_USER", "emdtuser")
-db_password = os.getenv("DB_PASSWORD", "6f62da594ee4995ef4fbe526c8a55ada")
-db_host = os.getenv("DB_HOST", "localhost")
-db_name = os.getenv("DB_NAME", "ardeocore")
+primary_db_user = os.getenv("PRIMARY_DB_USER")
+primary_db_password = os.getenv("PRIMARY_DB_PASSWORD")
+primary_db_host = os.getenv("PRIMARY_DB_HOST")
+primary_db_name = os.getenv("PRIMARY_DB_NAME")
 
-PRIMARY_DB_URI = f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}"
-METRICS_DB_URI = os.getenv("METRICS_DB_URI", "sqlite:///metrics.db")
+metrics_db_user = os.getenv("METRICS_DB_USER")
+metrics_db_password = os.getenv("METRICS_DB_PASSWORD")
+metrics_db_host = os.getenv("METRICS_DB_HOST")
+metrics_db_name = os.getenv("METRICS_DB_NAME")
+metrics_db_port = os.getenv("METRICS_DB_PORT")
+
+PRIMARY_DB_URI = f"mysql+pymysql://{primary_db_user}:{primary_db_password}@{primary_db_host}/{primary_db_name}"
+METRICS_DB_URI = f"postgresql://{metrics_db_user}:{metrics_db_password}@{metrics_db_host}:{metrics_db_port}/{metrics_db_name}"

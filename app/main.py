@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 
-from app.ModelGenerator import generate_models_to_files
 from app.api.routes import metrics
-from app.config import PRIMARY_DB_URI
 from app.dash_app.integration import mount_dash
 
 app = FastAPI()
