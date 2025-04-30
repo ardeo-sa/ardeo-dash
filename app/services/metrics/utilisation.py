@@ -1,11 +1,13 @@
-from app.services.metrics.operational import aggregate_operational_metrics
-from app.services.metrics.mdt import aggregate_mdt_metrics
-from app.services.metrics.pathway import aggregate_pathway_metrics
+from datetime import date
+
 from app.services.metrics.utilization import aggregate_utilization_metrics
 
 from app.database.metrics import MetricsSessionLocal
 from app.models.metrics import OperationalMetrics
-from datetime import date
+from app.services.metrics.mdt import aggregate_mdt_metrics
+from app.services.metrics.operational import aggregate_operational_metrics
+from app.services.metrics.pathway import aggregate_pathway_metrics
+
 
 def store_metrics():
     today = date.today()

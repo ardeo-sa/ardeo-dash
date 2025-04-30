@@ -1,7 +1,10 @@
+import enum
+
 from sqlalchemy import Column, Integer, String, Date, Enum, ForeignKey
 from sqlalchemy.orm import relationship
+
 from app.database.metrics import Base
-import enum
+
 
 # Enum for different admission statuses
 class ReferralStatusEnum(enum.Enum):
@@ -12,6 +15,7 @@ class ReferralStatusEnum(enum.Enum):
     COMPLETED = "Completed"
     CANCELLED = "Cancelled"
 
+
 class ReferralAdmission(Base):
     __tablename__ = 'referral_admissions'
 
@@ -21,7 +25,8 @@ class ReferralAdmission(Base):
     discharge_date = Column(Date, nullable=True)  # Date of discharge, if applicable
     referral_status = Column(Enum(ReferralStatusEnum), default=ReferralStatusEnum.PENDING)  # Status of the referral
     referral_type = Column(String, nullable=False)  # e.g., 'In' or 'Out'
-    clinician_id = Column(Integer, ForeignKey('users.id'), nullable=False)  # Foreign key to clinician handling the referral
+    clinician_id = Column(Integer, ForeignKey('users.id'),
+                          nullable=False)  # Foreign key to clinician handling the referral
     treatment_plan_id = Column(Integer, ForeignKey('treatments.id'), nullable=True)  # If treatment is assigned
     discharge_notes = Column(String, nullable=True)  # Additional notes on discharge
 
@@ -32,4 +37,3 @@ class ReferralAdmission(Base):
 
     def __repr__(self):
         return f"<ReferralAdmission(id={self.id}, patient_id={self.patient_id}, referral_status={self.referral_status}, referral_type={self.referral_type})>"
-

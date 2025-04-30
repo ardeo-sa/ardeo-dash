@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, DateTime, ForeignKey, Boolean
+
 from app.database.metrics import Base
 
 
@@ -9,4 +10,3 @@ class Appointment(Base):
     scheduled_time = Column(DateTime)
     attended = Column(Boolean)
     cancelled = Column(Boolean)
-

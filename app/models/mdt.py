@@ -2,7 +2,9 @@
 
 from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
+
 from app.database.metrics import Base
+
 
 class MDTMeeting(Base):
     __tablename__ = "mdt_meetings"

@@ -1,7 +1,9 @@
-
 from dash import Dash
+from fastapi import FastAPI
 from starlette.middleware.wsgi import WSGIMiddleware
+
 from app.dash_app.dashboard import create_dashboard
+
 
 def mount_dash(app: FastAPI):
     dash_app = Dash(__name__, server=False)

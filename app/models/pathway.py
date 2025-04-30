@@ -1,18 +1,23 @@
 # app/models/pathway.py
 
-from sqlalchemy import Column, Integer, String, Enum
-from app.database.metrics import Base
 from enum import Enum as PyEnum
+
+from sqlalchemy import Column, Integer, Enum
+
+from app.database.metrics import Base
+
 
 class PathwayStatusEnum(str, PyEnum):
     ACTIVE = "active"
     COMPLETED = "completed"
     DROPPED = "dropped"
 
+
 class PathwayOutcomeEnum(str, PyEnum):
     SUCCESS = "success"
     FAILURE = "failure"
     UNKNOWN = "unknown"
+
 
 class PathwayProgress(Base):
     __tablename__ = "pathway_progress"

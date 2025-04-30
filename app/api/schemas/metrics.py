@@ -1,6 +1,7 @@
+from datetime import date
 
 from pydantic import BaseModel
-from datetime import date
+
 
 class MetricsResponse(BaseModel):
     date: date
