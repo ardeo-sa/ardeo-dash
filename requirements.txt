@@ -7,5 +7,4 @@ celery
 redis
 dash
 plotly
-sqlalchemy
 pytest
