@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Tuple
 
-from app.models.admission import Admission
+from app.models.admissions import ReferralAdmission
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -9,18 +9,20 @@ from app.models.appointments import Appointment
 from app.models.mdt import MDTMeeting
 from app.models.metrics import OperationalMetrics
 from app.models.treatments import Treatment  # Assuming this exists
+from app.models.patient import Patient
+
 
 TOTAL_BEDS = 100  # Placeholder for real-time config or DB-driven count
 
 
 def get_admissions_discharge_counts(session: Session, date_: datetime.date) -> Tuple[int, int]:
-    admissions = session.query(func.count()).filter(func.date(Admission.admit_time) == date_).scalar()
-    discharges = session.query(func.count()).filter(func.date(Admission.discharge_time) == date_).scalar()
+    admissions = session.query(func.count()).filter(func.date(ReferralAdmission.admit_time) == date_).scalar()
+    discharges = session.query(func.count()).filter(func.date(ReferralAdmission.discharge_time) == date_).scalar()
     return admissions, discharges
 
 
 def calculate_avg_length_of_stay(session: Session) -> float:
-    stays = session.query(Admission).filter(Admission.discharge_time.isnot(None)).all()
+    stays = session.query(ReferralAdmission).filter(ReferralAdmission.discharge_time.isnot(None)).all()
     los_list = [(a.discharge_time - a.admit_time).days for a in stays if a.admit_time and a.discharge_time]
     return sum(los_list) / len(los_list) if los_list else 0
 
@@ -34,7 +36,7 @@ def calculate_avg_mdt_wait_time(session: Session) -> float:
 
 
 def calculate_readmissions(session: Session, days: int = 30) -> int:
-    admissions = session.query(Admission).order_by(Admission.patient_id, Admission.admit_time).all()
+    admissions = session.query(ReferralAdmission).order_by(ReferralAdmission.patient_id, ReferralAdmission.admit_time).all()
     last_admit = {}
     count = 0
     for a in admissions:
@@ -56,15 +58,15 @@ def calculate_no_show_rate(session: Session) -> float:
 
 def calculate_bed_occupancy(session: Session, date_: datetime.date, total_beds: int = TOTAL_BEDS) -> float:
     occupied = session.query(func.count()).filter(
-        Admission.admit_time <= date_,
-        func.coalesce(Admission.discharge_time, date_) >= date_
+        ReferralAdmission.admit_time <= date_,
+        func.coalesce(ReferralAdmission.discharge_time, date_) >= date_
     ).scalar()
     return (occupied / total_beds) * 100
 
 
 def calculate_admit_to_treatment_time(session: Session) -> float:
-    pairs = session.query(Admission.admit_time, Treatment.start_time).join(
-        Treatment, Treatment.patient_id == Admission.patient_id
+    pairs = session.query(ReferralAdmission.admit_time, Treatment.start_time).join(
+        Treatment, Treatment.patient_id == ReferralAdmission.patient_id
     ).filter(Treatment.start_time.isnot(None)).all()
 
     gaps = [(start - admit).days for admit, start in pairs if start and admit]
