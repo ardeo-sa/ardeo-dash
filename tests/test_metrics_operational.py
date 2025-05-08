@@ -6,7 +6,7 @@ from app.services.metrics.operational import (
     calculate_avg_length_of_stay,
     calculate_readmissions,
 )
-from app.models.admission import Admission
+from app.models.admissions import ReferralAdmission
 
 
 def make_admission(patient_id, admit_days_ago, discharge_days_ago=None):
@@ -14,7 +14,7 @@ def make_admission(patient_id, admit_days_ago, discharge_days_ago=None):
     discharge_time = None
     if discharge_days_ago is not None:
         discharge_time = datetime.now() - timedelta(days=discharge_days_ago)
-    return Admission(patient_id=patient_id, admit_time=admit_time, discharge_time=discharge_time)
+    return ReferralAdmission(patient_id=patient_id, admit_time=admit_time, discharge_time=discharge_time)
 
 
 def test_avg_length_of_stay():
@@ -35,9 +35,9 @@ def test_readmission_count():
     mock_session = MagicMock()
     now = datetime.now()
     mock_admissions = [
-        Admission(patient_id=1, admit_time=now - timedelta(days=60), discharge_time=now - timedelta(days=50)),
-        Admission(patient_id=1, admit_time=now - timedelta(days=20), discharge_time=now - timedelta(days=10)),  # readmission
-        Admission(patient_id=2, admit_time=now - timedelta(days=15), discharge_time=now - timedelta(days=5)),
+        ReferralAdmission(patient_id=1, admit_time=now - timedelta(days=60), discharge_time=now - timedelta(days=50)),
+        ReferralAdmission(patient_id=1, admit_time=now - timedelta(days=20), discharge_time=now - timedelta(days=10)),  # readmission
+        ReferralAdmission(patient_id=2, admit_time=now - timedelta(days=15), discharge_time=now - timedelta(days=5)),
     ]
     mock_session.query.return_value.order_by.return_value.all.return_value = mock_admissions
 

@@ -1,4 +1,3 @@
-
 fastapi
 uvicorn
 sqlalchemy
@@ -9,3 +8,4 @@ redis
 dash
 plotly
 sqlalchemy
+pytest
