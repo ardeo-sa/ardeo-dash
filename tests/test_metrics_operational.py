@@ -7,6 +7,9 @@ from app.services.metrics.operational import (
     calculate_readmissions,
 )
 from app.models.admissions import ReferralAdmission
+from app.models.patient import Patient
+from app.models.clinician import Clinician
+from app.models.treatments import Treatment
 
 
 def make_admission(patient_id, admit_days_ago, discharge_days_ago=None):

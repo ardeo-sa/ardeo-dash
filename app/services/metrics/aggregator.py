@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import func
 
-from app.database.metrics import MetricsSessionLocal
+from app.database.metrics import init_metrics_db, MetricsSessionLocal
 from app.database.primary import PrimarySessionLocal
 from app.models.admissions import ReferralAdmission
 from app.models.appointments import Appointment
@@ -12,6 +12,7 @@ from app.models.metrics import OperationalMetrics
 
 def aggregate_operational_metrics():
     today = datetime.today().date()
+    init_metrics_db()
 
     with PrimarySessionLocal() as session:
         # 1. Daily Admissions/Discharges
