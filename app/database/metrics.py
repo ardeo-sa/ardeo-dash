@@ -41,4 +41,3 @@ def init_metrics_db():
     if not metrics_engine:
         metrics_engine = get_metrics_engine()
         MetricsSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=metrics_engine)
-

@@ -10,4 +10,3 @@ def run_metrics_aggregation():
     """Trigger the aggregation of operational metrics."""
     aggregate_operational_metrics()
     return {"status": "aggregation complete"}
-
