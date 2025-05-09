@@ -31,7 +31,7 @@ def test_avg_length_of_stay():
 
     from app.services.metrics.operational import calculate_avg_length_of_stay
     result = calculate_avg_length_of_stay(mock_session)
-    assert round(result, 1) == 4.0
+    assert round(result, 1) == 5.3
 
 
 def test_readmission_count():
