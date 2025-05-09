@@ -1,5 +1,20 @@
-from datetime import datetime
+"""
+This module defines the `aggregate_operational_metrics` function that aggregates various operational metrics
+from the primary database and stores them in the secondary metrics database.
 
+The following metrics are aggregated:
+1. Daily Admissions
+2. Daily Discharges
+3. Average Length of Stay
+4. MDT Referral to Review Wait Time
+5. Readmissions within 30 Days
+6. No-show / Cancellation Rate for Appointments
+
+These metrics are calculated based on data from tables such as `ReferralAdmission`, `MDTMeeting`, and `Appointment`.
+
+The aggregated metrics are then stored in the `OperationalMetrics` table in the metrics database.
+"""
+from datetime import datetime
 from sqlalchemy import func
 
 from app.database.metrics import init_metrics_db, MetricsSessionLocal
@@ -11,6 +26,25 @@ from app.models.metrics import OperationalMetrics
 
 
 def aggregate_operational_metrics():
+    """
+    Aggregates operational metrics from the primary database and stores them in the secondary metrics database.
+
+    The function calculates the following metrics for the current date:
+    1. **Daily Admissions**: Count of admissions for the day.
+    2. **Daily Discharges**: Count of discharges for the day.
+    3. **Average Length of Stay (LOS)**: Average number of days between admission and discharge.
+    4. **MDT Referral to Review Wait Time**: Average number of days between referral time and review time in MDT meetings.
+    5. **Readmissions within 30 Days**: Count of patients readmitted within 30 days of their previous discharge.
+    6. **No-show / Cancellation Rate**: Percentage of missed or cancelled appointments out of the total appointments.
+
+    The function performs the following steps:
+    1. Fetches the relevant data from the primary database using SQLAlchemy queries.
+    2. Aggregates the metrics based on the fetched data.
+    3. Stores the aggregated metrics in the `OperationalMetrics` table in the metrics database.
+
+    Returns:
+        None
+    """
     today = datetime.today().date()
     init_metrics_db()
 

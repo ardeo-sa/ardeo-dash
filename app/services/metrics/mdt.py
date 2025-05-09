@@ -1,7 +1,20 @@
-# app/services/metrics/mdt.py
+"""
+This module defines the `aggregate_mdt_metrics` function that aggregates various metrics related to MDT (Multidisciplinary Team) meetings.
+These metrics include the total number of meetings, average attendance, average wait time from referral to MDT meeting,
+and action completion rate.
 
+The function uses SQLAlchemy queries to retrieve and calculate the required metrics from the database.
+It returns the results as a list of tuples, each containing the metric name, value, and unit of measurement.
+
+Metrics aggregated:
+1. **MDT Meeting Count**: Total number of MDT meetings held today.
+2. **MDT Average Attendance**: Average number of participants attending MDT meetings.
+3. **MDT Average Wait Time**: Average time (in days) between referral and review in MDT meetings.
+4. **MDT Action Completion Rate**: Percentage of MDT actions that have been completed.
+
+The function expects an active SQLAlchemy session to query the database.
+"""
 from datetime import date
-
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -9,6 +22,26 @@ from app.models.mdt import MDTMeeting, MDTParticipant, MDTAction
 
 
 def aggregate_mdt_metrics(session: Session):
+    """
+    Aggregates MDT-related metrics from the database for the current day.
+
+    The function calculates the following metrics:
+    1. **MDT Meeting Count**: Total number of MDT meetings held today.
+    2. **MDT Average Attendance**: Average number of participants attending MDT meetings.
+    3. **MDT Average Wait Time**: Average time (in days) between the referral and review time for MDT meetings.
+    4. **MDT Action Completion Rate**: Percentage of MDT actions that have been completed.
+
+    The function performs the following:
+    1. Fetches data related to MDT meetings, participants, and actions from the database.
+    2. Computes the required metrics.
+    3. Returns the metrics as a list of tuples, each containing the metric name, value, and unit of measurement.
+
+    Args:
+        session (Session): The SQLAlchemy session to use for querying the database.
+
+    Returns:
+        List[Tuple[str, float, str]]: A list of tuples, each representing a metric with its name, value, and unit.
+    """
     today = date.today()
 
     total_meetings = session.query(MDTMeeting).filter(
