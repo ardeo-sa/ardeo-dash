@@ -1,5 +1,7 @@
-import os
+"""Database configuration module for loading and constructing DB URIs from environment
+variables."""
 
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,5 +17,7 @@ metrics_db_host = os.getenv("METRICS_DB_HOST")
 metrics_db_name = os.getenv("METRICS_DB_NAME")
 metrics_db_port = os.getenv("METRICS_DB_PORT")
 
-PRIMARY_DB_URI = f"mysql+pymysql://{primary_db_user}:{primary_db_password}@{primary_db_host}/{primary_db_name}"
-METRICS_DB_URI = f"postgresql://{metrics_db_user}:{metrics_db_password}@{metrics_db_host}:{metrics_db_port}/{metrics_db_name}"
+PRIMARY_DB_URI = (f"mysql+pymysql://{primary_db_user}:{primary_db_password}@{primary_db_host}/"
+                  f"{primary_db_name}")
+METRICS_DB_URI = (f"postgresql://{metrics_db_user}:{metrics_db_password}@{metrics_db_host}:"
+                  f"{metrics_db_port}/{metrics_db_name}")

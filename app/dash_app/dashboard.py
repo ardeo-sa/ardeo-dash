@@ -1,3 +1,4 @@
+"""Dash Dashboard"""
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
@@ -7,6 +8,9 @@ from app.models.metrics import PatientMetrics
 
 
 def get_data():
+    """
+    Fetches patient metrics data from the metrics database and returns it as a pandas DataFrame.
+    """
     with MetricsSessionLocal() as session:
         data = session.query(PatientMetrics).all()
         return pd.DataFrame([{
@@ -17,6 +21,10 @@ def get_data():
 
 
 def create_dashboard():
+    """
+    Creates a Dash HTML layout containing a graph of patient metrics over time.
+    If no data is available, displays a placeholder message.
+    """
     df = get_data()
     if df.empty:
         return html.Div([
@@ -28,8 +36,10 @@ def create_dashboard():
         dcc.Graph(
             figure={
                 "data": [
-                    {"x": df["date"], "y": df["avg_length_of_stay"], "type": "line", "name": "Avg LOS"},
-                    {"x": df["date"], "y": df["admission_count"], "type": "bar", "name": "Admissions"},
+                    {"x": df["date"], "y": df["avg_length_of_stay"],
+                     "type": "line", "name": "Avg LOS"},
+                    {"x": df["date"], "y": df["admission_count"],
+                     "type": "bar", "name": "Admissions"},
                 ],
                 "layout": {"title": "Patient Metrics Over Time"}
             }
