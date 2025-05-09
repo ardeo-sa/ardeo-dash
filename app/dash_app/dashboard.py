@@ -1,6 +1,5 @@
 """Dash Dashboard"""
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc, html
 import pandas as pd
 
 from app.database.metrics import MetricsSessionLocal
