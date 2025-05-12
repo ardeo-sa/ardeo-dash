@@ -70,6 +70,33 @@ def calculate_mdt_action_completion_rate(session: Session) -> float:
     return (completed / len(actions)) * 100
 
 
+def calculate_mdt_avg_case_discussion_time(session: Session) -> float:
+    """
+    Calculates the average time (in minutes) spent discussing each case during MDT meetings.
+
+    Returns:
+        float: Average time per case in minutes.
+    """
+    meetings = session.query(MDTMeeting).filter(
+        MDTMeeting.meeting_start_time.isnot(None),
+        MDTMeeting.meeting_end_time.isnot(None),
+        MDTMeeting.cases.any()
+    ).all()
+
+    total_minutes = 0
+    total_cases = 0
+
+    for meeting in meetings:
+        duration = (meeting.meeting_end_time - meeting.meeting_start_time).total_seconds() / 60
+        case_count = len(meeting.cases)
+
+        if case_count > 0:
+            total_minutes += duration
+            total_cases += case_count
+
+    return (total_minutes / total_cases) if total_cases > 0 else 0
+
+
 def aggregate_mdt_metrics(session: Session, for_date: date = None) -> Dict[str, Any]:
     """
     Aggregates all MDT metrics and returns them as a dictionary.
@@ -82,4 +109,5 @@ def aggregate_mdt_metrics(session: Session, for_date: date = None) -> Dict[str, 
         "mdt_avg_attendance": calculate_mdt_avg_attendance(session),
         "mdt_avg_wait_time": calculate_mdt_avg_wait_time(session),
         "mdt_action_completion_rate": calculate_mdt_action_completion_rate(session),
+        "mdt_avg_case_discussion_time": calculate_mdt_avg_case_discussion_time(session),
     }

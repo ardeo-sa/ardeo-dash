@@ -8,10 +8,8 @@ a dictionary keyed by metric names with associated values and units.
 
 Requires an SQLAlchemy session to interact with the database.
 """
-
 from sqlalchemy.orm import Session
 from app.models.pathway import PathwayProgress
-
 
 def calculate_pathway_adherence_rate(session: Session) -> float:
     """
@@ -70,6 +68,7 @@ def calculate_pathway_failure_rate(session: Session) -> float:
     failures = sum(1 for p in progress if p.outcome == "failure")
     return (failures / len(progress)) * 100
 
+
 def calculate_readmission_rate(session: Session) -> float:
     """
     Calculates the percentage of patients who were readmitted.
@@ -100,6 +99,68 @@ def calculate_admit_to_treatment_time(session: Session) -> float:
     return sum(time_deltas) / len(time_deltas) if time_deltas else 0
 
 
+def calculate_diagnosis_to_treatment_time(session: Session) -> float:
+    """
+    Calculates the average time in days from diagnosis to treatment start.
+
+    Returns:
+        float: Average duration in days from diagnosis to treatment.
+    """
+    progress = session.query(PathwayProgress).all()
+    time_deltas = [
+        (p.treatment_start_time - p.diagnosis_time).days
+        for p in progress
+        if hasattr(p, "diagnosis_time") and p.diagnosis_time and p.treatment_start_time
+    ]
+    return sum(time_deltas) / len(time_deltas) if time_deltas else 0
+
+
+def calculate_treatment_duration(session: Session) -> float:
+    """
+    Calculates the average duration in days from treatment start to completion.
+
+    Returns:
+        float: Average treatment duration in days.
+    """
+    progress = session.query(PathwayProgress).all()
+    time_deltas = [
+        (p.treatment_end_time - p.treatment_start_time).days
+        for p in progress
+        if hasattr(p, "treatment_end_time") and p.treatment_start_time and p.treatment_end_time
+    ]
+    return sum(time_deltas) / len(time_deltas) if time_deltas else 0
+
+
+def calculate_complication_rate(session: Session) -> float:
+    """
+    Calculates the percentage of patients who experienced complications.
+
+    Returns:
+        float: Complication rate in percentage.
+    """
+    progress = session.query(PathwayProgress).all()
+    complications = [
+        p for p in progress
+        if hasattr(p, "had_complication") and p.had_complication
+    ]
+    return (len(complications) / len(progress)) * 100 if progress else 0
+
+
+def calculate_relapse_rate(session: Session) -> float:
+    """
+    Calculates the percentage of patients who experienced a relapse.
+
+    Returns:
+        float: Relapse rate in percentage.
+    """
+    progress = session.query(PathwayProgress).all()
+    relapses = [
+        p for p in progress
+        if hasattr(p, "had_relapse") and p.had_relapse
+    ]
+    return (len(relapses) / len(progress)) * 100 if progress else 0
+
+
 def aggregate_pathway_metrics(session: Session) -> dict:
     """
     Aggregates all pathway-related metrics into a structured dictionary.
@@ -114,4 +175,8 @@ def aggregate_pathway_metrics(session: Session) -> dict:
         "pathway_failure_rate": (calculate_pathway_failure_rate(session), "percent"),
         "pathway_readmission_rate": (calculate_readmission_rate(session), "percent"),
         "pathway_admit_to_treatment_time": (calculate_admit_to_treatment_time(session), "days"),
+        "pathway_diagnosis_to_treatment_time": (calculate_diagnosis_to_treatment_time(session), "days"),
+        "pathway_treatment_duration": (calculate_treatment_duration(session), "days"),
+        "pathway_complication_rate": (calculate_complication_rate(session), "percent"),
+        "pathway_relapse_rate": (calculate_relapse_rate(session), "percent"),
     }

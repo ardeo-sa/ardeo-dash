@@ -24,7 +24,6 @@ This project aggregates patient and operational data to produce real-time dashbo
 
 ## Metrics
 ### Patient Flow & Operational Metrics
-
 * Number of admissions/discharges per day/week/month
 * Average Length of Stay (ALOS) per treatment or condition
 * Bed occupancy rate 
@@ -37,8 +36,8 @@ This project aggregates patient and operational data to produce real-time dashbo
 ### Treatment Pathway Metrics
 * Pathway adherence rate: Are patients following the recommended pathway steps? 
 * Time to treatment milestones:
-* Diagnosis to treatment start 
-* Treatment start to completion 
+  * Diagnosis to treatment start 
+  * Treatment start to completion 
 * Treatment dropout rate 
 * Treatment outcomes:
   * Success/failure rates 
@@ -51,12 +50,27 @@ This project aggregates patient and operational data to produce real-time dashbo
 * Time from referral to MDT discussion 
 * Actions assigned vs. completed (follow-up tracking)
 
+### Clinician Performance Metrics
+* Patients admitted per clinician
+* Average time to treatment start per clinician
+* Readmission rate per clinician
+* No-show rate per clinician
+* Clinician workload:
+  * Patients seen per day 
+  * Outstanding tasks or follow-ups
+
+### Referral & Source Metrics
+* Referrals by source (e.g., GP, self, ED, internal)
+* Referral conversion rate: % of referrals resulting in admission
+* Referral-to-admission time
+* Referral volume trend (by day/week/month)
+
 ### Administrative & Utilization Metrics
-* Patient-to-clinician ratio 
-* Clinician workload metrics (patients seen per day, tasks pending)
+* Patient-to-clinician ratio
 * Resource utilization:
-  * Imaging, lab tests, treatment slots 
-  * Referral source breakdown (e.g., primary care, ED, internal transfer)
+  * Imaging
+  * lab tests
+  * treatment slots 
 
 ### Coming Soon 
 #### Patient-Centered Metrics (data not yet available)

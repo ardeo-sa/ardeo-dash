@@ -31,3 +31,7 @@ class PathwayProgress(Base):
     readmitted = Column(Boolean, default=False)
     admission_time = Column(DateTime, nullable=True)
     treatment_start_time = Column(DateTime, nullable=True)
+    diagnosis_time = Column(DateTime, nullable=True)
+    treatment_end_time = Column(DateTime, nullable=True)
+    had_complication = Column(Boolean, default=False)
+    had_relapse = Column(Boolean, default=False)

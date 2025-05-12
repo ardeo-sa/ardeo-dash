@@ -46,7 +46,10 @@ from app.services.metrics.pathway import (
     calculate_pathway_failure_rate,
     calculate_readmission_rate,
     calculate_admit_to_treatment_time,
-    calculate_no_show_rate,
+    calculate_diagnosis_to_treatment_time,
+    calculate_treatment_duration,
+    calculate_complication_rate,
+    calculate_relapse_rate,
 )
 
 
@@ -98,11 +101,14 @@ def aggregate_all_metrics():
             date=today,
             avg_admission_to_treatment_days=calculate_admit_to_treatment_time(primary_db),
             readmission_rate_30d=calculate_readmission_rate(primary_db),
-            no_show_rate=calculate_no_show_rate(primary_db),
             adherence_rate=calculate_pathway_adherence_rate(primary_db),
             dropout_rate=calculate_pathway_dropout_rate(primary_db),
             success_rate=calculate_pathway_success_rate(primary_db),
             failure_rate=calculate_pathway_failure_rate(primary_db),
+            diagnosis_to_treatment_days=calculate_diagnosis_to_treatment_time(primary_db),
+            avg_treatment_duration_days=calculate_treatment_duration(primary_db),
+            complication_rate=calculate_complication_rate(primary_db),
+            relapse_rate=calculate_relapse_rate(primary_db),
         )
         metrics_db.add(pathway_metrics)
 
