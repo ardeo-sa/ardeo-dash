@@ -10,3 +10,4 @@ class Clinician(Base):
     name = Column(String)
     user_role = Column(String)
     referral_admissions = relationship('ReferralAdmission', back_populates='clinician')
+

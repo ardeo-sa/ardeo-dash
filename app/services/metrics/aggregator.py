@@ -9,7 +9,6 @@ from app.models.appointments import Appointment
 from app.models.mdt import MDTMeeting
 from app.models.metrics import OperationalMetrics
 
-
 def aggregate_operational_metrics():
     today = datetime.today().date()
     init_metrics_db()
