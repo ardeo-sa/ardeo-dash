@@ -75,9 +75,12 @@ def calculate_avg_mdt_wait_time(session: Session) -> float:
 
 def calculate_readmissions(session: Session, days: int = 30) -> int:
 <<<<<<< HEAD
+<<<<<<< HEAD
     admissions = session.query(ReferralAdmission).order_by(ReferralAdmission.
                                                            patient_id, ReferralAdmission.admit_time).all()
 =======
+=======
+>>>>>>> aabdd7f80e7b3fdf5010171d7ae7caafa69fa992
     """
     Calculates the number of readmissions for patients within a specified number of days (default is 30 days).
 
@@ -89,7 +92,11 @@ def calculate_readmissions(session: Session, days: int = 30) -> int:
         int: The number of readmissions within the specified period.
     """
     admissions = session.query(ReferralAdmission).order_by(ReferralAdmission.patient_id, ReferralAdmission.admit_time).all()
+<<<<<<< HEAD
 >>>>>>> dev
+=======
+
+>>>>>>> aabdd7f80e7b3fdf5010171d7ae7caafa69fa992
     last_admit = {}
     count = 0
     for a in admissions:
