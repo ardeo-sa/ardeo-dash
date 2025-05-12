@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 
 from app.database.metrics import Base
 
-
 class Clinician(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)

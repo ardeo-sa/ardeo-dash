@@ -1,60 +1,117 @@
 """
-This module defines a function to aggregate metrics related to patient pathway progress, including adherence rates, dropout rates,
-and outcome success/failure rates. These metrics are calculated from the data stored in the `PathwayProgress` model.
+This module defines functions to calculate individual metrics related to patient pathway progress,
+including adherence rates, dropout rates, outcome success/failure rates, readmission rates,
+admit-to-treatment times, and no-show rates.
 
-Metrics aggregated:
-1. **Pathway Adherence Rate**: The percentage of steps completed by patients out of total steps for their respective pathways.
-2. **Pathway Dropout Rate**: The percentage of patients who dropped out of their pathway.
-3. **Pathway Success Rate**: The percentage of patients who completed their pathway with a successful outcome.
-4. **Pathway Failure Rate**: The percentage of patients who completed their pathway with a failed outcome.
+Each metric is computed separately, and a central aggregator function compiles the results into
+a dictionary keyed by metric names with associated values and units.
 
-The function requires an SQLAlchemy session to interact with the database and retrieve pathway progress data.
+Requires an SQLAlchemy session to interact with the database.
 """
-from datetime import date
-from sqlalchemy.orm import Session
 
+from sqlalchemy.orm import Session
 from app.models.pathway import PathwayProgress
 
-def aggregate_pathway_metrics(session: Session):
-    """
-    Aggregates metrics related to patient pathway progress, including adherence, dropout rates, and outcomes (success/failure).
 
-    Args:
-        session (Session): The SQLAlchemy session to query the database.
+def calculate_pathway_adherence_rate(session: Session) -> float:
+    """
+    Calculates the average adherence rate to pathways.
 
     Returns:
-        List[Tuple[str, float, str]]: A list of tuples where each tuple contains the metric name, its value, and its unit of measurement.
-            Example:
-            [
-                ("pathway_adherence_rate", 75.5, "percent"),
-                ("pathway_dropout_rate", 10.0, "percent"),
-                ("pathway_success_rate", 80.0, "percent"),
-                ("pathway_failure_rate", 20.0, "percent")
-            ]
+        float: Average percentage of steps completed by patients.
     """
-    today = date.today()
-
     progress = session.query(PathwayProgress).all()
-
-    # Adherence = completed_steps / total_steps
     adherence_rates = [
         p.steps_completed / p.steps_total
         for p in progress
         if p.steps_total > 0
     ]
-    avg_adherence = sum(adherence_rates) / len(adherence_rates) * 100 if adherence_rates else 0
+    return (sum(adherence_rates) / len(adherence_rates) * 100) if adherence_rates else 0
 
-    # Dropouts
+
+def calculate_pathway_dropout_rate(session: Session) -> float:
+    """
+    Calculates the percentage of patients who dropped out of their pathways.
+
+    Returns:
+        float: Dropout rate in percentage.
+    """
+    progress = session.query(PathwayProgress).all()
+    if not progress:
+        return 0
     dropouts = sum(1 for p in progress if p.status == "dropped")
-    dropout_rate = (dropouts / len(progress)) * 100 if progress else 0
+    return (dropouts / len(progress)) * 100
 
-    # Outcomes
-    success_rate = sum(1 for p in progress if p.outcome == "success") / len(progress) * 100 if progress else 0
-    failure_rate = sum(1 for p in progress if p.outcome == "failure") / len(progress) * 100 if progress else 0
 
-    return [
-        ("pathway_adherence_rate", avg_adherence, "percent"),
-        ("pathway_dropout_rate", dropout_rate, "percent"),
-        ("pathway_success_rate", success_rate, "percent"),
-        ("pathway_failure_rate", failure_rate, "percent"),
+def calculate_pathway_success_rate(session: Session) -> float:
+    """
+    Calculates the percentage of patients who successfully completed their pathways.
+
+    Returns:
+        float: Success rate in percentage.
+    """
+    progress = session.query(PathwayProgress).all()
+    if not progress:
+        return 0
+    successes = sum(1 for p in progress if p.outcome == "success")
+    return (successes / len(progress)) * 100
+
+
+def calculate_pathway_failure_rate(session: Session) -> float:
+    """
+    Calculates the percentage of patients who failed their pathway.
+
+    Returns:
+        float: Failure rate in percentage.
+    """
+    progress = session.query(PathwayProgress).all()
+    if not progress:
+        return 0
+    failures = sum(1 for p in progress if p.outcome == "failure")
+    return (failures / len(progress)) * 100
+
+def calculate_readmission_rate(session: Session) -> float:
+    """
+    Calculates the percentage of patients who were readmitted.
+
+    Returns:
+        float: Readmission rate as a percentage (0–100).
+    """
+    progress = session.query(PathwayProgress).all()
+    if not progress:
+        return 0
+    readmitted = sum(1 for p in progress if getattr(p, "readmitted", False))
+    return (readmitted / len(progress)) * 100
+
+
+def calculate_admit_to_treatment_time(session: Session) -> float:
+    """
+    Calculates the average time in days from admission to treatment start.
+
+    Returns:
+        float: Average duration in days from admission to treatment.
+    """
+    progress = session.query(PathwayProgress).all()
+    time_deltas = [
+        (p.treatment_start_time - p.admission_time).days
+        for p in progress
+        if p.admission_time and p.treatment_start_time
     ]
+    return sum(time_deltas) / len(time_deltas) if time_deltas else 0
+
+
+def aggregate_pathway_metrics(session: Session) -> dict:
+    """
+    Aggregates all pathway-related metrics into a structured dictionary.
+
+    Returns:
+        dict: Dictionary of metric_name -> (value, unit).
+    """
+    return {
+        "pathway_adherence_rate": (calculate_pathway_adherence_rate(session), "percent"),
+        "pathway_dropout_rate": (calculate_pathway_dropout_rate(session), "percent"),
+        "pathway_success_rate": (calculate_pathway_success_rate(session), "percent"),
+        "pathway_failure_rate": (calculate_pathway_failure_rate(session), "percent"),
+        "pathway_readmission_rate": (calculate_readmission_rate(session), "percent"),
+        "pathway_admit_to_treatment_time": (calculate_admit_to_treatment_time(session), "days"),
+    }

@@ -10,3 +10,4 @@ class Appointment(Base):
     scheduled_time = Column(DateTime)
     attended = Column(Boolean)
     cancelled = Column(Boolean)
+
