@@ -8,3 +8,4 @@ redis
 dash
 plotly
 pytest
+pandas
