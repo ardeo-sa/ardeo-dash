@@ -2,7 +2,7 @@
 This module defines the models for Multidisciplinary Team (MDT) meetings, participants, actions, and cases.
 
 The following entities are defined:
-- MDTMeeting: Represents an MDT meeting, including meeting times and relationships with participants, actions, and cases.
+- MDTMeeting: Represents an MDT meeting, including meeting times and relationships with participants, actions, and cases
 - MDTParticipant: Represents participants (clinicians) in an MDT meeting.
 - MDTAction: Represents actions taken during an MDT meeting.
 - MDTCase: Represents cases discussed in an MDT meeting, typically linked to a patient.
@@ -96,7 +96,7 @@ class MDTCase(Base):
         Attributes:
             id (int): Primary key of the case record.
             meeting_id (int): Foreign key referencing the MDT meeting the case was discussed in.
-            patient_id (int): Foreign key referencing the patient associated with this case (optional if patient table exists).
+            patient_id (int): Foreign key referencing the patient associated with this case.
             discussion_notes (str): Notes from the meeting about the case.
 
         Relationships:

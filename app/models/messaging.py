@@ -7,13 +7,14 @@ and each message includes metadata such as sender, receiver, timestamp, and read
 """
 # from datetime import datetime
 from uuid import uuid4
-import datetime
+from datetime import datetime
 
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, String, DateTime, Boolean, ForeignKey, Text
+from sqlalchemy import Column, DateTime, Boolean, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
-from app.database import Base
+from app.database.metrics import Base
+
 
 class Conversation(Base):
     """
