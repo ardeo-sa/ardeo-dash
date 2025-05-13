@@ -3,10 +3,12 @@ Database setup and initialization for the metrics database using SQLAlchemy.
 """
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import Session
 
 from app.config import METRICS_DB_URI
 
 Base = declarative_base()
+
 
 def get_metrics_engine():
     """
@@ -41,3 +43,19 @@ def init_metrics_db():
     if not metrics_engine:
         metrics_engine = get_metrics_engine()
         MetricsSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=metrics_engine)
+
+
+def get_db() -> Session:
+    """
+    Provides a database session to be used in FastAPI route functions.
+
+    This will be used as a dependency to inject the session into FastAPI routes.
+
+    Yields:
+        Session: A database session instance.
+    """
+    db = MetricsSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
