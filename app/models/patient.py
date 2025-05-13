@@ -1,8 +1,8 @@
+from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy.orm import relationship
 
-from sqlalchemy import Column, Integer, String, Date, Float
-from sqlalchemy.ext.declarative import declarative_base
+from app.database.metrics import Base
 
-Base = declarative_base()
 
 class Patient(Base):
     __tablename__ = "patients"
@@ -10,3 +10,4 @@ class Patient(Base):
     name = Column(String)
     admission_date = Column(Date)
     discharge_date = Column(Date)
+    referral_admissions = relationship('ReferralAdmission', back_populates='patient')

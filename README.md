@@ -1,8 +1,91 @@
-# emdt-dash
-Management dashboards for eMDT monitoring
+# eMDT Dash
+Management dashboards for enhanced MDT coordination and patient care monitoring in secondary healthcare.
+This project aggregates patient and operational data to produce real-time dashboards for clinical teams, analysts, and administrators.
 
+## 📚 Table of Contents
 
-## Project structure
+- [Features](#features)
+- [Metrics](#metrics)
+  - [Patient Flow & Operational Metrics](#patient-flow--operational-metrics)
+  - [Treatment Pathway Metrics](#treatment-pathway-metrics)
+  - [MDT Coordination Metrics](#mdt-coordination-metrics)
+  - [Administrative & Utilization Metrics](#administrative--utilization-metrics)
+  - [Coming Soon](#coming-soon)
+- [Project Structure](#project-structure)
+- [Data Flow Overview](#data-flow-overview)
+- [Getting Started](#getting-started)
+
+## Features
+* Automated aggregation of key healthcare metrics 
+* FastAPI backend for efficient API serving 
+* Dash (by Plotly) for interactive, customizable frontend dashboards 
+* Dual-database architecture separating raw data and metrics 
+* Celery + Redis (optional) for background task scheduling
+
+## Metrics
+### Patient Flow & Operational Metrics
+* Number of admissions/discharges per day/week/month
+* Average Length of Stay (ALOS) per treatment or condition
+* Bed occupancy rate 
+* Patient wait times:
+  * Time from admission to treatment start 
+  * Time between referral and MDT review 
+* Readmission rates (within 30/60 days)
+* Patient no-show / cancellation rate for appointments or MDTs
+
+### Treatment Pathway Metrics
+* Pathway adherence rate: Are patients following the recommended pathway steps? 
+* Time to treatment milestones:
+  * Diagnosis to treatment start 
+  * Treatment start to completion 
+* Treatment dropout rate 
+* Treatment outcomes:
+  * Success/failure rates 
+  * Complication or relapse rates
+
+### MDT Coordination Metrics
+* Number of MDT meetings held 
+* Attendance rate (clinicians, specialists, etc.)
+* Average time per case discussed 
+* Time from referral to MDT discussion 
+* Actions assigned vs. completed (follow-up tracking)
+
+### Clinician Performance Metrics
+* Patients admitted per clinician
+* Average time to treatment start per clinician
+* Readmission rate per clinician
+* No-show rate per clinician
+* Clinician workload:
+  * Patients seen per day 
+  * Outstanding tasks or follow-ups
+
+### Referral & Source Metrics
+* Referrals by source (e.g., GP, self, ED, internal)
+* Referral conversion rate: % of referrals resulting in admission
+* Referral-to-admission time
+* Referral volume trend (by day/week/month)
+
+### Administrative & Utilization Metrics
+* Patient-to-clinician ratio
+* Resource utilization:
+  * Imaging
+  * lab tests
+  * treatment slots 
+
+### Coming Soon 
+#### Patient-Centered Metrics (data not yet available)
+* Patient satisfaction scores 
+* Patient-reported outcomes (PROMs)
+* Patient engagement rate (portal logins, form completions, etc.)
+
+### Predictive or Risk-Based Metrics (Data not available and/or algorithms not developed yet)
+* Risk scores (e.g., risk of readmission, deterioration)
+* Early warning flags from lab/vital sign trends 
+* Forecasted resource demands (beds, staff)
+
+## Project Structure
+
+```text
 fastapi_dash_metrics/
 │
 ├── app/
@@ -14,10 +97,14 @@ fastapi_dash_metrics/
 │   │   ├── primary.py           # Engine/session for source DB
 │   │   └── metrics.py           # Engine/session for metrics DB
 │   │
-│   ├── models/
+│   ├── models/ # ORM models
 │   │   ├── __init__.py
-│   │   ├── patient.py           # ORM models from primary DB
-│   │   └── metrics.py           # ORM models for metrics
+│   │   ├── patient.py
+│   │   └── appointments.py
+│   │   └── mdt.py
+│   │   └── metrics.py
+│   │   └── metrics.py
+│   │   └── metrics.py
 │   │
 │   ├── api/
 │   │   ├── __init__.py
@@ -43,6 +130,7 @@ fastapi_dash_metrics/
 ├── .env                         # Secrets, DB URIs
 ├── requirements.txt
 └── run.py                       # Entry script to run FastAPI + Dash
+```
 
 
              ┌───────────────────────┐
@@ -67,3 +155,20 @@ fastapi_dash_metrics/
                           │ Dash App (UI frontend) │
                           └────────────────────────┘
 
+
+## Getting Started
+```bash
+# 1. Create virtual env and install dependencies
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+
+# 2. Set up environment variables
+cp .env.example .env  # Edit DB URIs, secrets
+
+# 3. Run backend and dashboard
+python run.py
+
+# 4. (Optional) Run background metrics aggregation
+celery -A app.tasks.worker worker --loglevel=info
+
+```

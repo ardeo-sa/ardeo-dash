@@ -1,0 +1,12 @@
+# app/models/referral.py
+
+from sqlalchemy import Column, Integer, String
+
+from app.database.metrics import Base
+
+
+class Referral(Base):
+    __tablename__ = "referrals"
+    id = Column(Integer, primary_key=True)
+    patient_id = Column(Integer)
+    source = Column(String)
