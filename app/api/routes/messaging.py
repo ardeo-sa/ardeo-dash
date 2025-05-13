@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import List
 
-from app.database import get_db
-from app.schemas.messaging import MessageCreate, MessageOut
+from app.database.metrics import get_db
+from app.api.schemas.messaging import MessageCreate, MessageOut
 from app.services.messaging_service import create_message, get_conversation_messages
 
 router = APIRouter(prefix="/api/messages", tags=["Messaging"])
