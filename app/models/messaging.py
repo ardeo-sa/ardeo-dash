@@ -5,12 +5,13 @@ Defines the `Conversation` and `Message` database tables, which support private
 messaging between two users. Each conversation contains multiple messages,
 and each message includes metadata such as sender, receiver, timestamp, and read status.
 """
-from sqlalchemy import Column, String, DateTime, Boolean, ForeignKey, Text
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
-from datetime import datetime
-from uuid import UUID
+# from datetime import datetime
+from uuid import uuid4
 import datetime
+
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, DateTime, Boolean, ForeignKey, Text
+from sqlalchemy.orm import relationship
 
 from app.database import Base
 
@@ -27,11 +28,12 @@ class Conversation(Base):
     """
     __tablename__ = "conversations"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     user1_id = Column(UUID(as_uuid=True), nullable=False)
     user2_id = Column(UUID(as_uuid=True), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    # Relationships
     messages = relationship("Message", back_populates="conversation")
 
 class Message(Base):
@@ -50,7 +52,7 @@ class Message(Base):
     """
     __tablename__ = "messages"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     conversation_id = Column(UUID(as_uuid=True), ForeignKey("conversations.id"), nullable=False)
     sender_id = Column(UUID(as_uuid=True), nullable=False)
     receiver_id = Column(UUID(as_uuid=True), nullable=False)
@@ -58,4 +60,5 @@ class Message(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
     read = Column(Boolean, default=False)
 
+    # Relationships
     conversation = relationship("Conversation", back_populates="messages")
