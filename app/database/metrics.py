@@ -1,6 +1,7 @@
 """
 Database setup and initialization for the metrics database using SQLAlchemy.
 """
+# pylint: disable=invalid-name
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.orm import Session
@@ -39,7 +40,7 @@ def init_metrics_db():
     Raises:
         ValueError: If the METRICS_DB_URI is not defined or the engine could not be initialized.
     """
-    global metrics_engine, MetricsSessionLocal
+    global metrics_engine, MetricsSessionLocal # pylint: disable=global-statement
     if not metrics_engine:
         metrics_engine = get_metrics_engine()
         MetricsSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=metrics_engine)
