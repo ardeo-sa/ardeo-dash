@@ -1,23 +1,26 @@
 """
-This module defines a set of functions to aggregate operational metrics related to hospital admissions, discharges, MDT meetings,
-appointments, treatment start times, and bed occupancy. It performs calculations on these metrics using data from the primary database
-and stores the results in a secondary metrics database.
+This module defines a set of functions to aggregate operational metrics related to hospital admissions, discharges,
+MDT meetings, appointments, treatment start times, and bed occupancy. It performs calculations on these metrics using
+data from the primary database.
 
-Metrics aggregated:
-1. **Daily Admissions and Discharges**: The total number of admissions and discharges on a given day.
-2. **Average Length of Stay**: The average number of days patients stay in the hospital.
-3. **Average MDT Wait Time**: The average wait time (in days) from referral to review in MDT meetings.
-4. **Readmission Rate (30 days)**: The number of readmissions within 30 days of discharge.
-5. **Appointment No-Show Rate**: The percentage of appointments that were missed or canceled.
-6. **Bed Occupancy Rate**: The percentage of hospital beds occupied on a given day.
-7. **Admission to Treatment Start Time**: The average number of days between patient admission and the start of treatment.
+Metrics calculated:
+1. Daily Admissions and Discharges**: The total number of admissions and discharges on a given day.
+2. Average Length of Stay: The average number of days patients stay in the hospital.
+3. Average MDT Wait Time: The average wait time (in days) from referral to review in MDT meetings.
+4. Readmission Rate (30 days): The number of readmissions within 30 days of discharge.
+5. Appointment No-Show Rate: The percentage of appointments that were missed or canceled.
+6. Bed Occupancy Rate: The percentage of hospital beds occupied on a given day.
+7. Admission to Treatment Start Time: The average number of days between patient admission and the start of treatment.
 
-The module expects SQLAlchemy sessions for querying the database.
+The module expects SQLAlchemy sessions for querying the database. This module does NOT handle persistence of metrics.
 """
 from datetime import datetime
 from typing import Tuple
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+
+from app.database.primary import PrimarySessionLocal
+from app.database.metrics import MetricsSessionLocal
 
 from app.models.admissions import ReferralAdmission
 from app.models.appointments import Appointment
@@ -146,46 +149,28 @@ def calculate_admit_to_treatment_time(session: Session) -> float:
     gaps = [(start - admit).days for admit, start in pairs if start and admit]
     return sum(gaps) / len(gaps) if gaps else 0
 
-def aggregate_operational_metrics():
+def aggregate_operational_metrics(session: Session, date_: datetime.date = None) -> Dict[str, Any]:
     """
-    Aggregates various operational metrics for the hospital, including admissions,
-    discharges, length of stay, MDT wait time, readmissions, no-show rate, bed occupancy,
-    and treatment start time. The metrics are calculated using data from the primary database
-    and stored in the metrics database.
+    Computes all operational metrics for a given date.
 
     Args:
-        None
+        session (Session): The SQLAlchemy session to query the database.
+        date_ (datetime.date, optional): The date for which metrics are calculated. Defaults to today.
 
     Returns:
-        None: This function does not return any value. It stores the aggregated metrics in
-        the metrics database.
+        Dict[str, Any]: A dictionary containing metric names and their computed values.
     """
-    from app.database.primary import PrimarySessionLocal
-    from app.database.metrics import MetricsSessionLocal
+    date_ = date_ or datetime.today().date()
 
-    today = datetime.today().date()
-
-    with PrimarySessionLocal() as source_db:
-        daily_adm, daily_dis = get_admissions_discharge_counts(source_db, today)
-        avg_los = calculate_avg_length_of_stay(source_db)
-        avg_mdt_wait = calculate_avg_mdt_wait_time(source_db)
-        readmissions = calculate_readmissions(source_db)
-        no_show = calculate_no_show_rate(source_db)
-        bed_occ = calculate_bed_occupancy(source_db, today)
-        admit_to_treat = calculate_admit_to_treatment_time(source_db)
-
-    with MetricsSessionLocal() as metrics_db:
-        def save_metric(name: str, value: float, unit: str = "count"):
-            metric = OperationalMetrics(date=today, metric_name=name, value=value, unit=unit)
-            metrics_db.add(metric)
-
-        save_metric("daily_admissions", daily_adm)
-        save_metric("daily_discharges", daily_dis)
-        save_metric("average_length_of_stay", avg_los, "days")
-        save_metric("average_mdt_wait_time", avg_mdt_wait, "days")
-        save_metric("readmission_rate_30d", readmissions)
-        save_metric("appointment_no_show_rate", no_show, "percent")
-        save_metric("bed_occupancy_rate", bed_occ, "percent")
-        save_metric("admission_to_treatment_start", admit_to_treat, "days")
-
-        metrics_db.commit()
+    admissions, discharges = get_admissions_discharge_counts(session, date_)
+    return {
+        "date": date_,
+        "daily_admissions": admissions,
+        "daily_discharges": discharges,
+        "average_length_of_stay": calculate_avg_length_of_stay(session),
+        "average_mdt_wait_time": calculate_avg_mdt_wait_time(session),
+        "readmission_rate_30d": calculate_readmissions(session),
+        "appointment_no_show_rate": calculate_no_show_rate(session),
+        "bed_occupancy_rate": calculate_bed_occupancy(session, date_),
+        "admission_to_treatment_start": calculate_admit_to_treatment_time(session),
+    }

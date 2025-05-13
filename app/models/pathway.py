@@ -2,7 +2,7 @@
 
 from enum import Enum as PyEnum
 
-from sqlalchemy import Column, Integer, Enum
+from sqlalchemy import  Column, Integer, Enum, Boolean, DateTime
 
 from app.database.metrics import Base
 
@@ -28,3 +28,10 @@ class PathwayProgress(Base):
     steps_completed = Column(Integer)
     status = Column(Enum(PathwayStatusEnum, name="pathway_status_enum"))
     outcome = Column(Enum(PathwayOutcomeEnum, name="pathway_outcome_enum"))
+    readmitted = Column(Boolean, default=False)
+    admission_time = Column(DateTime, nullable=True)
+    treatment_start_time = Column(DateTime, nullable=True)
+    diagnosis_time = Column(DateTime, nullable=True)
+    treatment_end_time = Column(DateTime, nullable=True)
+    had_complication = Column(Boolean, default=False)
+    had_relapse = Column(Boolean, default=False)

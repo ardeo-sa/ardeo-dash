@@ -1,99 +1,124 @@
 """
-This module defines the `aggregate_operational_metrics` function that aggregates various operational metrics
-from the primary database and stores them in the secondary metrics database.
+This module aggregates various types of metrics from the primary database and stores them in the metrics database.
+The metrics include patient, MDT (Multidisciplinary Team), pathway, and operational metrics.
+Each metric category is calculated using specific business logic and is persisted into separate tables
+in the metrics database.
 
 The following metrics are aggregated:
-1. Daily Admissions
-2. Daily Discharges
-3. Average Length of Stay
-4. MDT Referral to Review Wait Time
-5. Readmissions within 30 Days
-6. No-show / Cancellation Rate for Appointments
+1. Patient Metrics: Includes metrics like average length of stay and admission count.
+2. MDT Metrics: Includes metrics like MDT meeting count, average attendance, average wait time,
+and MDT action completion rate.
+3. Pathway Metrics: Includes metrics like readmission rate, no-show rate, and admission to treatment time.
+4. Operational Metrics*: Includes general KPIs such as bed occupancy rate.
 
-These metrics are calculated based on data from tables such as `ReferralAdmission`, `MDTMeeting`, and `Appointment`.
-
-The aggregated metrics are then stored in the `OperationalMetrics` table in the metrics database.
+Functions:
+- `aggregate_all_metrics`: The main entry point for aggregating and saving all metrics.
 """
-from datetime import datetime
-from sqlalchemy import func
 
-from app.database.metrics import init_metrics_db, MetricsSessionLocal
+from datetime import date
 from app.database.primary import PrimarySessionLocal
-from app.models.admissions import ReferralAdmission
-from app.models.appointments import Appointment
-from app.models.mdt import MDTMeeting
-from app.models.metrics import OperationalMetrics
+from app.database.metrics import MetricsSessionLocal, init_metrics_db
+
+from app.models.metrics import (
+    PatientMetrics,
+    MDTMetrics,
+    PathwayMetrics,
+    OperationalMetrics,
+)
+
+from app.services.metrics.operational import (
+    get_admissions_discharge_counts,
+    calculate_avg_length_of_stay,
+    calculate_bed_occupancy,
+)
+
+from app.services.metrics.mdt import (
+    calculate_mdt_meeting_count,
+    calculate_mdt_avg_attendance,
+    calculate_mdt_avg_wait_time,
+    calculate_mdt_action_completion_rate,
+)
+
+from app.services.metrics.pathway import (
+    calculate_pathway_adherence_rate,
+    calculate_pathway_dropout_rate,
+    calculate_pathway_success_rate,
+    calculate_pathway_failure_rate,
+    calculate_readmission_rate,
+    calculate_admit_to_treatment_time,
+    calculate_diagnosis_to_treatment_time,
+    calculate_treatment_duration,
+    calculate_complication_rate,
+    calculate_relapse_rate,
+)
 
 
-def aggregate_operational_metrics():
+def aggregate_all_metrics():
     """
-    Aggregates operational metrics from the primary database and stores them in the secondary metrics database.
+    Aggregates and stores all metrics, including patient metrics, MDT metrics, pathway metrics,
+    and operational metrics for the current day.
 
-    The function calculates the following metrics for the current date:
-    1. **Daily Admissions**: Count of admissions for the day.
-    2. **Daily Discharges**: Count of discharges for the day.
-    3. **Average Length of Stay (LOS)**: Average number of days between admission and discharge.
-    4. **MDT Referral to Review Wait Time**: Average number of days between referral time and review time in MDT meetings.
-    5. **Readmissions within 30 Days**: Count of patients readmitted within 30 days of their previous discharge.
-    6. **No-show / Cancellation Rate**: Percentage of missed or cancelled appointments out of the total appointments.
+    This function:
+    - Fetches relevant data from the primary database.
+    - Computes the necessary metrics using the data.
+    - Saves the aggregated metrics in the metrics database.
 
-    The function performs the following steps:
-    1. Fetches the relevant data from the primary database using SQLAlchemy queries.
-    2. Aggregates the metrics based on the fetched data.
-    3. Stores the aggregated metrics in the `OperationalMetrics` table in the metrics database.
+    The metrics are saved in their respective tables: PatientMetrics, MDTMetrics, PathwayMetrics, and OperationalMetrics
+
+    Args:
+        None
 
     Returns:
         None
     """
-    today = datetime.today().date()
+    today = date.today()
     init_metrics_db()
 
-    with PrimarySessionLocal() as session:
-        # 1. Daily Admissions/Discharges
-        daily_admissions = session.query(func.count()).filter(func.date(ReferralAdmission.admit_time) == today).scalar()
-        daily_discharges = session.query(func.count()).filter(
-            func.date(ReferralAdmission.discharge_time) == today).scalar()
+    with PrimarySessionLocal() as primary_db, MetricsSessionLocal() as metrics_db:
+        # ----- Patient Metrics -----
+        admissions, discharges = get_admissions_discharge_counts(primary_db, today)
+        avg_los = calculate_avg_length_of_stay(primary_db)
 
-        # 2. Average Length of Stay
-        stays = session.query(ReferralAdmission).filter(ReferralAdmission.discharge_time.isnot(None)).all()
-        los_list = [(a.discharge_time - a.admit_time).days for a in stays if a.admit_time and a.discharge_time]
-        avg_los = sum(los_list) / len(los_list) if los_list else 0
+        patient_metrics = PatientMetrics(
+            date=today,
+            admission_count=admissions,
+            avg_length_of_stay=avg_los
+        )
+        metrics_db.add(patient_metrics)
 
-        # 3. MDT Referral to Review Wait Time
-        wait_times = session.query(MDTMeeting).filter(MDTMeeting.referral_time.isnot(None),
-                                                      MDTMeeting.review_time.isnot(None)).all()
-        mdt_waits = [(m.review_time - m.referral_time).days for m in wait_times]
-        avg_mdt_wait = sum(mdt_waits) / len(mdt_waits) if mdt_waits else 0
+        # ----- MDT Metrics -----
+        mdt_metrics = MDTMetrics(
+            date=today,
+            meeting_count=calculate_mdt_meeting_count(primary_db, today),
+            avg_attendance=calculate_mdt_avg_attendance(primary_db, today),
+            avg_wait_time=calculate_mdt_avg_wait_time(primary_db),
+            action_completion_rate=calculate_mdt_action_completion_rate(primary_db)
+        )
+        metrics_db.add(mdt_metrics)
 
-        # 4. Readmissions within 30 days
-        readmissions = 0
-        admissions = session.query(ReferralAdmission).order_by(ReferralAdmission.patient_id,
-                                                               ReferralAdmission.admit_time).all()
-        last_admit = {}
-        for a in admissions:
-            if a.patient_id in last_admit:
-                delta = (a.admit_time - last_admit[a.patient_id]).days
-                if 0 < delta <= 30:
-                    readmissions += 1
-            last_admit[a.patient_id] = a.discharge_time
+        # ----- Pathway Metrics -----
+        pathway_metrics = PathwayMetrics(
+            date=today,
+            avg_admission_to_treatment_days=calculate_admit_to_treatment_time(primary_db),
+            readmission_rate_30d=calculate_readmission_rate(primary_db),
+            adherence_rate=calculate_pathway_adherence_rate(primary_db),
+            dropout_rate=calculate_pathway_dropout_rate(primary_db),
+            success_rate=calculate_pathway_success_rate(primary_db),
+            failure_rate=calculate_pathway_failure_rate(primary_db),
+            diagnosis_to_treatment_days=calculate_diagnosis_to_treatment_time(primary_db),
+            avg_treatment_duration_days=calculate_treatment_duration(primary_db),
+            complication_rate=calculate_complication_rate(primary_db),
+            relapse_rate=calculate_relapse_rate(primary_db),
+        )
+        metrics_db.add(pathway_metrics)
 
-        # 5. No-show/Cancellation Rate
-        appts = session.query(Appointment).all()
-        total_appts = len(appts)
-        missed = sum(1 for a in appts if not a.attended or a.cancelled)
-        no_show_rate = (missed / total_appts) * 100 if total_appts else 0
+        # ----- Operational Metrics (general KPIs) -----
+        bed_occ = calculate_bed_occupancy(primary_db, today)
+        metrics_db.add(OperationalMetrics(
+            date=today,
+            metric_name="bed_occupancy_rate",
+            value=bed_occ,
+            unit="percent"
+        ))
 
-    # Store metrics in secondary DB
-    with MetricsSessionLocal() as session:
-        def add_metric(name, value, unit):
-            metric = OperationalMetrics(date=today, metric_name=name, value=value, unit=unit)
-            session.add(metric)
-
-        add_metric("daily_admissions", daily_admissions, "count")
-        add_metric("daily_discharges", daily_discharges, "count")
-        add_metric("average_length_of_stay", avg_los, "days")
-        add_metric("average_mdt_wait_time", avg_mdt_wait, "days")
-        add_metric("readmission_rate_30d", readmissions, "count")
-        add_metric("appointment_no_show_rate", no_show_rate, "percent")
-
-        session.commit()
+        metrics_db.commit()
