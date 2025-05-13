@@ -18,6 +18,7 @@ class MDTMeeting(Base):
 
     participants = relationship("MDTParticipant", back_populates="meeting")
     actions = relationship("MDTAction", back_populates="meeting")
+    cases = relationship("MDTCase", back_populates="meeting")
 
 class MDTParticipant(Base):
     __tablename__ = "mdt_participants"
