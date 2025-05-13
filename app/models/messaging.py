@@ -15,7 +15,6 @@ import datetime
 from app.database import Base
 
 class Conversation(Base):
-    class Conversation(Base):
     """
         Represents a private conversation between two users.
 

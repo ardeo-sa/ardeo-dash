@@ -1,8 +1,20 @@
-from pydantic import BaseModel
+"""
+Pydantic schemas for messaging functionality.
+
+This module defines the data models used for creating, retrieving, and serializing
+messages and conversations between users. These schemas support data validation
+and automatic documentation generation for FastAPI endpoints related to messaging.
+
+Schemas:
+- MessageCreate: For creating a new message.
+- MessageOut: For returning message data via the API.
+- ConversationOut: For returning a conversation along with its messages.
+- ConversationCreate: For initiating a new conversation between two users.
+"""
 from uuid import UUID
 from datetime import datetime
 from typing import List
-
+from pydantic import BaseModel
 
 class MessageCreate(BaseModel):
     """
@@ -20,6 +32,9 @@ class MessageCreate(BaseModel):
     content: str
 
     class Config:
+        """
+            Enables ORM mode for converting SQLAlchemy objects to Pydantic models.
+        """
         orm_mode = True
 
 
@@ -45,6 +60,9 @@ class MessageOut(BaseModel):
     read: bool
 
     class Config:
+        """
+            Enables ORM mode for converting SQLAlchemy objects to Pydantic models.
+        """
         orm_mode = True
 
 
@@ -66,6 +84,9 @@ class ConversationOut(BaseModel):
     messages: List[MessageOut]
 
     class Config:
+        """
+            Enables ORM mode for converting SQLAlchemy objects to Pydantic models.
+        """
         orm_mode = True
 
 
@@ -81,4 +102,7 @@ class ConversationCreate(BaseModel):
     user2_id: UUID
 
     class Config:
+        """
+            Enables ORM mode for converting SQLAlchemy objects to Pydantic models.
+        """
         orm_mode = True

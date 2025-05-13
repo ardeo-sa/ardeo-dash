@@ -4,10 +4,11 @@ Messaging API endpoints for sending and retrieving messages between users.
 This module defines FastAPI routes under the /api/messages prefix, allowing clients
 to send a message or fetch the full message history of a specific conversation.
 """
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
 from app.database.metrics import get_db
 from app.api.schemas.messaging import MessageCreate, MessageOut
