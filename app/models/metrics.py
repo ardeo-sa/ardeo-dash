@@ -4,11 +4,15 @@ This module defines SQLAlchemy ORM models for tracking various healthcare metric
 It includes the following models:
 
 1. `PatientMetrics`: Tracks patient-specific metrics such as the average length of stay and the total admission count.
-2. `OperationalMetrics`: Records operational metrics related to healthcare services, such as patient satisfaction and staff availability.
-3. `MDTMetrics`: Focuses on metrics related to Multidisciplinary Team (MDT) meetings, including meeting attendance, action completion, and wait times.
-4. `PathwayMetrics`: Monitors metrics associated with patient pathways, including treatment timelines, readmission rates, and no-show rates.
+2. `OperationalMetrics`: Records operational metrics related to healthcare services,
+such as patient satisfaction and staff availability.
+3. `MDTMetrics`: Focuses on metrics related to Multidisciplinary Team (MDT) meetings, including meeting attendance,
+action completion, and wait times.
+4. `PathwayMetrics`: Monitors metrics associated with patient pathways, including treatment timelines,
+readmission rates, and no-show rates.
 
-Each model maps to a respective table in the database, and the attributes of each class reflect the key metrics tracked for monitoring and improving healthcare services.
+Each model maps to a respective table in the database, and the attributes of each class reflect the key metrics
+tracked for monitoring and improving healthcare services.
 """
 
 from sqlalchemy import Column, Integer, Float, Date, String
@@ -41,7 +45,7 @@ class OperationalMetrics(Base):
         Attributes:
             id (int): Primary key for the operational metrics record.
             date (Date): The date on which the operational metrics were recorded.
-            metric_name (str): The name of the specific operational metric (e.g., 'Patient Satisfaction', 'Staff Availability').
+            metric_name (str): The name of the specific operational metric.
             value (float): The value or result of the operational metric being tracked.
             unit (str): The unit of measurement for the metric (e.g., 'percent', 'count', 'hours').
     """

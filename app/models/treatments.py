@@ -7,7 +7,8 @@ The `Treatment` model tracks treatment details for patients, which can be associ
 Attributes:
     id (int): Unique identifier for the treatment record.
     name (str): The name of the treatment plan (e.g., 'Chemotherapy', 'Surgery').
-    referral_admissions (list of `ReferralAdmission`): One-to-many relationship to referral admissions associated with this treatment plan.
+    referral_admissions (list of `ReferralAdmission`): One-to-many relationship to referral admissions associated
+    with this treatment plan.
 """
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
@@ -26,7 +27,8 @@ class Treatment(Base):
         Attributes:
             id (int): Primary key, unique identifier for the treatment plan.
             name (str): The name of the treatment (e.g., 'Chemotherapy', 'Surgery').
-            referral_admissions (list of `ReferralAdmission`): One-to-many relationship with referral admissions associated with the treatment.
+            referral_admissions (list of `ReferralAdmission`): One-to-many relationship with referral admissions
+            associated with the treatment.
     """
     __tablename__ = "treatments"
 

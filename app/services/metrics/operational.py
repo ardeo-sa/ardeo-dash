@@ -16,6 +16,7 @@ The module expects SQLAlchemy sessions for querying the database. This module do
 """
 from datetime import datetime
 from typing import Tuple, Dict, Any
+
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 

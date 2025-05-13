@@ -5,12 +5,14 @@ It includes the following models:
 
 1. `PathwayStatusEnum`: Enum for tracking the status of a patient's pathway (e.g., active, completed, or dropped).
 2. `PathwayOutcomeEnum`: Enum for tracking the outcome of a patient's pathway (e.g., success, failure, or unknown).
-3. `PathwayProgress`: Tracks the progress of a patient's pathway, including key milestones, status, and outcomes. It records information like:
+3. `PathwayProgress`: Tracks the progress of a patient's pathway, including key milestones, status, and outcomes.
+It records information like:
     - Total steps and steps completed in the pathway.
     - Whether the patient was readmitted, had complications, or experienced a relapse.
     - Dates for various stages in the pathway such as admission, treatment start, diagnosis, and treatment end.
 
-The `PathwayProgress` model helps in monitoring the patient’s journey through their treatment pathway, providing insights into treatment success and possible issues like complications or readmissions.
+The `PathwayProgress` model helps in monitoring the patient’s journey through their treatment pathway,
+providing insights into treatment success and possible issues like complications or readmissions.
 """
 from enum import Enum as PyEnum
 
