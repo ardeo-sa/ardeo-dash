@@ -1,9 +1,15 @@
 """
-This module defines database models related to treatment plans and scheduling,
-including available treatments and slot bookings by patients.
-"""
+This module defines the `Treatment` SQLAlchemy model, representing a treatment plan in the healthcare system.
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+The `Treatment` model tracks treatment details for patients, which can be associated with referral admissions.
+
+Attributes:
+    id (int): Unique identifier for the treatment record.
+    name (str): The name of the treatment plan (e.g., 'Chemotherapy', 'Surgery').
+    referral_admissions (list of `ReferralAdmission`): One-to-many relationship to referral admissions associated
+    with this treatment plan.
+"""
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.database.metrics import Base
 
@@ -11,6 +17,17 @@ from app.database.metrics import Base
 class Treatment(Base):
     """
     Represents a type of treatment or intervention that a patient may undergo.
+        SQLAlchemy model representing a treatment plan in the healthcare system.
+
+        This model captures details about treatments provided to patients, including the name of the treatment
+        and its association with referral admissions. A treatment plan can be linked to one or more referral
+        admissions.
+
+        Attributes:
+            id (int): Primary key, unique identifier for the treatment plan.
+            name (str): The name of the treatment (e.g., 'Chemotherapy', 'Surgery').
+            referral_admissions (list of `ReferralAdmission`): One-to-many relationship with referral admissions
+            associated with the treatment.
     """
     __tablename__ = "treatments"
 

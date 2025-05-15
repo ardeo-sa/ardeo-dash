@@ -4,9 +4,11 @@ This module is responsible for creating and saving referral records for patients
 The following records are created:
 1. **Referral In**: A new referral is made for a patient being referred into the system by a clinician.
 2. **Referral Out**: A new referral is made for a patient being referred out of the system.
-3. **Discharge Record**: A record is created when a patient is discharged from the system, marking their recovery and completion of care.
+3. **Discharge Record**: A record is created when a patient is discharged from the system, marking their recovery
+and completion of care.
 
-The module utilizes the `ReferralAdmission` model, patient data, and clinician information to log these events. Each referral record is committed to the database to ensure persistent storage.
+The module utilizes the `ReferralAdmission` model, patient data, and clinician information to log these events.
+Each referral record is committed to the database to ensure persistent storage.
 """
 from datetime import date
 
@@ -99,4 +101,3 @@ def handle_referral_and_discharge(patient_id: int, clinician_id: int, discharge_
     create_referral_in(patient_id, clinician_id, session)
     create_referral_out(patient_id, clinician_id, session)
     create_discharge_record(patient_id, clinician_id, discharge_notes, session)
-

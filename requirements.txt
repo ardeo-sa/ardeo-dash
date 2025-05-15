@@ -9,3 +9,4 @@ dash
 plotly
 pytest
 pandas
+pymysql
