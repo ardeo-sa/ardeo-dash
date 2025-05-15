@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
@@ -8,7 +7,7 @@ class OtpInfo(Base):
     __tablename__ = 'otp_info'
 
     id = Column(Integer, primary_key=True, nullable=False)
-    createdDate = Column(DateTime)
+    created_date = Column(DateTime)
     email = Column(String, nullable=False)
-    isOTPUsed = Column(String)
+    is_used = Column(String)
     otp = Column(String, nullable=False)

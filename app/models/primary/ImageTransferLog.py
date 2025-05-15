@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
@@ -11,8 +10,8 @@ class ImageTransferLog(Base):
     error_desc = Column(String)
     event_date = Column(DateTime, nullable=False)
     event_desc = Column(String, nullable=False)
-    img_accession_number = Column(String, nullable=False)
+    accession_number = Column(String, nullable=False)
     note_id = Column(Integer, nullable=False)
-    patient_id = Column(Integer, nullable=False)
+    subject_id = Column(Integer, nullable=False)
     transfer_method = Column(String, nullable=False)
     user_id = Column(Integer)

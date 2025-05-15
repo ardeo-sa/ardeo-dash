@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -8,7 +8,7 @@ class Pair(Base):
     __tablename__ = 'pair'
 
     pair_id = Column(Integer, primary_key=True, nullable=False)
-    nl_filterHospitalCode = Column(String)
+    nl_filter_org_code = Column(String)
     pair_first = Column(String, nullable=False)
     pair_second = Column(String, nullable=False)
     namedList_id = Column(Integer, ForeignKey('named_list.nl_id'))

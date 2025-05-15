@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -24,7 +24,7 @@ class Users(Base):
     user_forename = Column(String)
     google_user = Column(String, nullable=False)
     guid = Column(String, nullable=False)
-    isPatient = Column(String, nullable=False)
+    is_subject = Column(String, nullable=False)
     ldap_user = Column(String, nullable=False)
     user_middlename = Column(String)
     modified_date = Column(DateTime)
@@ -38,5 +38,5 @@ class Users(Base):
     user_surname = Column(String)
     username = Column(String, nullable=False)
     using2FA = Column(String, nullable=False)
-    hospital_id = Column(Integer, ForeignKey('organisation.id'))
+    organisation_id = Column(Integer, ForeignKey('organisation.id'))
     organisation = relationship('Organisation')
