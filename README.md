@@ -72,7 +72,7 @@ This project aggregates patient and operational data to produce real-time dashbo
   * lab tests
   * treatment slots 
 
-### Coming Soon 
+### To be added later
 #### Patient-Centered Metrics (data not yet available)
 * Patient satisfaction scores 
 * Patient-reported outcomes (PROMs)

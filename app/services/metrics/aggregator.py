@@ -31,6 +31,10 @@ from app.services.metrics.operational import (
     get_admissions_discharge_counts,
     calculate_avg_length_of_stay,
     calculate_bed_occupancy,
+    calculate_avg_mdt_wait_time,
+    calculate_readmissions,
+    calculate_no_show_rate,
+    calculate_admit_to_treatment_time,
 )
 
 from app.services.metrics.mdt import (
@@ -38,6 +42,7 @@ from app.services.metrics.mdt import (
     calculate_mdt_avg_attendance,
     calculate_mdt_avg_wait_time,
     calculate_mdt_action_completion_rate,
+    calculate_mdt_avg_case_discussion_time,
 )
 
 from app.services.metrics.pathway import (
@@ -93,7 +98,8 @@ def aggregate_all_metrics():
             meeting_count=calculate_mdt_meeting_count(primary_db, today),
             avg_attendance=calculate_mdt_avg_attendance(primary_db, today),
             avg_wait_time=calculate_mdt_avg_wait_time(primary_db),
-            action_completion_rate=calculate_mdt_action_completion_rate(primary_db)
+            action_completion_rate=calculate_mdt_action_completion_rate(primary_db),
+            discussion_time=calculate_mdt_avg_case_discussion_time(primary_db)
         )
         metrics_db.add(mdt_metrics)
 
@@ -114,12 +120,17 @@ def aggregate_all_metrics():
         metrics_db.add(pathway_metrics)
 
         # ----- Operational Metrics (general KPIs) -----
-        bed_occ = calculate_bed_occupancy(primary_db, today)
-        metrics_db.add(OperationalMetrics(
+        operational_metrics = OperationalMetrics(
             date=today,
-            metric_name="bed_occupancy_rate",
-            value=bed_occ,
-            unit="percent"
-        ))
+            daily_admissions=admissions,
+            daily_discharges=discharges,
+            average_length_of_stay=calculate_avg_length_of_stay(primary_db),
+            average_mdt_wait_time=calculate_avg_mdt_wait_time(primary_db),
+            readmission_rate_30d=calculate_readmissions(primary_db),
+            appointment_no_show_rate=calculate_no_show_rate(primary_db),
+            bed_occupancy_rate=calculate_bed_occupancy(primary_db, today),
+            admission_to_treatment_start=calculate_admit_to_treatment_time(primary_db),
+        )
+        metrics_db.add(operational_metrics)
 
         metrics_db.commit()
