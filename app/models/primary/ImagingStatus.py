@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -9,16 +9,16 @@ class ImagingStatus(Base):
 
     imaging_status_id = Column(Integer, primary_key=True, nullable=False)
     accession_number = Column(String, nullable=False)
-    carespell_id = Column(Integer, nullable=False)
+    episode_id = Column(Integer, nullable=False)
     current_status = Column(Integer, nullable=False)
     last_modified_date = Column(DateTime, nullable=False)
     note_id = Column(Integer, nullable=False)
     is_notified = Column(String, nullable=False)
     start_date = Column(DateTime, nullable=False)
     user_id = Column(Integer, nullable=False)
-    hospital_id = Column(Integer, ForeignKey('organisation.id'))
+    organisation_id = Column(Integer, ForeignKey('organisation.id'))
     image_transfer_method_id = Column(Integer, ForeignKey('image_transfer_method.id'))
-    patient_id = Column(Integer, ForeignKey('patient.patient_id'), nullable=False)
+    subject_id = Column(Integer, ForeignKey('subject.subject_id'), nullable=False)
     organisation = relationship('Organisation')
     image_transfer_method = relationship('Image_transfer_method')
-    patient = relationship('Patient')
+    subject = relationship('Subject')

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -18,25 +18,25 @@ class Referrals(Base):
     referral_mode = Column(Integer)
     referral_notes = Column(String)
     referral_status = Column(Integer, nullable=False)
-    referring_from_hospital = Column(Integer, nullable=False)
+    referring_from_organisation = Column(Integer, nullable=False)
     referring_specialist_address = Column(String)
     referring_specialist_fax = Column(String)
-    referring_specialist_hospcode = Column(String)
+    referring_specialist_org_code = Column(String)
     referring_specialist_jobtitle = Column(String)
     referring_specialist_name = Column(String)
     referring_specialist_postcode = Column(String)
     referring_specialist_telephone = Column(String)
     referring_specialist_username = Column(String)
-    referring_to_hospital = Column(Integer)
+    referring_to_organisation = Column(Integer)
     response_date = Column(DateTime)
     team = Column(String)
     tracking = Column(String)
-    carespell_id = Column(Integer, ForeignKey('carespell.carespell_id'), nullable=False)
+    episode_id = Column(Integer, ForeignKey('episode.episode_id'), nullable=False)
     pathway_id = Column(Integer, ForeignKey('pathway.pathway_id'))
     referred_from_user_id = Column(Integer, ForeignKey('users.user_id'))
     referred_to_user_id = Column(Integer, ForeignKey('users.user_id'))
     referring_specialist_user_id = Column(Integer, ForeignKey('users.user_id'))
-    referralDetails_index = Column(Integer)
-    carespell = relationship('Carespell')
+    child_index = Column(Integer)
+    episode = relationship('Episode')
     pathway = relationship('Pathway')
     users = relationship('Users')

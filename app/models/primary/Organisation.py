@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -18,5 +18,5 @@ class Organisation(Base):
     modified_date = Column(DateTime, nullable=False)
     postcode = Column(String)
     hosts_virtual_mdm = Column(String)
-    pas_context_id = Column(Integer, ForeignKey('pas_context.pas_context_id'))
-    pas_context = relationship('Pas_context')
+    context_id = Column(Integer, ForeignKey('identifier_context.context_id'))
+    identifier_context = relationship('Identifier_context')

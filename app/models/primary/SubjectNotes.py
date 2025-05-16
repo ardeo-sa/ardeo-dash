@@ -3,10 +3,10 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class Settings(Base):
-    __tablename__ = 'settings'
+class SubjectNotes(Base):
+    __tablename__ = 'subject_notes'
 
     id = Column(Integer, primary_key=True, nullable=False)
-    description = Column(String)
-    Property_key = Column(String, nullable=False)
-    Property_value = Column(String)
+    note_type = Column(Integer, nullable=False)
+    notes = Column(String)
+    subject_id = Column(Integer, nullable=False)
