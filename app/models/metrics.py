@@ -150,3 +150,23 @@ class ClinicianMetrics(Base):
     metric_name = Column(String, nullable=False)
     value = Column(Float, nullable=False)
     unit = Column(String, nullable=True)
+
+
+class AdminMetrics(Base):
+    """
+    SQLAlchemy model representing a stored administrative metric record.
+
+    Attributes:
+        id (int): Primary key.
+        date (date): Date of the metric.
+        metric_name (str): Name of the metric (e.g., 'patient_to_clinician_ratio').
+        value (float): Numeric value of the metric.
+        unit (str): Unit of measure (e.g., 'count', 'ratio').
+    """
+    __tablename__ = "admin_metrics"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, index=True, nullable=False)
+    metric_name = Column(String, nullable=False)
+    value = Column(Float, nullable=False)
+    unit = Column(String, nullable=True)

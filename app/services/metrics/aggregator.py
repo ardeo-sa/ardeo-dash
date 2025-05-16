@@ -16,13 +16,14 @@ from app.models.metrics import (
     MDTMetrics,
     ReferralMetrics,
     ClinicianMetrics,
+    AdminMetrics,
 )
 from app.services.metrics.pathway import aggregate_pathway_metrics
 from app.services.metrics.operational import aggregate_operational_metrics
 from app.services.metrics.mdt import aggregate_mdt_metrics
 from app.services.metrics.referrals import aggregate_referral_metrics
 from app.services.metrics.clinician_performance import aggregate_clinician_metrics
-
+from app.services.metrics.admin_utilisation import aggregate_admin_metrics
 
 def aggregate_all_metrics():
     """
@@ -96,5 +97,14 @@ def aggregate_all_metrics():
                 unit=unit
             ))
 
+        # ----- Admin Metrics -----
+        admin_metrics_dict = aggregate_admin_metrics(primary_db)
+        for name, (value, unit) in admin_metrics_dict.items():
+            metrics_db.add(AdminMetrics(
+                date=today,
+                metric_name=name,
+                value=value,
+                unit=unit
+            ))
 
         metrics_db.commit()
