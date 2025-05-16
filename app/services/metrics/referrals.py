@@ -115,3 +115,39 @@ def referral_volume_trend(session: Session, by: str = "day") -> dict:
     )
 
     return {tuple(row[0]) if isinstance(row[0], tuple) else row[0]: row[1] for row in results}
+
+
+def aggregate_referral_metrics(session: Session, for_date: date = None) -> dict:
+    """
+    Aggregates all referral-related metrics into a structured dictionary.
+
+    Args:
+        session (Session): SQLAlchemy session.
+        for_date (date, optional): Date to filter the metrics. Defaults to today.
+
+    Returns:
+        dict: Dictionary of metric_name -> (value, unit).
+    """
+    for_date = for_date or date.today()
+
+    # Referral source breakdown
+    referrals_by_src = referrals_by_source(session, for_date)
+
+    # Aggregate metrics
+    metrics = {
+        "referral_conversion_rate": (referral_conversion_rate(session, for_date), "percent"),
+        "referral_to_admission_time": (referral_to_admission_time(session, for_date), "days"),
+    }
+
+    # Add referral volume trend by day
+    daily_trend = referral_volume_trend(session, by="day")
+    daily_key = for_date.isoformat()
+    if daily_key in daily_trend:
+        metrics["referral_volume_daily"] = (daily_trend[daily_key], "count")
+
+    # Add individual referral source counts
+    for source, count in referrals_by_src.items():
+        metric_name = f"referral_source_count_{source.lower().replace(' ', '_')}"
+        metrics[metric_name] = (count, "count")
+
+    return metrics

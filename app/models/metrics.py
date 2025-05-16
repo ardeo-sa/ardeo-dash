@@ -98,3 +98,55 @@ class PathwayMetrics(Base):
     avg_admission_to_treatment_days = Column(Float, nullable=False)
     readmission_rate_30d = Column(Float, nullable=False)
     no_show_rate = Column(Float, nullable=False)  # percent
+
+
+class ReferralMetrics(Base):
+    """
+    SQLAlchemy model for storing daily referral-related metrics in a tall format.
+
+    Each row represents a single referral metric on a specific date. Metrics include:
+    - Referrals by source (e.g., self, GP, hospital)
+    - Conversion rate (percentage of referrals resulting in admissions)
+    - Average referral-to-admission time
+    - Referral volume trends
+
+    Attributes:
+        id (int): Primary key.
+        date (date): The date for which the metric was calculated.
+        metric_name (str): Name of the referral metric (e.g., 'conversion_rate').
+        value (float): The numeric value of the metric.
+        unit (str): Optional unit of the metric (e.g., 'percent', 'days').
+    """
+    __tablename__ = "referral_metrics"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, index=True, nullable=False)
+    metric_name = Column(String, nullable=False)
+    value = Column(Float, nullable=False)
+    unit = Column(String, nullable=True)
+
+
+class ClinicianMetrics(Base):
+    """
+    SQLAlchemy model for storing daily clinician-related metrics in a tall format.
+
+    Each row represents a single clinician metric on a specific date. Metrics include:
+    - Patients seen per clinician
+    - Average consultation time
+    - Clinician follow-up rate
+    - Documentation completion rate
+
+    Attributes:
+        id (int): Primary key.
+        date (date): The date for which the metric was calculated.
+        metric_name (str): Name of the clinician metric (e.g., 'avg_consultation_time').
+        value (float): The numeric value of the metric.
+        unit (str): Optional unit of the metric (e.g., 'minutes', 'percent').
+    """
+    __tablename__ = "clinician_metrics"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, index=True, nullable=False)
+    metric_name = Column(String, nullable=False)
+    value = Column(Float, nullable=False)
+    unit = Column(String, nullable=True)

@@ -162,3 +162,50 @@ def outstanding_tasks_per_clinician(session: Session) -> dict:
         .all()
     )
     return {clinician_id: count for clinician_id, count in results}
+
+
+def aggregate_clinician_metrics(session: Session, for_date: date = None) -> list[dict]:
+    """
+    Aggregates clinician performance metrics into a flat list of dictionaries.
+
+    Each dictionary represents one clinician-metric pair, and contains:
+    - clinician_id
+    - metric_name
+    - value
+    - unit
+
+    Args:
+        session (Session): SQLAlchemy session.
+        for_date (date, optional): Date to filter time-bound metrics. Defaults to today.
+
+    Returns:
+        list[dict]: List of aggregated clinician metrics.
+    """
+    for_date = for_date or date.today()
+
+    metrics = []
+
+    admitted = patients_admitted_per_clinician(session, for_date)
+    seen = patients_seen_per_day(session, for_date)
+    no_show = no_show_rate_per_clinician(session, for_date)
+    time_to_treatment = avg_time_to_treatment_per_clinician(session)
+    readmission = readmission_rate_per_clinician(session)
+    outstanding = outstanding_tasks_per_clinician(session)
+
+    def add_metric(metric_dict, name, unit):
+        for clinician_id, value in metric_dict.items():
+            metrics.append({
+                "clinician_id": clinician_id,
+                "metric_name": name,
+                "value": value,
+                "unit": unit
+            })
+
+    add_metric(admitted, "patients_admitted", "count")
+    add_metric(seen, "patients_seen", "count")
+    add_metric(no_show, "no_show_rate", "percent")
+    add_metric(time_to_treatment, "avg_time_to_treatment", "days")
+    add_metric(readmission, "readmission_rate", "percent")
+    add_metric(outstanding, "outstanding_tasks", "count")
+
+    return metrics
