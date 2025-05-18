@@ -1,6 +1,8 @@
+from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base
-from datetime import datetime
+
 from app.models.primary.parser.BandingDataParser import parse_banding_data
 
 Base = declarative_base()

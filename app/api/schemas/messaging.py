@@ -52,10 +52,6 @@ class MessageOut(BaseModel):
             read (bool): Whether the message has been read by the receiver.
     """
     id: UUID
-    conversation_id: UUID
-    sender_id: UUID
-    receiver_id: UUID
-    content: str
     timestamp: datetime
     read: bool
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -7,7 +7,7 @@ Base = declarative_base()
 class CareProvider(Base):
     __tablename__ = 'care_provider'
 
-    careProvider_id = Column(Integer, primary_key=True, nullable=False)
+    id = Column(Integer, primary_key=True, nullable=False)
     address1 = Column(String)
     address2 = Column(String)
     address3 = Column(String)
@@ -16,15 +16,15 @@ class CareProvider(Base):
     country = Column(String)
     county = Column(String)
     department = Column(String)
-    jobTitle = Column(String)
-    mobilePhone = Column(String)
-    organisationName = Column(String)
-    personalInformationBio = Column(String)
-    personalUrl = Column(String)
-    postCode = Column(String)
-    preferredContact = Column(String)
+    job_title = Column(String)
+    mobile_phone = Column(String)
+    organisation_name = Column(String)
+    personal_information_bio = Column(String)
+    personal_url = Column(String)
+    postcode = Column(String)
+    preferred_contact = Column(String)
     qualification = Column(String)
-    secretaryName = Column(String)
-    workPhone = Column(String)
+    secretary_name = Column(String)
+    work_phone = Column(String)
     user_id = Column(Integer, ForeignKey('users.user_id'))
     users = relationship('Users')
