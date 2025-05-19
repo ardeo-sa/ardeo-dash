@@ -37,7 +37,7 @@ pathway_formsummary_map_order = Table(
     Column('pathway_FormSummary_id', Integer, ForeignKey('pathway_FormSummary_Map.pathway_FormSummary_id'))
 )
 
-class ReferralsDefinition(Base):
+class Pathway(Base):
     __tablename__ = 'pathways'
     pathway_id = Column(Integer, primary_key=True, nullable=False)
     title = Column(String(100), nullable=False)

@@ -14,7 +14,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.models.messaging import Message, Conversation
-from app.schemas.messaging import MessageCreate
+from app.api.schemas.messaging import MessageCreate
 # from datetime import datetime
 
 def create_message(db: Session, message: MessageCreate) -> Message:

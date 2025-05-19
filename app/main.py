@@ -28,9 +28,11 @@ from fastapi import FastAPI
 from app.api.routes import metrics
 from app.dash_app.integration import mount_dash
 from app.api.routes import messaging
+from app.services.primary.aggregator import processDate
 
 app = FastAPI()
 app.include_router(metrics.router, prefix="/api")
 app.include_router(messaging.router, prefix="/api")
 
+processDate()
 mount_dash(app)

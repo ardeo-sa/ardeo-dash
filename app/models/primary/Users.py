@@ -1,8 +1,14 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+user_roles = Table(
+    'user_roles',
+    Base.metadata,
+    Column('user_id', Integer, ForeignKey('user.id'), nullable=True),
+    Column('roleId', Integer, ForeignKey('principal.id'), nullable=False)
+)
 
 class Users(Base):
     __tablename__ = 'users'
@@ -38,5 +44,13 @@ class Users(Base):
     user_surname = Column(String)
     username = Column(String, nullable=False)
     using2FA = Column(String, nullable=False)
+    roles = relationship(
+        "Role",
+        secondary=user_roles,
+        backref="users",
+        lazy="joined"  # eager fetching like FetchType.EAGER
+    )
     organisation_id = Column(Integer, ForeignKey('organisation.id'))
     organisation = relationship('Organisation')
+
+
