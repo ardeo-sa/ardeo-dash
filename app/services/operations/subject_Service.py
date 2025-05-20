@@ -6,14 +6,31 @@ import pandas as pd
 from app.models.primary.Referrals import Referrals
 from app.models.primary.Episode import Episode
 from app.models.primary.Subject import Subject
-from app.models.primary.AfFormData import  AfFormData
+from app.models.primary.AfFormData import AfFormData
 
 
 class subject_Service:
+    """
+    Service class for analytics and metrics related to subjects and their episodes,
+    including admissions, discharges, and length of stay calculations.
+    """
+
     def __init__(self, db: Session):
+        """
+        Initialize the service with a SQLAlchemy session.
+
+        Args:
+            db (Session): SQLAlchemy session object for accessing the database.
+        """
         self.db = db
 
     def _fetch_data(self):
+        """
+        Internal method to fetch and join episode, subject, and referral data.
+
+        Returns:
+            List[Episode]: A list of episode objects with subject and referral joins.
+        """
         cs_data = (
             self.db.query(Episode)
             .join(Subject, Episode.subject_id == Subject.patient_id)
@@ -23,6 +40,12 @@ class subject_Service:
         return cs_data
 
     def admissions_discharges_by_day(self):
+        """
+        Computes the number of admissions and discharges grouped by day.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing dates with counts of admissions and discharges.
+        """
         data = self._fetch_data()
         result = defaultdict(lambda: {"admission": 0, "discharge": 0})
 
@@ -38,6 +61,12 @@ class subject_Service:
         ])
 
     def admissions_discharges_by_week(self):
+        """
+        Computes the number of admissions and discharges grouped by ISO week.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing week labels with counts of admissions and discharges.
+        """
         data = self._fetch_data()
         result = defaultdict(lambda: {"admission": 0, "discharge": 0})
 
@@ -53,6 +82,12 @@ class subject_Service:
         ])
 
     def admissions_discharges_by_month(self):
+        """
+        Computes the number of admissions and discharges grouped by month.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing monthly periods with counts of admissions and discharges.
+        """
         data = self._fetch_data()
         result = defaultdict(lambda: {"admission": 0, "discharge": 0})
 
@@ -68,7 +103,16 @@ class subject_Service:
         ])
 
     def average_length_of_stay(self):
-        # Only discharged cases
+        """
+        Calculates the average length of stay (in days) for discharged episodes,
+        grouped by speciality.
+
+        Length of stay is calculated as the number of days between the episode's start date
+        and the latest modification date of associated form submissions (or episode modified date).
+
+        Returns:
+            pd.DataFrame: A DataFrame with specialities and their corresponding average length of stay.
+        """
         episodes = self.db.query(Episode).filter(Episode.status == "discharged").all()
 
         af_map = defaultdict(list)

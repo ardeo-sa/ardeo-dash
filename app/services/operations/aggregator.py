@@ -1,6 +1,6 @@
 from app.database.primary import PrimarySessionLocal
-from app.services.primary.subject_Service import subject_Service
-from app.services.primary.pathway_Service import pathway_Service
+from app.services.operations.subject_Service import subject_Service
+from app.services.operations.pathway_Service import pathway_Service
 
 
 def processDate():
