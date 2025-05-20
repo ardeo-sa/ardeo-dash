@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-
+from app.models.primary.Users import Users
 from app.models.primary.parser.AfFormDataValuesParser import parse_form_values
 
 Base = declarative_base()
@@ -14,11 +14,11 @@ class AfFormData(Base):
     creation_date = Column(DateTime)
     deleted = Column(String)
     editable = Column(String)
-    afobject_id = Column(Integer)
+    afo_id = Column(Integer)
     guid = Column(String, nullable=False)
     modified_date = Column(DateTime)
     xml = Column(String)
-    carespell_id = Column(Integer)
+    episode_id = Column(Integer)
     locked = Column(String)
     locked_by = Column(String)
     locked_date = Column(DateTime)
