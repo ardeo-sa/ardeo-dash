@@ -7,7 +7,7 @@ user_roles = Table(
     'user_roles',
     Base.metadata,
     Column('user_id', Integer, ForeignKey('user.id'), nullable=True),
-    Column('roleId', Integer, ForeignKey('principal.id'), nullable=False)
+    Column('role_id', Integer, ForeignKey('principal.id'), nullable=False)
 )
 
 class Users(Base):
@@ -45,7 +45,7 @@ class Users(Base):
     username = Column(String, nullable=False)
     using2FA = Column(String, nullable=False)
     roles = relationship(
-        "Role",
+        "Roles",
         secondary=user_roles,
         backref="users",
         lazy="joined"  # eager fetching like FetchType.EAGER

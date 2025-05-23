@@ -68,8 +68,9 @@ class ReferralAdmission(Base):
     discharge_date = Column(Date, nullable=True)  # Date of discharge, if applicable
     referral_status = Column(Enum(ReferralStatusEnum), default=ReferralStatusEnum.PENDING)  # Status of the referral
     referral_type = Column(String, nullable=False)  # e.g., 'In' or 'Out'
-    clinician_id = Column(Integer, ForeignKey('users.id'),
-                          nullable=False)  # Foreign key to clinician handling the referral
+    referring_clinician_id = Column(Integer, ForeignKey('clinician.id'), nullable=False)  # Foreign key to clinician handling the referral
+    receiving_clinician_id = Column(Integer, ForeignKey('clinician.id'))
+    receiving_organisation_id= Column(Integer, ForeignKey('organisation.id'))
     treatment_plan_id = Column(Integer, ForeignKey('treatments.id'), nullable=True)  # If treatment is assigned
     discharge_notes = Column(String, nullable=True)  # Additional notes on discharge
 
@@ -77,6 +78,7 @@ class ReferralAdmission(Base):
     patient = relationship('Patient', back_populates='referral_admissions')
     clinician = relationship('Clinician', back_populates='referral_admissions')
     treatment_plan = relationship('Treatment', back_populates='referral_admissions')
+    organisation = relationship('Organisation', back_populates='referral_admissions')
 
     def __repr__(self):
         return (f"<ReferralAdmission(id={self.id}, patient_id={self.patient_id}, "
