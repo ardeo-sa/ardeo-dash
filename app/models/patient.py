@@ -43,5 +43,4 @@ class Patient(Base):
     admission_date = Column(Date)
     discharge_date = Column(Date)
 
-
     referral_admissions = relationship('ReferralAdmission', back_populates='patient')

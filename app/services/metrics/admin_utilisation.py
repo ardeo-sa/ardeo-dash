@@ -3,7 +3,8 @@ This module defines metrics for administrative and resource utilization, includi
 - Patient-to-clinician ratios
 - Use of diagnostics and treatment slots
 """
-from datetime import date
+from datetime import datetime, date
+from typing import Dict, Any
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -15,7 +16,6 @@ from app.models.clinician import Clinician
 from app.models.imaging import ImagingOrder
 from app.models.lab import LabTestOrder
 from app.models.treatments import TreatmentSlotBooking
-
 
 def calculate_patient_to_clinician_ratio(session: Session, for_date: date = None) -> float:
     """
@@ -67,3 +67,25 @@ def calculate_treatment_slot_utilization(session: Session, for_date: date = None
     return session.query(TreatmentSlotBooking).filter(
         func.date(TreatmentSlotBooking.slot_time) == for_date
     ).count()
+
+
+def aggregate_admin_metrics(session: Session, date_: date = None) -> Dict[str, Any]:
+    """
+    Aggregates key administrative and resource utilization metrics for a given day.
+
+    Args:
+        session (Session): SQLAlchemy session to query the database.
+        date_ (date, optional): Date for which metrics should be calculated. Defaults to today.
+
+    Returns:
+        Dict[str, Any]: Dictionary containing metric names and their computed values.
+    """
+    date_ = date_ or datetime.today().date()
+
+    return {
+        "date": date_,
+        "patient_to_clinician_ratio": calculate_patient_to_clinician_ratio(session, date_),
+        "imaging_utilization": calculate_imaging_utilization(session, date_),
+        "lab_test_utilization": calculate_lab_test_utilization(session, date_),
+        "treatment_slot_utilization": calculate_treatment_slot_utilization(session, date_),
+    }

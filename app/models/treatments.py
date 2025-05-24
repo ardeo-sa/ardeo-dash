@@ -9,7 +9,7 @@ Attributes:
     referral_admissions (list of `ReferralAdmission`): One-to-many relationship to referral admissions associated
     with this treatment plan.
 """
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from app.database.metrics import Base
 

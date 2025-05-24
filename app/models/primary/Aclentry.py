@@ -11,6 +11,6 @@ class Aclentry(Base):
     aclentry_level = Column(Integer, nullable=False)
     acl = Column(Integer, ForeignKey('acl.acl_id'))
     aclentry_principalId = Column(Integer, ForeignKey('principal.principal_id'))
-    aclentry_aclId = Column(Integer, ForeignKey('acl.acl_id'))
-    acl = relationship('Acl')
+    aclentry_aclId = Column(Integer, ForeignKey('aclrelation.acl_id'))
+    aclrelation = relationship('Acl')
     principal = relationship('Principal')
