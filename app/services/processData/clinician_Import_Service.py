@@ -1,8 +1,6 @@
 from sqlalchemy.orm import Session, contains_eager, joinedload
-
 from app.models.clinician import Clinician
-from app.models.primary import Users
-from app.models.primary.Users import user_roles
+from app.models.primary.Users import Users
 
 
 class ClinicianImportService:

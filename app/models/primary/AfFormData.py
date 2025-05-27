@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 from sqlalchemy.orm import relationship
 from app.models.primary.Users import Users
 from app.models.primary.parser.AfFormDataValuesParser import parse_form_values
 
-Base = declarative_base()
+
 
 class AfFormData(Base):
     __tablename__ = 'af_form_data'

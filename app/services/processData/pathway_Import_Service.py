@@ -9,37 +9,14 @@ from app.models.primary import Episode, Subject, Referrals, PathwayFormMap, Path
 
 
 class PathwayImportService:
-    def __init__(self, primary_db: Session, secondary_db: Session):
-        """
-        Initialize the service with primary and secondary SQLAlchemy sessions.
+    class PathwayImportService:
+        def __init__(self, primary_db: Session, secondary_db: Session):
+            self.primary_db = primary_db
+            self.secondary_db = secondary_db
 
-        Args:
-            primary_db (Session): SQLAlchemy session for reading from the source (primary) DB.
-            secondary_db (Session): SQLAlchemy session for writing to the target (secondary) DB.
-        """
-        self.primary_db = primary_db
-        self.secondary_db = secondary_db
-
-    def import_pathway(self):
-        def map_status(episode_status, referral_status):
-            # Episode-based logic
-            if episode_status and episode_status.lower() == "discharged":
-                return PathwayStatusEnum.COMPLETED
-            elif episode_status and episode_status.lower() == "suspended":
-                return PathwayStatusEnum.DROPPED
-            elif episode_status and episode_status.lower() == "active":
-                return PathwayStatusEnum.ACTIVE
-
-            # Fallback to referral status logic
-            if referral_status is not None:
-                if referral_status == ReferralStatusEnum.COMPLETED:
-                    return PathwayStatusEnum.COMPLETED
-                elif referral_status == ReferralStatusEnum.REFERRED_OUT:
-                    return PathwayStatusEnum.DROPPED
-                elif referral_status in (ReferralStatusEnum.PENDING, ReferralStatusEnum.REFERRED_IN):
-                    return PathwayStatusEnum.ACTIVE
-
-            return PathwayStatusEnum.ACTIVE  # Default fallback
+        def import_pathway(self):
+            # If you want to use this as an entry point:
+            self.import_pathway_progress()
 
         def import_pathway_progress(self):
             session = self.primary_db
@@ -84,17 +61,34 @@ class PathwayImportService:
                 .all()
             )
 
+            def map_status(episode_status, referral_status):
+                if episode_status and episode_status.lower() == "discharged":
+                    return PathwayStatusEnum.COMPLETED
+                elif episode_status and episode_status.lower() == "suspended":
+                    return PathwayStatusEnum.DROPPED
+                elif episode_status and episode_status.lower() == "active":
+                    return PathwayStatusEnum.ACTIVE
+
+                if referral_status is not None:
+                    if referral_status == ReferralStatusEnum.COMPLETED:
+                        return PathwayStatusEnum.COMPLETED
+                    elif referral_status == ReferralStatusEnum.REFERRED_OUT:
+                        return PathwayStatusEnum.DROPPED
+                    elif referral_status in (ReferralStatusEnum.PENDING, ReferralStatusEnum.REFERRED_IN):
+                        return PathwayStatusEnum.ACTIVE
+
+                return PathwayStatusEnum.ACTIVE
+
             progress_records = []
             for row in results:
                 status = map_status(row.episode_status, row.referral_status)
-
                 progress = PathwayProgress(
                     id=row.id,
                     patient_id=row.patient_id,
                     steps_total=row.steps_total or 0,
                     steps_completed=row.steps_completed or 0,
                     status=status,
-                    outcome=PathwayOutcomeEnum.UNKNOWN,  # You can adjust this logic
+                    outcome=PathwayOutcomeEnum.UNKNOWN,
                     readmitted=False,
                     admission_time=row.admission_time,
                     treatment_start_time=row.treatment_start_time,

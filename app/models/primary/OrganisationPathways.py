@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+
 
 class OrganisationPathways(Base):
     __tablename__ = 'organisation_pathways'

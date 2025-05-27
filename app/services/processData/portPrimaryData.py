@@ -13,11 +13,12 @@ def portprimarydata():
     clinicianImportService = ClinicianImportService(primary_session,secondary_session)
     clinicianImportService.import_clinician()
 
-    mdtImportService = MdtImportService(primary_session,secondary_session)
-    mdtImportService.import_mdt()
+    # mdtImportService = MdtImportService(primary_session,secondary_session)
+    # mdtImportService.import_mdt()
 
-    pathwayImportService=PathwayImportService(primary_session,secondary_session)
-    pathwayImportService.import_pathway()
 
-    patientImportService = PatientImportService(primary_session, secondary_session)
-    patientImportService.import_patients_and_referrals()
+    # pathwayImportService = PathwayImportService(primary_session, secondary_session)
+    # pathwayImportService.import_pathway()
+    #
+    # patientImportService = PatientImportService(primary_session, secondary_session)
+    # patientImportService.import_patients_and_referrals()

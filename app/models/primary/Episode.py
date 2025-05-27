@@ -1,13 +1,10 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 from sqlalchemy.orm import relationship
 
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 from sqlalchemy.orm import relationship
-
-Base = declarative_base()
-
 
 class Episode(Base):
     __tablename__ = 'episode'
@@ -18,16 +15,16 @@ class Episode(Base):
     speciality = Column(String, nullable=False)
     start_date = Column(DateTime, nullable=False)
     status = Column(String)
-
-    assistant_id = Column(Integer, ForeignKey('assistant.user_id'))
     subject_id = Column(Integer, ForeignKey('subject.subject_id'), nullable=False)
-    primary_specialist_id = Column(Integer, ForeignKey('primary_specialist.user_id'))
 
-    pathway_id = Column(Integer, ForeignKey('pathway.pathway_id'))
     item_index = Column(Integer)
 
-    assistant = relationship("Users", foreign_keys=[assistant_id])
-    primary_specialist = relationship("Users", foreign_keys=[primary_specialist_id])
-    subject = relationship('Subject')
-    pathway = relationship('Pathway')
+    assistant_id = Column(Integer, ForeignKey('users.user_id'))
+    assistant = relationship('Users', foreign_keys=[assistant_id])
 
+    primary_specialist_id = Column(Integer, ForeignKey('users.user_id'))
+    primary_specialist = relationship('Users', foreign_keys=[primary_specialist_id])
+
+    subject = relationship('Subject',foreign_keys=[subject_id])
+    pathway_id = Column(Integer, ForeignKey('pathway.pathway_id'))
+    pathway = relationship('Pathway', foreign_keys=[pathway_id])

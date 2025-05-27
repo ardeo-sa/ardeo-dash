@@ -1,7 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from app.config import Base
 
 class PathwayGroups(Base):
     __tablename__ = 'pathway_groups'

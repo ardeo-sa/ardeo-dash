@@ -1,13 +1,13 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Table
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+# Now that 'roles' table is defined, define the association table
 user_roles = Table(
     'user_roles',
     Base.metadata,
-    Column('user_id', Integer, ForeignKey('user.id'), nullable=True),
-    Column('role_id', Integer, ForeignKey('principal.id'), nullable=False)
+    Column('user_id', Integer, ForeignKey('users.user_id'), nullable=False),
+    Column('role_id', Integer, ForeignKey('roles.role_id'), nullable=False)
 )
 
 class Users(Base):
@@ -44,13 +44,6 @@ class Users(Base):
     user_surname = Column(String)
     username = Column(String, nullable=False)
     using2FA = Column(String, nullable=False)
-    roles = relationship(
-        "Roles",
-        secondary=user_roles,
-        backref="users",
-        lazy="joined"  # eager fetching like FetchType.EAGER
-    )
+    roles = relationship("Roles", secondary=user_roles, backref="users", lazy="joined")  # eager fetching like FetchType.EAGER)
     organisation_id = Column(Integer, ForeignKey('organisation.id'))
     organisation = relationship('Organisation')
-
-

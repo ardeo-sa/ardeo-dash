@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 
-Base = declarative_base()
+
 
 class ContactBase(Base):
     __tablename__ = 'contact_base'

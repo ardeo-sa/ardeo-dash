@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship, declarative_base
 
 from app.models.primary.parser.BandingDataParser import parse_banding_data
 
-Base = declarative_base()
+
 
 class AFObject(Base):
     __tablename__ = 'af_object'
