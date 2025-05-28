@@ -2,9 +2,8 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from app.config import Base
 from sqlalchemy.orm import relationship
 
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from app.config import Base
-from sqlalchemy.orm import relationship
+from app.models.primary import Pathway
+
 
 class Episode(Base):
     __tablename__ = 'episode'
@@ -26,5 +25,5 @@ class Episode(Base):
     primary_specialist = relationship('Users', foreign_keys=[primary_specialist_id])
 
     subject = relationship('Subject',foreign_keys=[subject_id])
-    pathway_id = Column(Integer, ForeignKey('pathway.pathway_id'))
-    pathway = relationship('Pathway', foreign_keys=[pathway_id])
+    pathway_id = Column(Integer, ForeignKey('pathway.id'))
+    pathway = relationship(Pathway)

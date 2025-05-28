@@ -3,13 +3,13 @@ from collections import defaultdict
 from datetime import datetime
 import pandas as pd
 
+from app.models.primary import pathway_form_map
 from app.models.primary.Referrals import Referrals
 from app.models.primary.Subject import Subject
 from app.models.primary.Episode import Episode
-from app.models.primary.PathwayFormMap import PathwayFormMap
 from app.models.primary.AfFormData import AfFormData
 from app.models.primary.PathwayForms import PathwayForms
-from app.models.primary.PathwayFormSummaryMapOrder import PathwayFormSummaryMapOrder
+from app.models.primary.Pathway import pathway_formsummary_map_order
 from app.models.primary.PathwayFormSummaryMap import PathwayFormSummaryMap
 
 
@@ -45,7 +45,7 @@ class pathway_Service:
         episodes = self.db.query(Episode).join(Subject).all()
         referrals = self.db.query(Referrals).all()
         af_forms = self.db.query(AfFormData).all()
-        pfm = self.db.query(PathwayFormMap).all()
+        pfm = self.db.query(pathway_form_map).all()
         pathway_forms = self.db.query(PathwayForms).filter(PathwayForms.isMandatory == True).all()
 
         # Create lookups
@@ -113,7 +113,7 @@ class pathway_Service:
         """
         episodes = self.db.query(Episode).filter(Episode.start_date.isnot(None)).all()
         referrals = self.db.query(Referrals).all()
-        pfmo_all = self.db.query(PathwayFormSummaryMapOrder).all()
+        pfmo_all = self.db.query(pathway_formsummary_map_order).all()
         pfsm_all = self.db.query(PathwayFormSummaryMap).all()
         af_forms = self.db.query(AfFormData).all()
 

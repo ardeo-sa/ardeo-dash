@@ -2,8 +2,6 @@ from sqlalchemy import Column, Integer, ForeignKey
 from app.config import Base
 from sqlalchemy.orm import relationship
 
-
-
 class RoleMenuitem(Base):
     __tablename__ = 'role_menuitem'
 

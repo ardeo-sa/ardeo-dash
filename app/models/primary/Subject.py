@@ -2,8 +2,6 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from app.config import Base
 from sqlalchemy.orm import relationship
 
-
-
 class Subject(Base):
     __tablename__ = 'subject'
 

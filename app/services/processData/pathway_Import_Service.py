@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.admissions import ReferralStatusEnum
 from app.models.pathway import PathwayStatusEnum, PathwayOutcomeEnum, PathwayProgress
-from app.models.primary import Episode, Subject, Referrals, PathwayFormMap, Pathway, PathwayForms,AfFormData
+from app.models.primary import Episode, Subject, Referrals, Pathway, PathwayForms, AfFormData, pathway_form_map
 
 
 class PathwayImportService:
@@ -29,7 +29,7 @@ class PathwayImportService:
                     Episode.modified_date.label("modified_date"),
                     Episode.status.label("episode_status"),
                     Referrals.referral_status.label("referral_status"),
-                    func.count(distinct(PathwayFormMap.formsSet_KEY)).label("steps_total"),
+                    func.count(distinct(pathway_form_map.formsSet_KEY)).label("steps_total"),
                     func.count(distinct(AfFormData.afo_id)).label("steps_completed"),
                     func.min(AfFormData.creation_date).label("treatment_start_time"),
                     func.max(AfFormData.creation_date).label("treatment_end_time"),
@@ -45,10 +45,10 @@ class PathwayImportService:
                     Pathway.pathway_id == Episode.pathway_id,
                     Pathway.pathway_id == Referrals.pathway_id
                 ))
-                .join(PathwayFormMap, PathwayFormMap.pathway_id.in_([
+                .join(pathway_form_map, pathway_form_map.pathway_id.in_([
                     Episode.pathway_id, Referrals.pathway_id
                 ]))
-                .join(PathwayForms, PathwayForms.pathway_form_id == PathwayFormMap.formsSet_KEY)
+                .join(PathwayForms, PathwayForms.pathway_form_id == pathway_form_map.formsSet_KEY)
                 .outerjoin(AfFormData, and_(
                     AfFormData.episode_id == Episode.episode_id,
                     AfFormData.afo_id == PathwayForms.afobject_id

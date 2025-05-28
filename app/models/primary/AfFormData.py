@@ -1,10 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from app.config import Base
 from sqlalchemy.orm import relationship
-from app.models.primary.Users import Users
 from app.models.primary.parser.AfFormDataValuesParser import parse_form_values
-
-
 
 class AfFormData(Base):
     __tablename__ = 'af_form_data'
@@ -25,8 +22,8 @@ class AfFormData(Base):
     referral_id = Column(Integer)
     created_user = Column(Integer, ForeignKey('users.user_id'))
     modified_user = Column(Integer, ForeignKey('users.user_id'))
-    users = relationship('Users')
-
+    createdUser = relationship('Users', foreign_keys=[created_user])
+    modifiedUser = relationship('Users', foreign_keys=[modified_user])
     @property
     def values(self):
         return parse_form_values(self.xml)

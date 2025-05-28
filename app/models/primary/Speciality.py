@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from app.config import Base
 
-
-
 class Speciality(Base):
     __tablename__ = 'speciality'
 

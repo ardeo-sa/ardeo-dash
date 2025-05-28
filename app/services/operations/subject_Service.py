@@ -33,7 +33,7 @@ class subject_Service:
         """
         cs_data = (
             self.db.query(Episode)
-            .join(Subject, Episode.subject_id == Subject.patient_id)
+            .join(Subject, Episode.subject_id == Subject.subject_id)
             .join(Referrals, Episode.episode_id == Referrals.episode_id)
             .all()
         )
