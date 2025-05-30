@@ -4,76 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0a187a5a-2e72-4c2a-af1a-6753036dab1f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/app/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/AccountRequests.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/AccountRequests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Acl.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Acl.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/AclGroup.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/AclGroup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/AclPrincipal.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/AclPrincipal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Aclentry.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Aclentry.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Address.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Address.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Addresses.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Addresses.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/AfFormData.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/AfFormData.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/AfObject.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/AfObject.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/AuditLog.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/AuditLog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/CareProvider.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/CareProvider.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/ContactBase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/ContactBase.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Documents.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Documents.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Episode.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Episode.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/FormSequence.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/FormSequence.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/GpList.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/GpList.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/IdentifierContext.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/IdentifierContext.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Identifiers.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Identifiers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/IepImageRequest.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/IepImageRequest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/ImageTransferLog.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/ImageTransferLog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/ImageTransferMapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/ImageTransferMapping.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/ImageTransferMethod.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/ImageTransferMethod.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/ImagingStatus.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/ImagingStatus.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/JwtTokens.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/JwtTokens.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/MenuItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/MenuItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/NamedList.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/NamedList.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Organisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Organisation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/OrganisationPathways.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/OrganisationPathways.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/OtpInfo.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/OtpInfo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Pacs.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Pacs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PacsOrganisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PacsOrganisation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Pair.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Pair.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PasswordRequests.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PasswordRequests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Pathway.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Pathway.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PathwayFormMap.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PathwayFormMap.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PathwayFormSummaryMap.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PathwayFormSummaryMap.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PathwayFormSummaryMapOrder.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PathwayFormSummaryMapOrder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PathwayForms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PathwayForms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PathwayGroups.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PathwayGroups.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PathwayGroupsMap.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PathwayGroupsMap.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PathwayGroupsMapOrder.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PathwayGroupsMapOrder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PathwaySummaries.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PathwaySummaries.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PathwayUsers.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PathwayUsers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/PatientCareProviders.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/PatientCareProviders.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Program.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/ProgramSubject.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/ProgramSubject.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/ProviderDetails.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/ProviderDetails.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Referrals.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Referrals.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/RoleMenuitem.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/RoleMenuitem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Roles.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Roles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/ServiceTransactionInfo.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/ServiceTransactionInfo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Speciality.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Speciality.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Subject.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Subject.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/SubjectNotes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/SubjectNotes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Summary.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Summary.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/SummaryField.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/SummaryField.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/SummaryForm.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/SummaryForm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/SupportingStaff.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/SupportingStaff.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/SystemOptionKeyvalue.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/SystemOptionKeyvalue.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/UserSpeciality.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/UserSpeciality.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/Users.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/Users.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/primary/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/primary/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/metrics/admin_utilisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/metrics/admin_utilisation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/processData/clinician_Import_Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/processData/clinician_Import_Service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/processData/pathway_Import_Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/processData/pathway_Import_Service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/processData/portPrimaryData.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/processData/portPrimaryData.py" afterDir="false" />
-    </list>
+    <list default="true" id="0a187a5a-2e72-4c2a-af1a-6753036dab1f" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -114,7 +45,7 @@
     "Python.run.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "911-Process-data-924-Create-secondary-schema",
+    "git-widget-placeholder": "fix/app-declutter",
     "last_opened_file_path": "D:/ArdeoPythonWorkSpace/emdt-dash/app/models/primary",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
@@ -142,7 +73,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 (emdt-dash)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
