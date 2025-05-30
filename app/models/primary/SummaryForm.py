@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+
 
 class SummaryForm(Base):
     __tablename__ = 'summary_form'

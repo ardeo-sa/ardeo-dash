@@ -25,7 +25,7 @@ from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import registry
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 from sqlalchemy.orm import relationship, declarative_mixin, declared_attr
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import Mapped
@@ -40,7 +40,7 @@ from sqlalchemy.orm import composite
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.mutable import MutableDict
 
-Base = declarative_base()
+
 
 class AclPrincipal(Base):
     __tablename__ = 'principal'

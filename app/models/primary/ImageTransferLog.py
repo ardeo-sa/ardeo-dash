@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 
-Base = declarative_base()
+
 
 class ImageTransferLog(Base):
     __tablename__ = 'image_transfer_log'

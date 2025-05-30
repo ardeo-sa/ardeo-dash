@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 
-Base = declarative_base()
+
 
 class PasswordRequests(Base):
     __tablename__ = 'password_requests'

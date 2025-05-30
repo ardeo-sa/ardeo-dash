@@ -39,8 +39,9 @@ class Patient(Base):
     __tablename__ = "patients"
 
     id = Column(Integer, primary_key=True, index=True)
+    primary_guid= Column(String, nullable=False)
     name = Column(String)
     admission_date = Column(Date)
     discharge_date = Column(Date)
-
+    status=Column(String)
     referral_admissions = relationship('ReferralAdmission', back_populates='patient')

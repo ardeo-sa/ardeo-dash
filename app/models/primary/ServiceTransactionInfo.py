@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 from sqlalchemy.orm import relationship
-
-Base = declarative_base()
 
 class ServiceTransactionInfo(Base):
     __tablename__ = 'service_transaction_info'

@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+
 
 class Referrals(Base):
     __tablename__ = 'referrals'
@@ -32,11 +32,13 @@ class Referrals(Base):
     team = Column(String)
     tracking = Column(String)
     episode_id = Column(Integer, ForeignKey('episode.episode_id'), nullable=False)
-    pathway_id = Column(Integer, ForeignKey('pathway.pathway_id'))
+    pathway_id = Column(Integer, ForeignKey('pathway.id'))
     referred_from_user_id = Column(Integer, ForeignKey('users.user_id'))
     referred_to_user_id = Column(Integer, ForeignKey('users.user_id'))
     referring_specialist_user_id = Column(Integer, ForeignKey('users.user_id'))
     child_index = Column(Integer)
     episode = relationship('Episode')
     pathway = relationship('Pathway')
-    users = relationship('Users')
+    referred_from_user = relationship('Users', foreign_keys=[referred_from_user_id])
+    referred_to_user =relationship('Users', foreign_keys=[referred_to_user_id])
+    referring_specialist_user= relationship('Users',foreign_keys=[referring_specialist_user_id])

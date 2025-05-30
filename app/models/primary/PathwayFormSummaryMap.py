@@ -1,11 +1,8 @@
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from app.config import Base
 
 class PathwayFormSummaryMap(Base):
     __tablename__ = 'pathway_form_summary_map'
-
     pathway_FormSummary_id = Column(Integer, primary_key=True, nullable=False)
     afobject_id = Column(Integer)
     form_or_summary_name = Column(String)
