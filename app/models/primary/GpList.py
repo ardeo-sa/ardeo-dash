@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 
-Base = declarative_base()
+
 
 class GpList(Base):
     __tablename__ = 'gp_list'

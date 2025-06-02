@@ -28,11 +28,12 @@ from fastapi import FastAPI
 from app.api.routes import metrics
 from app.dash_app.integration import mount_dash
 from app.api.routes import messaging
-from app.services.operations.aggregator import processDate
+from app.services.processData.portPrimaryData import portprimarydata
+from app.services.operations.aggregator import process_data
 
 app = FastAPI()
 app.include_router(metrics.router, prefix="/api")
 app.include_router(messaging.router, prefix="/api")
-
-processDate()
+portprimarydata()
+process_data()
 mount_dash(app)

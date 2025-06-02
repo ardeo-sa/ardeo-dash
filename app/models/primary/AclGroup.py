@@ -1,9 +1,9 @@
 from sqlalchemy.orm import relationship
 
-from app.models.primary import AclPrincipal
+from app.config import Base
 
 
-class AclGroup(Principal):
+class AclGroup(Base):
     __mapper_args__ = {
         'polymorphic_identity': 'group',
     }

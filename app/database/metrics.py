@@ -27,8 +27,8 @@ def get_metrics_engine():
     return create_engine(METRICS_DB_URI, echo=True)
 
 
-metrics_engine = None
-MetricsSessionLocal = None
+metrics_engine = get_metrics_engine()
+MetricsSessionLocal =sessionmaker(autocommit=False, autoflush=False, bind=metrics_engine)
 
 def init_metrics_db():
     """

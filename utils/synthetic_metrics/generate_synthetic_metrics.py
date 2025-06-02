@@ -6,6 +6,7 @@ Saves them to a SQLite database matching the OperationalMetrics schema.
 """
 import argparse
 import random
+import pandas as pd
 from datetime import datetime, timedelta
 
 from sqlalchemy import create_engine, Column, Integer, String, Float, Date
@@ -14,50 +15,83 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 Base = declarative_base()
 
 
-class OperationalMetrics(Base):
+class GeneratedMetrics(Base):
     """
-    Represents operational metrics for a healthcare facility.
+    Represents generated hospital metrics (operational or pathway).
     """
-    __tablename__ = "operational_metrics"
+    __tablename__ = "generated_metrics"
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date)
     metric_name = Column(String)
     value = Column(Float)
     unit = Column(String)
-
+    metric_type = Column(String)
 
 def generate_metrics_for_day(date_, total_beds):
     """
-    Generate realistic operational metrics for a single day.
-
-    Args:
-        date_ (datetime.date): The date of the metric.
-        total_beds (int): Total number of hospital beds.
+    Generate realistic synthetic metrics for a given date.
 
     Returns:
-        list of OperationalMetrics: Synthetic metrics for that date.
+        List[GeneratedMetrics]: All metrics for the day.
     """
+
+    # --- Operational metrics ---
     admissions = random.randint(30, 70)
     discharges = max(20, admissions - random.randint(0, 10))
     avg_los = round(random.uniform(3.5, 7.0), 2)
     mdt_wait = round(random.uniform(1.0, 4.5), 2)
     readmission_rate = round(random.uniform(5.0, 12.0), 2)
     no_show_rate = round(random.uniform(3.0, 10.0), 2)
-    occupancy_rate = round(min(100.0, (random.uniform(0.75, 0.95) * total_beds / total_beds) * 100), 2)
+    occupancy_rate = round(random.uniform(75.0, 95.0), 2)
     admit_to_treatment = round(random.uniform(0.5, 2.5), 2)
 
-    return [
-        OperationalMetrics(date=date_, metric_name="daily_admissions", value=admissions, unit="count"),
-        OperationalMetrics(date=date_, metric_name="daily_discharges", value=discharges, unit="count"),
-        OperationalMetrics(date=date_, metric_name="average_length_of_stay", value=avg_los, unit="days"),
-        OperationalMetrics(date=date_, metric_name="average_mdt_wait_time", value=mdt_wait, unit="hours"),
-        OperationalMetrics(date=date_, metric_name="readmission_rate_30d", value=readmission_rate, unit="percent"),
-        OperationalMetrics(date=date_, metric_name="appointment_no_show_rate", value=no_show_rate, unit="percent"),
-        OperationalMetrics(date=date_, metric_name="bed_occupancy_rate", value=occupancy_rate, unit="percent"),
-        OperationalMetrics(date=date_, metric_name="admission_to_treatment_start",
-                           value=admit_to_treatment, unit="days"),
+    operational_metrics = [
+        ("daily_admissions", admissions, "count"),
+        ("daily_discharges", discharges, "count"),
+        ("average_length_of_stay", avg_los, "days"),
+        ("average_mdt_wait_time", mdt_wait, "hours"),
+        ("readmission_rate_30d", readmission_rate, "percent"),
+        ("appointment_no_show_rate", no_show_rate, "percent"),
+        ("bed_occupancy_rate", occupancy_rate, "percent"),
+        ("admission_to_treatment_start", admit_to_treatment, "days"),
     ]
+
+    # --- Pathway metrics ---
+    adherence_rate = round(random.uniform(70.0, 90.0), 2)
+    dropout_rate = round(random.uniform(5.0, 15.0), 2)
+    success_rate = round(random.uniform(75.0, 95.0), 2)
+    failure_rate = 100.0 - success_rate
+    readmission_rate_pw = round(random.uniform(5.0, 12.0), 2)
+    admit_to_treatment_pw = round(random.uniform(0.5, 2.5), 2)
+    diagnosis_to_treatment = round(random.uniform(1.0, 4.0), 2)
+    treatment_duration = round(random.uniform(5.0, 14.0), 2)
+    complication_rate = round(random.uniform(3.0, 10.0), 2)
+    relapse_rate = round(random.uniform(2.0, 8.0), 2)
+
+    pathway_metrics = [
+        ("pathway_adherence_rate", adherence_rate, "percent"),
+        ("pathway_dropout_rate", dropout_rate, "percent"),
+        ("pathway_success_rate", success_rate, "percent"),
+        ("pathway_failure_rate", failure_rate, "percent"),
+        ("pathway_readmission_rate", readmission_rate_pw, "percent"),
+        ("pathway_admit_to_treatment_time", admit_to_treatment_pw, "days"),
+        ("pathway_diagnosis_to_treatment_time", diagnosis_to_treatment, "days"),
+        ("pathway_treatment_duration", treatment_duration, "days"),
+        ("pathway_complication_rate", complication_rate, "percent"),
+        ("pathway_relapse_rate", relapse_rate, "percent"),
+    ]
+
+    # Create GeneratedMetrics objects
+    results = [
+        GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="operational")
+        for name, value, unit in operational_metrics
+    ] + [
+        GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="pathway")
+        for name, value, unit in pathway_metrics
+    ]
+
+    return results
 
 
 def main():
@@ -65,6 +99,7 @@ def main():
     parser.add_argument("--days", type=int, default=30, help="Number of days of data to generate")
     parser.add_argument("--beds", type=int, default=100, help="Total number of hospital beds")
     parser.add_argument("--db", type=str, default="sqlite:///synthetic_metrics.db", help="Database URL")
+    parser.add_argument("--csv", type=str, default="synthetic_metrics.csv", help="Output CSV file name.")
     args = parser.parse_args()
 
     engine = create_engine(args.db, echo=False)
@@ -74,13 +109,29 @@ def main():
     Base.metadata.create_all(engine)
 
     today = datetime.today().date()
+
+    all_metrics = []
+
+
     for i in range(args.days):
         date_ = today - timedelta(days=i)
-        metrics = generate_metrics_for_day(date_, args.beds)
-        session.add_all(metrics)
+        daily_metrics = generate_metrics_for_day(date_, args.beds)
+        session.add_all(daily_metrics)
+        all_metrics.extend(daily_metrics)
 
     session.commit()
-    print(f"Generated {args.days} days of metrics in {args.db}")
+    print(f"Inserted {len(all_metrics)} metrics across {args.days} days into {args.db}")
+
+    # Save to CSV
+    df = pd.DataFrame([{
+        "date": m.date,
+        "metric_name": m.metric_name,
+        "value": m.value,
+        "unit": m.unit,
+        "metric_type": m.metric_type
+    } for m in all_metrics])
+    df.to_csv(args.csv, index=False)
+    print(f"Exported to CSV: {args.csv}")
 
 
 if __name__ == "__main__":

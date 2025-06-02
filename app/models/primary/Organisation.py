@@ -1,12 +1,9 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from app.config import Base
 from sqlalchemy.orm import relationship
-
-Base = declarative_base()
 
 class Organisation(Base):
     __tablename__ = 'organisation'
-
     id = Column(Integer, primary_key=True, nullable=False)
     address = Column(String)
     is_central_hub = Column(String)
@@ -19,4 +16,4 @@ class Organisation(Base):
     postcode = Column(String)
     hosts_virtual_mdm = Column(String)
     context_id = Column(Integer, ForeignKey('identifier_context.context_id'))
-    identifier_context = relationship('Identifier_context')
+    identifier_context = relationship('IdentifierContext')

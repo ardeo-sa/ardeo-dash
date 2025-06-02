@@ -37,6 +37,7 @@ class MDTMeeting(Base):
     __tablename__ = "mdt_meetings"
 
     id = Column(Integer, primary_key=True)
+    primary_guid= Column(String, nullable=False)
     meeting_time = Column(DateTime)
     referral_time = Column(DateTime)
     review_time = Column(DateTime)

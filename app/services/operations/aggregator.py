@@ -3,7 +3,7 @@ from app.services.operations.subject_Service import subject_Service
 from app.services.operations.pathway_Service import pathway_Service
 
 
-def processDate():
+def process_data():
     session = PrimarySessionLocal()
 
     subject_service = subject_Service(session)
