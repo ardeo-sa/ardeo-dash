@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session, contains_eager, joinedload
 from app.models.clinician import Clinician
+from app.models.primary import Organisation as PrimaryOrganisation
+from app.models import Organisation as MetricOrganisation
 from app.models.primary.Users import Users
 
-class ClinicianImportService:
+class OrganisationImportService:
     def __init__(self, primary_db: Session, secondary_db: Session):
         """
         Initialize the service with primary and secondary SQLAlchemy sessions.
@@ -14,29 +16,21 @@ class ClinicianImportService:
         self.primary_db = primary_db
         self.secondary_db = secondary_db
 
-    def import_clinician(self):
+    def import_organisation(self):
         # Query all users with their roles (ORM style)
-        users = self.primary_db.query(Users).outerjoin(Users.roles).all()
+        organisations = self.primary_db.query(PrimaryOrganisation).outerjoin(Users.roles).all()
 
-        clinicians = {}
+        organisationsmetric = {}
 
-        for user in users:
-            clinician = Clinician(
-                id=user.user_id,
-                name=user.username
+        for org in organisations:
+            metricorg = MetricOrganisation(
+                id=org.id,
+                name = org.name,
+                code = org.code
             )
+            organisationsmetric[org.id] = metricorg
 
-            # Collect role values as strings
-            role_values = [
-                role.value
-                for role in user.roles
-                if role is not None
-            ]
-            clinician.user_role = list(set(role_values))  # Deduplicate roles
-
-            clinicians[user.user_id] = clinician
-
-        self.secondary_db.add_all(clinicians.values())
+        self.secondary_db.add_all(organisationsmetric.values())
         self.secondary_db.commit()
 
 

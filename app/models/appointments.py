@@ -34,8 +34,8 @@ class Appointment(Base):
     cancelled = Column(Boolean)
 
     # Relationships
-    patient = relationship('Patient', back_populates='appointments')  # Links to Patient model
-    clinician = relationship('Clinician', back_populates='appointments')  # If Clinician model exists
+    patient = relationship('Patient', foreign_keys=[patient_id])# Links to Patient model
+    # clinician = relationship('Clinician', back_populates='appointments')  # If Clinician model exists
 
     def __repr__(self):
         return f"<Appointment(id={self.id}, patient_id={self.patient_id}, scheduled_time={self.scheduled_time})>"

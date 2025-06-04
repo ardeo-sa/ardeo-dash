@@ -40,9 +40,9 @@ pathway_summaries = Table(
     Column('summary_name', String),
 )
 pathway_formsummary_map_order = Table(
-    'pathway_FormSummary_map_order', Base.metadata,
+    'pathway_form_summary_map_order', Base.metadata,
     Column('pathway_id', Integer, ForeignKey('pathway.id'), primary_key=True),
-    Column('pathway_form_summary_id', Integer, ForeignKey('pathway_form_summary_map.pathway_FormSummary_id'), primary_key=True),
+    Column('pathway_form_summary_id', Integer, ForeignKey('pathway_form_summary_map.pathway_form_summary_id'), primary_key=True),
     Column('child_index', Integer)
 )
 

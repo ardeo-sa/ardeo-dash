@@ -64,10 +64,10 @@ class MDTParticipant(Base):
 
     id = Column(Integer, primary_key=True)
     meeting_id = Column(Integer, ForeignKey("mdt_meetings.id"))
-    clinician_id = Column(Integer, ForeignKey("users.id"))
+    clinician_id = Column(Integer, ForeignKey("clinician.id"))
 
     meeting = relationship("MDTMeeting", back_populates="participants")
-
+    clinician = relationship('Clinician', foreign_keys=[clinician_id] )
 
 class MDTAction(Base):
     """

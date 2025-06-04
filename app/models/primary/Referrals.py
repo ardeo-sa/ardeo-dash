@@ -42,3 +42,4 @@ class Referrals(Base):
     referred_from_user = relationship('Users', foreign_keys=[referred_from_user_id])
     referred_to_user =relationship('Users', foreign_keys=[referred_to_user_id])
     referring_specialist_user= relationship('Users',foreign_keys=[referring_specialist_user_id])
+
