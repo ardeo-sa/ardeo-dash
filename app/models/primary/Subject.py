@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 
 class Subject(Base):
     __tablename__ = 'subject'
-
     subject_id = Column(Integer, primary_key=True, nullable=False)
     address = Column(String)
     patient_admitting_physician = Column(Integer)

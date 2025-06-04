@@ -3,7 +3,8 @@ from app.config import Base
 
 class PathwayFormSummaryMap(Base):
     __tablename__ = 'pathway_form_summary_map'
-    pathway_FormSummary_id = Column(Integer, primary_key=True, nullable=False)
+
+    pathway_form_summary_id = Column(Integer, primary_key=True, nullable=False)
     afobject_id = Column(Integer)
     form_or_summary_name = Column(String)
     group_name = Column(String, nullable=False)

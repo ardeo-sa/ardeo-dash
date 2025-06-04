@@ -34,7 +34,7 @@ class Treatment(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
-    referral_admissions = relationship('ReferralAdmission', back_populates='treatment_plan')
+    # referral_admissions = relationship('ReferralAdmission', back_populates='treatment_plan')
     slot_bookings = relationship('TreatmentSlotBooking', back_populates='treatment')
 
 

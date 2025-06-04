@@ -71,14 +71,19 @@ class ReferralAdmission(Base):
     referring_clinician_id = Column(Integer, ForeignKey('clinician.id'), nullable=False)  # Foreign key to clinician handling the referral
     receiving_clinician_id = Column(Integer, ForeignKey('clinician.id'))
     receiving_organisation_id= Column(Integer, ForeignKey('organisation.id'))
-    treatment_plan_id = Column(Integer, ForeignKey('treatments.id'), nullable=True)  # If treatment is assigned
+    # treatment_plan_id = Column(Integer, ForeignKey('treatments.id'), nullable=True)  # If treatment is assigned
+    pathway_id = Column(Integer, ForeignKey('pathway_progress.id'))
     discharge_notes = Column(String, nullable=True)  # Additional notes on discharge
 
     # Relationships
+    receiving_clinician = relationship('Clinician', foreign_keys=[receiving_clinician_id],
+                                       back_populates='referrals_received')
+    referring_clinician = relationship('Clinician', foreign_keys=[referring_clinician_id],
+                                       back_populates='referrals_made')
     patient = relationship('Patient', back_populates='referral_admissions')
-    clinician = relationship('Clinician', back_populates='referral_admissions')
-    treatment_plan = relationship('Treatment', back_populates='referral_admissions')
-    organisation = relationship('Organisation', back_populates='referral_admissions')
+    # treatment_plan = relationship('Treatment', back_populates='referral_admissions')
+    pathwayProgress = relationship('PathwayProgress')
+    organisation = relationship('Organisation', foreign_keys=[receiving_organisation_id])
 
     def __repr__(self):
         return (f"<ReferralAdmission(id={self.id}, patient_id={self.patient_id}, "
