@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session, contains_eager, joinedload
 from app.models.clinician import Clinician
 from app.models.primary.Users import Users
 
+""" users from primary database is copied to clinician table of metrics database """
 class ClinicianImportService:
     def __init__(self, primary_db: Session, secondary_db: Session):
         """
@@ -15,6 +16,7 @@ class ClinicianImportService:
         self.secondary_db = secondary_db
 
     def import_clinician(self):
+        """ username and roles(as concatenated string)  are fetched and stored from primary db to metrics db """
         # Query all users with their roles (ORM style)
         users = self.primary_db.query(Users).outerjoin(Users.roles).all()
 

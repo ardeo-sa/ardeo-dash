@@ -6,7 +6,7 @@ from app.models.primary.Episode import Episode
 from app.models.primary.Subject import Subject
 from app.models.primary.Referrals import Referrals
 
-
+""" pathient details, treatement used and referrals  from primary database is ported to  patient and referral_admissions table of metrics database """
 class PatientImportService:
     def __init__(self, primary_db: Session, secondary_db: Session):
         """

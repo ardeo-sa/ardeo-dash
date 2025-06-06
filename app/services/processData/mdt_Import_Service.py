@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models.mdt import MDTMeeting, MDTParticipant, MDTAction, MDTCase
 
-
+""" meeting details are updated to metrics database  via services #todo"""
 class MdtImportService:
     def __init__(self, primary_db: Session, secondary_db: Session):
         """

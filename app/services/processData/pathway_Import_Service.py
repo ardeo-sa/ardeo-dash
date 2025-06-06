@@ -13,7 +13,7 @@ from app.models.primary.PathwayForms import PathwayForms
 from app.models.primary.AfFormData import AfFormData
 from app.models.primary.Pathway import pathway_form_map
 
-
+""" pathway details from primary database is ported to  pathway table of metrics database """
 class PathwayImportService:
     def __init__(self, primary_db: Session, secondary_db: Session):
         self.primary_db = primary_db

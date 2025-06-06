@@ -11,6 +11,49 @@ user_roles = Table(
 )
 
 class Users(Base):
+    """
+    Represents users within the system, storing user details, authentication information,
+    and role assignments.  This model is central to managing user accounts and access control.
+
+    Attributes:
+    user_id : int  Unique identifier for the user.
+    accountNonExpired : str  Flag indicating if the account is not expired ("Yes" or "No").
+    accountNonLocked : str  Flag indicating if the account is not locked ("Yes" or "No").
+    user_can_edit : str  Flag indicating if the user can edit their profile ("Yes" or "No").
+    creation_date : datetime  Date and time when the user account was created.
+    credentialsNonExpired : str    Flag indicating if user credentials are not expired ("Yes" or "No").
+    dateAccountExpires : datetime Date when the user account expires (if applicable).
+    datePasswordLastChanged : datetime  Date when the user's password was last changed.
+    deleted : str  Flag indicating if the user account is deleted ("Yes" or "No").
+    email : str  User's email address.
+    email_verified : str   Flag indicating if the user's email address is verified ("Yes" or "No").
+    enabled : str  Flag indicating if the user account is enabled ("Yes" or "No").
+    enforceStrongPassword : str  Flag indicating if strong password enforcement is enabled for the user ("Yes" or "No").
+    external_ldap_user_id : str Identifier for the user in an external LDAP system (if applicable).
+    user_forename : str  User's first name.
+    google_user : str  Flag indicating if the user is authenticated via Google ("Yes" or "No").
+    guid : str Globally unique identifier for the user.
+    is_subject : str Flag indicating if the user is also a subject (patient) ("Yes" or "No").
+    ldap_user : str   Flag indicating if the user is managed via LDAP ("Yes" or "No").
+    user_middlename : str  User's middle name.
+    modified_date : datetime  Date and time when the user record was last modified.
+    user_nickname : str  User's nickname.
+    password : str  User's password (stored securely!).
+    passwordCanExpire : str Flag indicating if the user's password can expire ("Yes" or "No").
+    user_prefix : str User's prefix (e.g., "Dr.").
+    profileImagePath : str   Path to the user's profile image.
+    secret : str  Secret value (e.g., for 2FA).
+    user_suffix : str  User's suffix (e.g., "Jr.").
+    user_surname : str  User's surname.
+    username : str  User's username.
+    using2FA : str  Flag indicating if the user is using 2FA ("Yes" or "No").
+    organisation_id : int Foreign key linking to the Organisation model.
+
+    Relationships:
+    roles :  Many-to-many relationship with Roles, defining the user's roles.  Uses the `user_roles` association table.
+    organisation : Relationship with the Organisation model.
+
+    """
     __tablename__ = 'users'
 
     user_id = Column(Integer, primary_key=True, nullable=False)
