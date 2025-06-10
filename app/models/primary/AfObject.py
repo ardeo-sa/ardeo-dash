@@ -8,6 +8,62 @@ from app.models.primary.parser.BandingDataParser import parse_banding_data
 
 
 class AFObject(Base):
+    """
+    Serves as the base model for form objects, providing common attributes and polymorphic behavior for various form-related entities.
+    Attributes:
+    afo_id : int
+        Unique identifier for the form object.
+    afo_type : int
+        Type identifier for polymorphic differentiation.
+    afo_h_align : str
+        Horizontal alignment setting.
+    afo_v_align : str
+        Vertical alignment setting.
+    afo_alignment : str
+        General alignment configuration.
+    afo_bg_colour : str
+        Background color of the object.
+    afo_colour_code : str
+        Color code for additional customization.
+    afo_creation_date : datetime
+        Date and time of creation.
+    afo_description : str
+        Description of the form object.
+    afo_domain : str
+        Domain context of the form object.
+    field_label_position : str
+        Position of the field label.
+    afo_height : int
+        Height dimension of the object.
+    afo_label : str
+        Label associated with the form object.
+    afo_label_align : str
+        Alignment for the label.
+    afo_label_type : str
+        Type of the label.
+    afo_label_url : str
+        URL associated with the label.
+    afo_modified_date : datetime
+        Date and time of the last modification.
+    afo_name : str
+        Name of the form object.
+    afo_unique_string : str
+        Unique string identifier.
+    afo_width : int
+        Width dimension of the object.
+    afo_parent : int
+        Reference to a parent object.
+    child_index : int
+        Index to differentiate children in a parent-child structure.
+    roles : str
+        Roles associated with the object.
+
+    Relationships:
+    af_object : relationship Self-referential relationship for parent-child hierarchy.
+
+    Polymorphism:
+    This model uses polymorphic inheritance to define specific subtypes of form objects.
+    """
     __tablename__ = 'af_object'
     afo_id = Column(Integer, primary_key=True, nullable=False)
     afo_type = Column(Integer, nullable=False)
@@ -42,16 +98,45 @@ class AFObject(Base):
 # Child classes
 
 class FormDomain(AFObject):
+    """
+    Represents a domain within which forms operate, inheriting common attributes from AFObject.
+    """
     __mapper_args__ = {
         'polymorphic_identity': 0
     }
 
 class FormGroup(AFObject):
+    """ Represents a group of forms, inheriting from AFObject. """
     __mapper_args__ = {
         'polymorphic_identity': 1
     }
 
 class FormDefinition(AFObject):
+    """
+      Provides detailed definitions for forms,
+      extending AFObject with specific attributes for form configuration.
+      Attributes:
+      formDefinition_allow_notes_attachment : str
+          Flag for allowing notes attachments.
+      formDefinition_allow_notification : str
+          Flag for enabling notifications.
+      formDefinition_Allow_PDF_view : str
+          Flag for PDF view permissions.
+      formDefinition_expression : str
+          Expression for form logic.
+      formDefinition_liveStatus : int
+          Status indicating if the form is live.
+      formDefinition_notifing_users : str
+          Users to notify about form events.
+      formDefinition_owner : str
+          Owner of the form.
+      formDefinition_primaryKeyField : str
+          Primary key field for the form.
+      formDefinition_Publish_To_MobilePortal : str
+          Flag for mobile portal publication.
+      formDefinition_Publish_To_PatientPortal : str
+          Flag for patient portal publication.
+      formDefinition_show_notes : str Flag for displaying notes."""
     __mapper_args__ = {
         'polymorphic_identity': 2
     }
@@ -68,12 +153,27 @@ class FormDefinition(AFObject):
     formDefinition_show_notes = Column(String)
 
 class FormPage(AFObject):
+    """
+     Represents a page within a form, inheriting from AFObject.
+      This model is designed to manage the layout and content organization within a form,
+      ensuring a structured presentation of form elements.
+    Attributes:
+    formPage_sectPerRow : int Number of sections displayed per row on the form page.
+    """
     __mapper_args__ = {
         'polymorphic_identity': 3
     }
     formPage_sectPerRow = Column(Integer)
 
 class FormSection(AFObject):
+    """
+     Represents a section within a form page, inheriting from AFObject.
+     This model is used to organize form fields into logical groups,
+      enhancing the readability and usability of forms.
+    Attributes:
+    columns : int Number of columns in the section, determining the layout structure.
+    show_title : str  Flag indicating whether to display the section title.
+    """
     __mapper_args__ = {
         'polymorphic_identity': 4
     }
@@ -81,6 +181,37 @@ class FormSection(AFObject):
     show_title = Column(String)
 
 class FormField(AFObject):
+    """
+    Represents an individual field within a form section, inheriting from AFObject.
+    This model is crucial for capturing user input and managing the display and behavior of form fields.
+    Attributes:
+    formField_AssociatedMedia_Link : str Link to media associated with the form field.
+    formField_bandingDataXmlValue : str XML data for banding information.
+    bindExp : str Binding expression for dynamic data associations.
+    formField_defSequence : str Sequence definition for form field ordering.
+    formField_defValMode : int  Default value mode indicating how values are determined.
+    formField_defValue : str  Default value for the form field.
+    formField_extRefField : str External reference field.
+    formField_extRef : str External reference for extended data linking.
+    formField_fieldType : int  Type indicator for the form field.
+    formField_filter_childField : int Filter criteria for child fields.
+    formField_filter_HospitalCode : str  Filter criteria based on hospital code.
+    formField_filter_parentField : int  Filter criteria for parent fields.
+    formField_input_style : str Style attributes for the field input.
+    formField_inputType : int Input type (e.g., text, number).
+    formField_max : str Maximum value constraint.
+    formField_mediaTextBlock : str Text block for media content.
+    formField_min : str Minimum value constraint.
+    formField_mapDomain : str Domain mapping for the field.
+    formField_mapName : strMapping name for data associations.
+    formField_pattern : str Pattern for validating input.
+    formField_referencedField : str Field referenced for additional data.
+    formField_required : str Flag indicating if the field is mandatory.
+    formField_style : str Style attributes for the field.
+    formField_syncWithReference : str Flag for syncing with reference data.
+    Properties:
+    banding_data : property Parses and returns banding data from the XML string.
+    """
     __mapper_args__ = {
         'polymorphic_identity': 5
     }

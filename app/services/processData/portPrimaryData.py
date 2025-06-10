@@ -6,6 +6,13 @@ from app.services.processData.organisation_Import_Service import OrganisationImp
 from app.services.processData.pathway_Import_Service import PathwayImportService
 from app.services.processData.patient_Import_Service import PatientImportService
 
+"""
+Migrates data from the primary database to the metrics database.
+
+This function handles the end-to-end process of fetching relevant data
+from the primary database and inserting or updating it into the metrics
+database to ensure synchronized reporting and analytics.
+"""
 
 def portprimarydata():
     primary_session = PrimarySessionLocal()
@@ -17,8 +24,10 @@ def portprimarydata():
     organisationsImportService = OrganisationImportService(primary_session, secondary_session)
     organisationsImportService.import_organisation()
 
+
     mdtImportService = MdtImportService(primary_session,secondary_session)
     mdtImportService.import_mdt()
+
 
     pathwayImportService = PathwayImportService(primary_session, secondary_session)
     pathwayImportService.import_pathway()

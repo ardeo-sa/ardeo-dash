@@ -4,6 +4,7 @@ from app.models.primary import Organisation as PrimaryOrganisation
 from app.models import Organisation as MetricOrganisation
 from app.models.primary.Users import Users
 
+""" organisations from primary database is copied to organisations table of metrics database """
 class OrganisationImportService:
     def __init__(self, primary_db: Session, secondary_db: Session):
         """
