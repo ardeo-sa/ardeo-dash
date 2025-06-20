@@ -62,8 +62,10 @@ def aggregate_all_metrics():
             metrics_db.add(MDTMetrics(
                 date=today,
                 metric_name=name,
-                value=value,
-                unit=unit
+                meeting_count=value,
+                avg_attendance=value,
+                avg_wait_time=unit,
+                action_completion_rate=True
             ))
 
         # ----- Pathway Metrics -----
@@ -71,10 +73,10 @@ def aggregate_all_metrics():
             metrics_db.add(PathwayMetrics(
                 date=today,
                 metric_name=name,
-                value=value,
-                unit=unit
+                avg_admission_to_treatment_days=value,
+                readmission_rate_30d=value,
+                no_show_rate=unit
             ))
-
         # ----- Referral Metrics -----
         referral_metrics_dict = aggregate_referral_metrics(primary_db, today)
         for name, (value, unit) in referral_metrics_dict.items():

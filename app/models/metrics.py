@@ -74,6 +74,7 @@ class MDTMetrics(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False, index=True)
+    metric_name = Column(String)
     meeting_count = Column(Integer, nullable=False)
     avg_attendance = Column(Float, nullable=False)
     avg_wait_time = Column(Float, nullable=False)  # in days
@@ -94,6 +95,7 @@ class PathwayMetrics(Base):
     __tablename__ = "pathway_metrics"
 
     id = Column(Integer, primary_key=True, index=True)
+    metric_name = Column(String)
     date = Column(Date, nullable=False, index=True)
     avg_admission_to_treatment_days = Column(Float, nullable=False)
     readmission_rate_30d = Column(Float, nullable=False)
