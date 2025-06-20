@@ -32,6 +32,10 @@ def generate_metrics_for_day(date_, total_beds):
     """
     Generate realistic synthetic metrics for a given date.
 
+    Args:
+        date_ (datetime.date): The date for the metrics.
+        total_beds (int): Total number of hospital beds.
+
     Returns:
         List[GeneratedMetrics]: All metrics for the day.
     """
@@ -82,14 +86,75 @@ def generate_metrics_for_day(date_, total_beds):
         ("pathway_relapse_rate", relapse_rate, "percent"),
     ]
 
-    # Create GeneratedMetrics objects
-    results = [
-        GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="operational")
-        for name, value, unit in operational_metrics
-    ] + [
-        GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="pathway")
-        for name, value, unit in pathway_metrics
+    # --- Admin metrics ---
+    patient_to_clinician = round(random.uniform(8.0, 15.0), 2)
+    imaging_util = random.randint(20, 50)
+    lab_util = random.randint(50, 100)
+    treatment_slot_util = random.randint(10, 30)
+
+    admin_metrics = [
+        ("patient_to_clinician_ratio", patient_to_clinician, "ratio"),
+        ("imaging_utilization", imaging_util, "count"),
+        ("lab_test_utilization", lab_util, "count"),
+        ("treatment_slot_utilization", treatment_slot_util, "count"),
     ]
+
+    # --- Clinician performance ---
+    clinician_count = random.randint(15, 25)
+    avg_admitted = round(admissions / clinician_count, 2)
+    avg_seen = round(random.uniform(5.0, 10.0), 2)
+    avg_tasks = round(random.uniform(1.0, 5.0), 2)
+
+    clinician_metrics = [
+        ("active_clinicians", clinician_count, "count"),
+        ("avg_patients_admitted", avg_admitted, "count"),
+        ("avg_patients_seen", avg_seen, "count"),
+        ("avg_outstanding_tasks", avg_tasks, "count"),
+    ]
+
+    # --- MDT metrics ---
+    mdt_meetings = random.randint(2, 5)
+    mdt_attendance = round(random.uniform(6.0, 10.0), 2)
+    mdt_wait_time = round(random.uniform(0.5, 2.0), 2)
+    mdt_completion = round(random.uniform(80.0, 98.0), 2)
+    mdt_case_time = round(random.uniform(5.0, 15.0), 2)
+
+    mdt_metrics = [
+        ("mdt_meeting_count", mdt_meetings, "count"),
+        ("mdt_avg_attendance", mdt_attendance, "people"),
+        ("mdt_avg_wait_time", mdt_wait_time, "days"),
+        ("mdt_action_completion_rate", mdt_completion, "percent"),
+        ("mdt_avg_case_discussion_time", mdt_case_time, "minutes"),
+    ]
+
+    # --- Referral metrics ---
+    referral_volume = random.randint(40, 80)
+    referral_conversion = round(random.uniform(60.0, 85.0), 2)
+    referral_time = round(random.uniform(1.0, 3.0), 2)
+    referral_sources = random.randint(5, 10)
+
+    referral_metrics = [
+        ("referral_volume_daily", referral_volume, "count"),
+        ("referral_conversion_rate", referral_conversion, "percent"),
+        ("referral_to_admission_time", referral_time, "days"),
+        ("referral_source_count", referral_sources, "count"),
+    ]
+
+    # Compile all results into GeneratedMetrics objects
+    results = []
+    for name, value, unit in operational_metrics:
+        results.append(
+            GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="operational"))
+    for name, value, unit in pathway_metrics:
+        results.append(GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="pathway"))
+    for name, value, unit in admin_metrics:
+        results.append(GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="admin"))
+    for name, value, unit in clinician_metrics:
+        results.append(GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="clinician"))
+    for name, value, unit in mdt_metrics:
+        results.append(GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="mdt"))
+    for name, value, unit in referral_metrics:
+        results.append(GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="referral"))
 
     return results
 
@@ -109,9 +174,7 @@ def main():
     Base.metadata.create_all(engine)
 
     today = datetime.today().date()
-
     all_metrics = []
-
 
     for i in range(args.days):
         date_ = today - timedelta(days=i)
@@ -131,7 +194,16 @@ def main():
         "metric_type": m.metric_type
     } for m in all_metrics])
     df.to_csv(args.csv, index=False)
-    print(f"Exported to CSV: {args.csv}")
+    print(f"Exported to tall CSV: {args.csv}")
+
+    # --- Save wide-format tables by metric_type ---
+    for metric_type in df["metric_type"].unique():
+        df_subset = df[df["metric_type"] == metric_type].copy()
+        df_wide = df_subset.pivot(index="date", columns="metric_name", values="value")
+        df_wide.reset_index(inplace=True)
+        output_filename = f"{metric_type}_metrics_wide.csv"
+        df_wide.to_csv(output_filename, index=False)
+        print(f"Exported wide-format CSV: {output_filename}")
 
 
 if __name__ == "__main__":
