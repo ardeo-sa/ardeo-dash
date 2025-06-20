@@ -45,3 +45,4 @@ class Patient(Base):
     discharge_date = Column(Date)
     status=Column(String)
     referral_admissions = relationship('ReferralAdmission', back_populates='patient')
+    appointments = relationship("Appointment", back_populates="patient")

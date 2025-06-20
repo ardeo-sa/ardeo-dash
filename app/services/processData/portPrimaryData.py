@@ -18,19 +18,18 @@ def portprimarydata():
     primary_session = PrimarySessionLocal()
     secondary_session = MetricsSessionLocal()
 
-    clinicianImportService = ClinicianImportService(primary_session,secondary_session)
-    clinicianImportService.import_clinician()
-
-    organisationsImportService = OrganisationImportService(primary_session, secondary_session)
-    organisationsImportService.import_organisation()
-
-
-    mdtImportService = MdtImportService(primary_session,secondary_session)
+    mdtImportService = MdtImportService(secondary_session)
     mdtImportService.import_mdt()
 
-
-    pathwayImportService = PathwayImportService(primary_session, secondary_session)
-    pathwayImportService.import_pathway()
-
-    patientImportService = PatientImportService(primary_session, secondary_session)
-    patientImportService.import_patients_and_referrals()
+    #
+    # clinicianImportService = ClinicianImportService(primary_session,secondary_session)
+    # clinicianImportService.import_clinician()
+    #
+    # organisationsImportService = OrganisationImportService(primary_session, secondary_session)
+    # organisationsImportService.import_organisation()
+    #
+    # pathwayImportService = PathwayImportService(primary_session, secondary_session)
+    # pathwayImportService.import_pathway()
+    #
+    # patientImportService = PatientImportService(primary_session, secondary_session)
+    # patientImportService.import_patients_and_referrals()

@@ -34,7 +34,7 @@ class Appointment(Base):
     cancelled = Column(Boolean)
 
     # Relationships
-    patient = relationship('Patient', foreign_keys=[patient_id])# Links to Patient model
+    patient = relationship('Patient', foreign_keys=[patient_id],back_populates="appointments")# Links to Patient model
     # clinician = relationship('Clinician', back_populates='appointments')  # If Clinician model exists
 
     def __repr__(self):
