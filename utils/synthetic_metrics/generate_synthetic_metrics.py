@@ -12,6 +12,9 @@ from datetime import datetime, timedelta
 from sqlalchemy import create_engine, Column, Integer, String, Float, Date
 from sqlalchemy.orm import sessionmaker, declarative_base
 
+from clinician_registry import generate_clinician_registry, generate_clinician_daily_metrics
+
+
 Base = declarative_base()
 
 
@@ -28,7 +31,7 @@ class GeneratedMetrics(Base):
     unit = Column(String)
     metric_type = Column(String)
 
-def generate_metrics_for_day(date_, total_beds):
+def generate_metrics_for_day(date_, total_beds, daily_clinician_data):
     """
     Generate realistic synthetic metrics for a given date.
 
@@ -99,19 +102,6 @@ def generate_metrics_for_day(date_, total_beds):
         ("treatment_slot_utilization", treatment_slot_util, "count"),
     ]
 
-    # --- Clinician performance ---
-    clinician_count = random.randint(15, 25)
-    avg_admitted = round(admissions / clinician_count, 2)
-    avg_seen = round(random.uniform(5.0, 10.0), 2)
-    avg_tasks = round(random.uniform(1.0, 5.0), 2)
-
-    clinician_metrics = [
-        ("active_clinicians", clinician_count, "count"),
-        ("avg_patients_admitted", avg_admitted, "count"),
-        ("avg_patients_seen", avg_seen, "count"),
-        ("avg_outstanding_tasks", avg_tasks, "count"),
-    ]
-
     # --- MDT metrics ---
     mdt_meetings = random.randint(2, 5)
     mdt_attendance = round(random.uniform(6.0, 10.0), 2)
@@ -140,21 +130,50 @@ def generate_metrics_for_day(date_, total_beds):
         ("referral_source_count", referral_sources, "count"),
     ]
 
+
+    # --- Clinician performance from individual data ---
+    clinician_count = len([c for c in daily_clinician_data if not c["is_absent"]])
+    clinician_absent_count = len([c for c in daily_clinician_data if c["is_absent"]])
+    total_seen = sum(d["patients_seen"] for d in daily_clinician_data)
+    total_admitted = sum(d["patients_admitted"] for d in daily_clinician_data)
+    total_tasks = sum(d["tasks_completed"] for d in daily_clinician_data)
+    total_clinicians = clinician_absent_count + clinician_count
+
+    avg_seen = round(total_seen / clinician_count, 2) if clinician_count else 0
+    avg_admitted = round(total_admitted / clinician_count, 2) if clinician_count else 0
+    avg_tasks = round(total_tasks / clinician_count, 2) if clinician_count else 0
+    absence_rate = round(clinician_absent_count / total_clinicians, 2) if total_clinicians else 0
+
+    clinician_metrics = [
+        ("active_clinicians", clinician_count, "count"),
+        ("absent_clinicians", clinician_absent_count, "count"),
+        ("absence_rate", absence_rate, "rate"),
+        ("avg_patients_seen", avg_seen, "count"),
+        ("avg_patients_admitted", avg_admitted, "count"),
+        ("avg_tasks_completed", avg_tasks, "count"),
+    ]
+
+
     # Compile all results into GeneratedMetrics objects
     results = []
     for name, value, unit in operational_metrics:
         results.append(
             GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="operational"))
     for name, value, unit in pathway_metrics:
-        results.append(GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="pathway"))
+        results.append(
+            GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="pathway"))
     for name, value, unit in admin_metrics:
-        results.append(GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="admin"))
+        results.append(
+            GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="admin"))
     for name, value, unit in clinician_metrics:
-        results.append(GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="clinician"))
+        results.append(
+            GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="clinician"))
     for name, value, unit in mdt_metrics:
-        results.append(GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="mdt"))
+        results.append(
+            GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="mdt"))
     for name, value, unit in referral_metrics:
-        results.append(GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="referral"))
+        results.append(
+            GeneratedMetrics(date=date_, metric_name=name, value=value, unit=unit, metric_type="referral"))
 
     return results
 
@@ -173,14 +192,23 @@ def main():
 
     Base.metadata.create_all(engine)
 
+    clinician_roster = generate_clinician_registry(
+        departments=["Oncology", "Cardiology", "Emergency", "General Medicine", "Surgery"],
+        clinicians_per_dept=20
+    )
+
     today = datetime.today().date()
     all_metrics = []
+    clinician_daily_records = []
 
     for i in range(args.days):
         date_ = today - timedelta(days=i)
-        daily_metrics = generate_metrics_for_day(date_, args.beds)
+        daily_clinician_data = generate_clinician_daily_metrics(clinician_roster, date_)
+        daily_metrics = generate_metrics_for_day(date_, args.beds, daily_clinician_data)
+
         session.add_all(daily_metrics)
         all_metrics.extend(daily_metrics)
+        clinician_daily_records.extend(daily_clinician_data)
 
     session.commit()
     print(f"Inserted {len(all_metrics)} metrics across {args.days} days into {args.db}")
@@ -205,6 +233,10 @@ def main():
         df_wide.to_csv(output_filename, index=False)
         print(f"Exported wide-format CSV: {output_filename}")
 
+    # --- Save clinician data ---
+    clinician_df = pd.DataFrame(clinician_daily_records)
+    clinician_df.to_csv("clinician_daily_metrics.csv", index=False)
+    print("Exported individual clinician daily performance to: clinician_daily_metrics.csv")
 
 if __name__ == "__main__":
     main()
