@@ -23,6 +23,8 @@ Note:
       are set up correctly, including database connections and any Dash
       component dependencies.
 """
+import os
+
 from fastapi import FastAPI
 
 from app.api.routes import metrics
@@ -36,6 +38,7 @@ app = FastAPI()
 app.include_router(metrics.router, prefix="/api")
 app.include_router(messaging.router, prefix="/api")
 
-portprimarydata()
-process_data()
-mount_dash(app)
+if os.getenv("TESTING") != "1":
+    portprimarydata()
+    process_data()
+    mount_dash(app)

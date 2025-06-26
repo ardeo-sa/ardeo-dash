@@ -127,3 +127,21 @@ def test_run_metrics_aggregation(
     assert "ReferralMetrics" in metric_type_names
     assert "ClinicianMetrics" in metric_type_names
     assert "AdminMetrics" in metric_type_names
+
+
+@patch("app.services.meeting_services.requests.get")
+def test_fetch_meetings_mocked(mock_requests_get):
+    # Prepare fake response object
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = [{"id": "mocked-id", "timestamp": "2024-06-26T12:00:00Z", "read": False}]
+
+    # Set return value of requests.get
+    mock_requests_get.return_value = mock_response
+
+    # Now call the endpoint (or service directly if preferred)
+    from app.services.meeting_services import fetch_meetings
+    result = fetch_meetings()
+
+    assert isinstance(result, list)
+    assert result[0]["id"] == "mocked-id"

@@ -1,7 +1,10 @@
 # conftest.py
 import pytest
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
 from app.database.metrics import Base
 
 @pytest.fixture(autouse=True)
@@ -35,3 +38,6 @@ def db_session(engine, tables):
     session.close()
     transaction.rollback()
     connection.close()
+
+def pytest_configure():
+    os.environ["TESTING"] = "1"
