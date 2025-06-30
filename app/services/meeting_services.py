@@ -1,7 +1,9 @@
+import os
 import requests
 from typing import List, Dict
 
 BASE_URL = "http://localhost:8000"  # Replace with your actual app URL if different
+
 
 def fetch_meetings() -> List[Dict]:
     """
@@ -10,6 +12,10 @@ def fetch_meetings() -> List[Dict]:
     Returns:
         List[Dict]: List of enriched meetings.
     """
+
+    # if os.getenv("TESTING") == "1":
+    #     return [{"id": "test", "timestamp": "2024-06-01T00:00:00Z", "read": False}]
+
     try:
         meetings_resp = requests.get(f"{BASE_URL}/meetings/")
         meetings_resp.raise_for_status()
