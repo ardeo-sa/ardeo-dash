@@ -87,7 +87,7 @@ def generate_clinician_registry(departments, clinicians_per_dept=20, output_file
     return roster
 
 
-def generate_clinician_daily_metrics(roster: List[Dict]) -> List[Dict]:
+def generate_clinician_daily_metrics(roster: List[Dict], date_) -> List[Dict]:
     """
     Simulate individual clinician performance for a single day.
     Adds absence status and 0s for performance if absent.
