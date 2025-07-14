@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, contains_eager, joinedload
 from app.models.clinician import Clinician
 from app.models.primary import Organisation as PrimaryOrganisation
-from app.models import Organisation as MetricOrganisation
+from app.models import organisation as MetricOrganisation
 from app.models.primary.Users import Users
 
 """ organisations from primary database is copied to organisations table of metrics database """

@@ -17,7 +17,7 @@ from app.models.metrics import AdminMetrics
 from app.models.metrics import ClinicianMetrics
 from app.models.metrics import PathwayMetrics
 from app.models.metrics import ReferralMetrics
-from app.models.Organisation import Organisation
+from app.models.organisation import Organisation
 from app.models.pathway import PathwayProgress
 from app.models.patient import Patient
 from app.models.referrals import Referral

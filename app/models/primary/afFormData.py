@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from app.config import Base
 from sqlalchemy.orm import relationship
-from app.models.primary.parser.AfFormDataValuesParser import parse_form_values
+from app.models.primary.parser.af_form_data_values_parser import parse_form_values
 
 class AfFormData(Base):
     """

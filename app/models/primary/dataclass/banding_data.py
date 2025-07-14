@@ -1,3 +1,10 @@
+"""
+This module defines the BandingData dataclass used for value classification or scoring.
+
+The BandingData class models a numeric range (band) with associated metadata such as
+an assigned value, a message, and a color code. It can be used in systems involving
+threshold evaluation, visual indicators (e.g., charts), or score interpretation.
+"""
 from dataclasses import dataclass
 
 @dataclass
@@ -12,8 +19,8 @@ class BandingData:
            message (str): A descriptive message associated with this band.
            assignColor (str): A color code or name used to represent this band visually (e.g., "red", "#FF0000").
        """
-    lowerBand: float
-    higherBand: float
-    assignValue: float
+    lower_band: float
+    higher_band: float
+    assign_value: float
     message: str
-    assignColor: str
+    assign_color: str

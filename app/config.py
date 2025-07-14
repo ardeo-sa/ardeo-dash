@@ -16,7 +16,7 @@ metrics_db_user = os.getenv("METRICS_DB_USER", "user123")
 metrics_db_password = os.getenv("METRICS_DB_PASSWORD", "pass123")
 metrics_db_host = os.getenv("METRICS_DB_HOST", "someurl")
 metrics_db_name = os.getenv("METRICS_DB_NAME", "myreportingdb")
-metrics_db_port = os.getenv("METRICS_DB_PORT", 1234)
+metrics_db_port = os.getenv("METRICS_DB_PORT", "1234")
 
 
 required_vars = {
@@ -37,4 +37,3 @@ Base = declarative_base()
 
 METRICS_DB_URI = (f"postgresql://{metrics_db_user}:{metrics_db_password}@{metrics_db_host}:"
                   f"{metrics_db_port}/{metrics_db_name}")
-

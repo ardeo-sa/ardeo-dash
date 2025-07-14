@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.config import Base
-from app.models.primary.parser.BandingDataParser import parse_banding_data
+from app.models.primary.parser.banding_data_parser import parse_banding_data
 
 
 class AFObject(Base):

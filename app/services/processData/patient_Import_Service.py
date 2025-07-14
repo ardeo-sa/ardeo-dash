@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session, contains_eager, joinedload
 
 from app.models.admissions import ReferralAdmission, ReferralStatusEnum
 from app.models.patient import Patient
-from app.models.primary.Episode import Episode
+from app.models.primary.episode import Episode
 from app.models.primary.Subject import Subject
 from app.models.primary.Referrals import Referrals
 

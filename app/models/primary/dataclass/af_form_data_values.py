@@ -1,3 +1,12 @@
+"""
+This module defines data classes for representing structured form field values.
+
+It includes:
+- `ValueData`: Represents individual labeled values (e.g., "Male" → "M").
+- `FormValue`: Represents a form field with a name and a list of possible values.
+
+These classes can be used for form rendering, schema generation, or serialization of option sets.
+"""
 from dataclasses import dataclass, field
 from typing import List
 

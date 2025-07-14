@@ -1,5 +1,5 @@
-from app.models.primary.IdentifierContext import IdentifierContext
-from app.models.primary.Identifiers import Identifiers
+from app.models.primary.identifierContext import IdentifierContext
+from app.models.primary.identifiers import Identifiers
 from app.models.primary.Organisation import Organisation
 from app.models.primary.Roles import Roles
 from app.models.primary.Users import user_roles
@@ -18,5 +18,5 @@ from app.models.primary.PathwayGroups import PathwayGroups
 from app.models.primary.PathwayGroupsMapOrder import PathwayGroupsMapOrder
 
 from app.models.primary.PatientCareProviders import PatientCareProviders
-from app.models.primary.Episode import Episode
+from app.models.primary.episode import Episode
 from app.models.primary.Subject import Subject

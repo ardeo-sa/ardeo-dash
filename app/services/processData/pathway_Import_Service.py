@@ -5,12 +5,12 @@ from sqlalchemy.orm import Session
 
 from app.models.admissions import ReferralStatusEnum
 from app.models.pathway import PathwayStatusEnum, PathwayOutcomeEnum, PathwayProgress
-from app.models.primary.Episode import Episode
+from app.models.primary.episode import Episode
 from app.models.primary.Subject import Subject
 from app.models.primary.Referrals import Referrals
 from app.models.primary.Pathway import Pathway
 from app.models.primary.PathwayForms import PathwayForms
-from app.models.primary.AfFormData import AfFormData
+from app.models.primary.afFormData import AfFormData
 from app.models.primary.Pathway import pathway_form_map
 
 """ pathway details from primary database is ported to  pathway table of metrics database """

@@ -4,9 +4,9 @@ from datetime import datetime
 import pandas as pd
 
 from app.models.primary.Referrals import Referrals
-from app.models.primary.Episode import Episode
+from app.models.primary.episode import Episode
 from app.models.primary.Subject import Subject
-from app.models.primary.AfFormData import AfFormData
+from app.models.primary.afFormData import AfFormData
 
 
 class subject_Service:

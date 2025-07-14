@@ -68,7 +68,8 @@ class ReferralAdmission(Base):
     discharge_date = Column(Date, nullable=True)  # Date of discharge, if applicable
     referral_status = Column(Enum(ReferralStatusEnum), default=ReferralStatusEnum.PENDING)  # Status of the referral
     referral_type = Column(String, nullable=False)  # e.g., 'In' or 'Out'
-    referring_clinician_id = Column(Integer, ForeignKey('clinician.id'), nullable=False)  # Foreign key to clinician handling the referral
+    # Foreign key to clinician handling the referral
+    referring_clinician_id = Column(Integer, ForeignKey('clinician.id'), nullable=False)
     receiving_clinician_id = Column(Integer, ForeignKey('clinician.id'))
     receiving_organisation_id= Column(Integer, ForeignKey('organisation.id'))
     # treatment_plan_id = Column(Integer, ForeignKey('treatments.id'), nullable=True)  # If treatment is assigned

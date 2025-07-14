@@ -32,7 +32,7 @@ from app.dash_app.integration import mount_dash
 from app.api.routes import messaging
 from app.services.processData.portPrimaryData import portprimarydata
 from app.services.operations.aggregator import process_data
-from app.database.metrics import Base, metrics_engine
+# from app.database.metrics import Base, metrics_engine
 
 app = FastAPI()
 app.include_router(metrics.router, prefix="/api")
