@@ -46,18 +46,18 @@ class pathway_Service:
         referrals = self.db.query(Referrals).all()
         af_forms = self.db.query(AfFormData).all()
         pfm = self.db.query(pathway_form_map).all()
-        pathway_forms = self.db.query(PathwayForms).filter(PathwayForms.isMandatory == True).all()
+        pathway_forms = self.db.query(PathwayForms).filter(PathwayForms.is_mandatory == True).all()
 
         # Create lookups
         pf_map = defaultdict(set)
         for pfmap in pfm:
             pf_map[pfmap.pathway_id].add(pfmap.formsSet_KEY)
 
-        mandatory_forms = {pf.pathway_form_id: pf.filterFormId for pf in pathway_forms}
+        mandatory_forms = {pf.pathway_form_id: pf.afobject_id for pf in pathway_forms}
 
         submitted_forms_map = defaultdict(set)
         for af in af_forms:
-            if af.afFormInstance_filterFormId:
+            if af.afo_id:
                 submitted_forms_map[af.episode_id].add(af.afo_id)
 
         referral_map = defaultdict(list)
@@ -120,9 +120,9 @@ class pathway_Service:
         min_index_map = {}
         for p in pfmo_all:
             if p.pathway_id not in min_index_map or p.child_index < min_index_map[p.pathway_id][1]:
-                min_index_map[p.pathway_id] = (p.pathway_FormSummary_id, p.child_index)
+                min_index_map[p.pathway_id] = (p.pathway_form_summary_id, p.child_index)
 
-        summary_map = {pfs.pathway_FormSummary_id: pfs.filterFormId for pfs in pfsm_all}
+        summary_map = {pfs.pathway_form_summary_id: pfs.afobject_id for pfs in pfsm_all}
 
         aff_instance_map = defaultdict(dict)
         for af in af_forms:

@@ -10,3 +10,5 @@ plotly
 pytest
 pandas
 pymysql
+psycopg2-binary
+httpx

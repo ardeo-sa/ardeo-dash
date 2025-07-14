@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session, contains_eager, joinedload
 from app.models.clinician import Clinician
 from app.models.primary.Users import Users
 
-
+""" users from primary database is copied to clinician table of metrics database """
 class ClinicianImportService:
     def __init__(self, primary_db: Session, secondary_db: Session):
         """
@@ -16,6 +16,7 @@ class ClinicianImportService:
         self.secondary_db = secondary_db
 
     def import_clinician(self):
+        """ username and roles(as concatenated string)  are fetched and stored from primary db to metrics db """
         # Query all users with their roles (ORM style)
         users = self.primary_db.query(Users).outerjoin(Users.roles).all()
 
@@ -24,14 +25,14 @@ class ClinicianImportService:
         for user in users:
             clinician = Clinician(
                 id=user.user_id,
-                name=user.user_username
+                name=user.username
             )
 
             # Collect role values as strings
             role_values = [
-                ur.role.value
-                for ur in user.roles
-                if ur.role is not None
+                role.value
+                for role in user.roles
+                if role is not None
             ]
             clinician.user_role = list(set(role_values))  # Deduplicate roles
 

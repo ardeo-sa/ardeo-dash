@@ -28,7 +28,10 @@ class Clinician(Base):
     user_role = Column(String)
 
     # Relationships
-    referral_admissions = relationship('ReferralAdmission', back_populates='clinician')
+    referrals_made = relationship('ReferralAdmission', back_populates='referring_clinician',
+                                  foreign_keys='ReferralAdmission.referring_clinician_id')
+    referrals_received = relationship('ReferralAdmission', back_populates='receiving_clinician',
+                                      foreign_keys='ReferralAdmission.receiving_clinician_id')
     tasks = relationship('ClinicianTask', back_populates='clinician')
 
 

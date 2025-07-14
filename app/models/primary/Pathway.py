@@ -40,13 +40,41 @@ pathway_summaries = Table(
     Column('summary_name', String),
 )
 pathway_formsummary_map_order = Table(
-    'pathway_FormSummary_map_order', Base.metadata,
+    'pathway_form_summary_map_order', Base.metadata,
     Column('pathway_id', Integer, ForeignKey('pathway.id'), primary_key=True),
-    Column('pathway_form_summary_id', Integer, ForeignKey('pathway_form_summary_map.pathway_FormSummary_id'), primary_key=True),
+    Column('pathway_form_summary_id', Integer, ForeignKey('pathway_form_summary_map.pathway_form_summary_id'), primary_key=True),
     Column('child_index', Integer)
 )
 
 class Pathway(Base):
+    """
+    Represents a clinical pathway in healthcare,
+    providing a structured approach to manage patient care through predefined processes and steps.
+    This model includes various mappings to forms, groups, and summaries,
+     allowing comprehensive management of pathways across different sites.
+
+    Attributes:
+    id : int  Unique identifier for the pathway.
+    title : str Title of the pathway, describing its focus or purpose.
+    speciality : str Medical speciality related to the pathway.
+    order_index : int  Index for ordering pathways.
+    creation_date : datetime  Date and time when the pathway was created.
+    modified_date : datetime  Date and time when the pathway was last modified.
+    guid : str Globally unique identifier for the pathway.
+    is_inter_site_pathway : bool  Indicates if the pathway is used across multiple sites.
+    inter_site_name : str   Name of the inter-site pathway.
+    description : str Detailed description of the pathway.
+
+    Relationships:
+    created_by_user : relationship User who created the pathway.
+    modified_by_user : relationship  User who last modified the pathway.
+    forms_set : relationship Set of forms associated with the pathway.
+    group_map : relationship   Group mapping for the pathway.
+    group_map_order : relationship Ordered group map for the pathway.
+    summaries : relationship  Summaries associated with the pathway.
+    form_summary_map_order : relationship Ordered summary map for the pathway forms.
+
+    """
     __tablename__ = 'pathway'
 
     id = Column(Integer, primary_key=True, autoincrement=True)

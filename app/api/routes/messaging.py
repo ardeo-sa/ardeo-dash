@@ -14,7 +14,7 @@ from app.database.metrics import get_db
 from app.api.schemas.messaging import MessageCreate, MessageOut
 from app.services.messaging_service import create_message, get_conversation_messages
 
-router = APIRouter(prefix="/api/messages", tags=["Messaging"])
+router = APIRouter(prefix="/messages", tags=["Messaging"])
 
 @router.post("/", response_model=MessageOut)
 def send_message(message: MessageCreate, db: Session = Depends(get_db)):

@@ -2,9 +2,11 @@ from sqlalchemy.orm import Session, contains_eager, joinedload
 
 from app.models.admissions import ReferralAdmission, ReferralStatusEnum
 from app.models.patient import Patient
-from app.models.primary import Episode
+from app.models.primary.Episode import Episode
+from app.models.primary.Subject import Subject
+from app.models.primary.Referrals import Referrals
 
-
+""" pathient details, treatement used and referrals  from primary database is ported to  patient and referral_admissions table of metrics database """
 class PatientImportService:
     def __init__(self, primary_db: Session, secondary_db: Session):
         """
@@ -18,19 +20,18 @@ class PatientImportService:
         self.secondary_db = secondary_db
 
     def import_patients_and_referrals(self):
-        episodes_with_subjects_and_referrals = (
-            self.primary_db.query(Episode)
+        referrals_with_episodes = (
+            self.primary_db.query(Referrals)
+            .join(Referrals.episode)
             .join(Episode.subject)
-            .outerjoin(Episode.referrals)
             .options(
-                contains_eager(Episode.subject),
-                joinedload(Episode.referrals)
+                joinedload(Referrals.episode).joinedload(Episode.subject)
             )
             .all()
         )
-
-        for ep in episodes_with_subjects_and_referrals:
-            subj = ep.subject
+        for ref in referrals_with_episodes:
+            ep=ref.episode
+            subj =ep.subject
 
             # Create Patient
             patient = Patient(
@@ -45,30 +46,30 @@ class PatientImportService:
             self.secondary_db.flush()
 
             # Create ReferralAdmissions (if any)
-            for ref in ep.referrals:
-                referral_status_enum = {
-                    0: ReferralStatusEnum.PENDING,
-                    1: ReferralStatusEnum.REFERRED_IN,
-                    2: ReferralStatusEnum.REFERRED_OUT,  # or another value depending on use case
-                    3: ReferralStatusEnum.COMPLETED,
-                    4: ReferralStatusEnum.REFERRED_IN,  # OR create a new status like ADDED_TO_MEETING if needed
-                }
-                status_enum = referral_status_enum.get(ref.referral_status, ReferralStatusEnum.PENDING)
 
-                referral = ReferralAdmission(
-                    admit_time=ep.start_date,
-                    discharge_time=ep.modified_date,
-                    patient_id=patient.id,
-                    referral_date=ref.referral_date,
-                    referral_status=referral_status_enum,
-                    referral_type="In",  # or determine logic if needed
-                    referring_clinician_id=ref.referred_from_user_id,
-                    receiving_clinician_id=ref.referred_to_user_id,
-                    receiving_organisation_id=ref.referring_to_organisation,
-                    treatment_plan_id=ref.pathway_id,
-                    discharge_notes= ""    
-                    """ discharge_notes not updated yet can be derived from comments table not ported to primary db """
-                )
-                self.secondary_db.add(referral)
+            referral_status_enum = {
+                0: ReferralStatusEnum.PENDING,
+                1: ReferralStatusEnum.REFERRED_IN,
+                2: ReferralStatusEnum.REFERRED_OUT,  # or another value depending on use case
+                3: ReferralStatusEnum.COMPLETED,
+                4: ReferralStatusEnum.REFERRED_IN,  # OR create a new status like ADDED_TO_MEETING if needed
+            }
+            status_enum = referral_status_enum.get(ref.referral_status, ReferralStatusEnum.PENDING)
+
+            referral = ReferralAdmission(
+                admit_time=ep.start_date,
+                discharge_time=ep.modified_date,
+                patient_id=patient.id,
+                referral_date=ref.referral_date,
+                referral_status=status_enum,
+                referral_type="In",  # or determine logic if needed
+                referring_clinician_id=ref.referred_from_user_id,
+                receiving_clinician_id=ref.referred_to_user_id,
+                receiving_organisation_id=ref.referring_to_organisation,
+                pathway_id=ref.pathway_id,
+                discharge_notes= ""
+                # """ discharge_notes not updated yet can be derived from comments table not ported to primary db """
+            )
+            self.secondary_db.add(referral)
             # Final commit to secondary DB
-            self.secondary_db.commit()
+        self.secondary_db.commit()

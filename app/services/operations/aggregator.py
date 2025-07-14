@@ -2,7 +2,17 @@ from app.database.primary import PrimarySessionLocal
 from app.services.operations.subject_Service import subject_Service
 from app.services.operations.pathway_Service import pathway_Service
 
+"""
+   Processes and aggregates admission and treatment-related data from the primary database.
 
+   This function initializes service classes for subjects and pathways,
+   then collects various metrics including:
+       - Daily, weekly, and monthly admissions and discharges
+       - Average length of stay (ALOS)
+       - Pathway adherence rate
+       - Days to treatment 
+       - using primary database
+   """
 def process_data():
     session = PrimarySessionLocal()
 
