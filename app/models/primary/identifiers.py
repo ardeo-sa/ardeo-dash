@@ -1,6 +1,13 @@
+"""
+Represents the association between subjects (patients) and their unique identifiers across different contexts.
+This model facilitates the management of patient identifiers within a healthcare system,
+ensuring each identifier is unique within its context.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 
 class Identifiers(Base):
     """

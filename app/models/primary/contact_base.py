@@ -1,6 +1,10 @@
+"""
+Serves as the foundational model for contact information,
+capturing essential details about an individual or organization.
+"""
 from sqlalchemy import Column, Integer, String
-from app.config import Base
 
+from app.config import Base
 
 
 class ContactBase(Base):

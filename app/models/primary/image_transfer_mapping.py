@@ -1,7 +1,12 @@
+"""
+Represents the mapping between organizations and their preferred image transfer methods,
+facilitating streamlined image exchanges in the healthcare system.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey
-from app.config import Base
 from sqlalchemy.orm import relationship
 
+from app.config import Base
 
 
 class ImageTransferMapping(Base):

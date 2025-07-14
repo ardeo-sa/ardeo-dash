@@ -1,4 +1,14 @@
+"""
+Module defining the AuditLog ORM model.
+
+This model captures detailed audit records for actions performed within the application,
+enabling tracking of user activity, changes, and event history for auditing purposes.
+
+Attributes include identifiers, timestamps, user info, action descriptions, and related form/module context.
+"""
+
 from sqlalchemy import Column, Integer, String, DateTime
+
 from app.config import Base
 
 class AuditLog(Base):

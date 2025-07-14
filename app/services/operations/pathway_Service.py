@@ -7,7 +7,7 @@ from app.models.primary import pathway_form_map
 from app.models.primary.Referrals import Referrals
 from app.models.primary.Subject import Subject
 from app.models.primary.episode import Episode
-from app.models.primary.afFormData import AfFormData
+from app.models.primary.af_form_data import AfFormData
 from app.models.primary.PathwayForms import PathwayForms
 from app.models.primary.Pathway import pathway_formsummary_map_order
 from app.models.primary.PathwayFormSummaryMap import PathwayFormSummaryMap

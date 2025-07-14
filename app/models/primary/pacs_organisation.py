@@ -1,8 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey
-from app.config import Base
 from sqlalchemy.orm import relationship
 
-
+from app.config import Base
 
 class PacsOrganisation(Base):
     """

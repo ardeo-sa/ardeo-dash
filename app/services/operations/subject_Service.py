@@ -6,7 +6,7 @@ import pandas as pd
 from app.models.primary.Referrals import Referrals
 from app.models.primary.episode import Episode
 from app.models.primary.Subject import Subject
-from app.models.primary.afFormData import AfFormData
+from app.models.primary.af_form_data import AfFormData
 
 
 class subject_Service:

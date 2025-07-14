@@ -1,6 +1,42 @@
+"""
+This module defines the SQLAlchemy ORM model for the NamedList table.
+
+The NamedList model represents a named list containing pairs of names and values,
+allowing for organized collections of items within specified domains.
+This model is useful for managing configurable lists that can be updated and maintained
+by users and used across the system.
+
+Attributes:
+----------
+nl_id : int
+    Unique identifier for the named list.
+nl_creationDate : datetime
+    Timestamp when the list was created.
+description : str
+    Description of the list's purpose or contents.
+nl_domain : str
+    Domain within which the list is applicable, ensuring context-specific usage.
+nl_modifiedDate : datetime
+    Timestamp of the last modification to the list.
+nl_name : str
+    Name of the list, used for identification and reference.
+created_by_user : int
+    Foreign key linking to the user who created the list.
+modified_by_user : int
+    Foreign key linking to the user who last modified the list.
+
+Relationships:
+-------------
+created_by : Users
+    Relationship with the Users model for the user who created the list.
+modified_by : Users
+    Relationship with the Users model for the user who last modified the list.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 
 class NamedList(Base):
     """

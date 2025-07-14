@@ -1,4 +1,15 @@
+"""
+Module defining the AccountRequests ORM model.
+
+This module contains the SQLAlchemy model for tracking user login account requests.
+It includes fields for request metadata such as creation date, user email, verification token,
+and whether the associated URL has been used.
+
+The AccountRequests table supports managing and validating new account creation requests.
+"""
+
 from sqlalchemy import Column, Integer, String, DateTime
+
 from app.config import Base
 
 

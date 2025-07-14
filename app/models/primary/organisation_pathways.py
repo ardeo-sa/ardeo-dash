@@ -1,8 +1,35 @@
+"""
+Represents pathways associated with an organisation, facilitating the management of
+clinical pathways and their assigned clinicians within the healthcare network.
+
+Attributes:
+----------
+id : int
+    Unique identifier for the organisation pathway.
+guid : str
+    Globally unique identifier for the pathway.
+is_published : str
+    Flag indicating whether the pathway is published ("Yes" or "No").
+organisation_id : int
+    Foreign key linking to the Organisation model.
+pathway_id : int
+    Foreign key linking to the Pathway model.
+
+Relationships:
+-------------
+organisation : Organisation
+    Relationship with the Organisation model to access organisational details.
+pathway : Pathway
+    Relationship with the Pathway model to access pathway details.
+clinicians : list of Users
+    List of clinicians associated with the pathway, ordered by `child_index`.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey, Table, UniqueConstraint
 from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.orm import relationship
 
 from app.config import Base
-from sqlalchemy.orm import relationship
 
 pathway_clinicians = Table(
     'pathway_users',

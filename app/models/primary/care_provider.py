@@ -1,6 +1,13 @@
+"""
+Represents a healthcare provider within the system,
+capturing essential details about their contact information,
+professional background, and organizational affiliations.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 
 class CareProvider(Base):
     """

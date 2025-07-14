@@ -1,6 +1,10 @@
+"""
+Represents a menu item within the system, used for configuring system and report menus
+based on user roles. This model supports dynamic menu management, allowing for personalized user experiences.
+"""
+
 from sqlalchemy import Column, Integer, String
 from app.config import Base
-
 
 
 class MenuItem(Base):

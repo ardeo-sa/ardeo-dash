@@ -1,6 +1,11 @@
-from sqlalchemy import Column, Integer, String
-from app.config import Base
+"""
+Represents a sequence generator for forms,
+providing automated numbering and formatting for form identifiers.
+"""
 
+from sqlalchemy import Column, Integer, String
+
+from app.config import Base
 
 
 class FormSequence(Base):

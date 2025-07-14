@@ -1,3 +1,9 @@
+"""
+Module defining the AclGroup ORM model.
+
+This module includes the AclGroup class, representing an access control group
+used for managing group-based permissions and user associations within the application.
+"""
 from sqlalchemy.orm import relationship
 
 from app.config import Base

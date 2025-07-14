@@ -10,7 +10,7 @@ from app.models.primary.Subject import Subject
 from app.models.primary.Referrals import Referrals
 from app.models.primary.Pathway import Pathway
 from app.models.primary.PathwayForms import PathwayForms
-from app.models.primary.afFormData import AfFormData
+from app.models.primary.af_form_data import AfFormData
 from app.models.primary.Pathway import pathway_form_map
 
 """ pathway details from primary database is ported to  pathway table of metrics database """

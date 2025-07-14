@@ -1,3 +1,11 @@
+"""
+Module defining the Aclentry ORM model.
+
+This module contains the SQLAlchemy model for ACL entries, which assign permission
+levels to principals (users or groups) within a specific Access Control List (ACL).
+Each entry links to both the ACL resource and the principal entity.
+"""
+
 from sqlalchemy import Column, Integer, ForeignKey
 from app.config import Base
 from sqlalchemy.orm import relationship

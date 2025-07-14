@@ -1,3 +1,16 @@
+"""
+Module defining the AFObject model hierarchy for form-related entities.
+
+This module provides a polymorphic ORM model representing form objects,
+including domains, groups, definitions, pages, sections, and fields.
+Each subclass specializes attributes relevant to its role in form management.
+
+The AFObject base model supports parent-child relationships and common
+attributes such as alignment, colors, dimensions, and roles.
+
+The FormField subclass includes a property to parse embedded banding data XML.
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey

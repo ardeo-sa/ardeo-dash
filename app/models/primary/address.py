@@ -1,4 +1,12 @@
+"""
+Module defining the Address ORM model.
+
+This module provides a SQLAlchemy model representing addresses within the system,
+covering various classification types and address details.
+"""
+
 from sqlalchemy import Column, Integer, String
+
 from app.config import Base
 
 class Address(Base):

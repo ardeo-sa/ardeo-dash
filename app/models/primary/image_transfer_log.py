@@ -1,4 +1,10 @@
+"""
+Logs the details of image transfers within the healthcare system, capturing key events, errors,
+and transfer methods for auditing and troubleshooting purposes.
+"""
+
 from sqlalchemy import Column, Integer, String, DateTime
+
 from app.config import Base
 
 class ImageTransferLog(Base):

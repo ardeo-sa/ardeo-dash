@@ -1,4 +1,12 @@
+"""
+Represents a list of general practitioners (GPs),
+capturing essential details about their practice locations, contact information,
+and affiliations. This model is designed to facilitate the integration and management
+of GP details from external data sources.
+"""
+
 from sqlalchemy import Column, String
+
 from app.config import Base
 
 class GpList(Base):

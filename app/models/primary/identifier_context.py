@@ -1,4 +1,12 @@
+"""
+Represents an IdentifierContext or Master Subject Index,
+defining a logical namespace for Subject identifiers.
+This model ensures that Subject identifiers are unique within an associated organization
+or shared across multiple organization sites using the same physical Context.
+"""
+
 from sqlalchemy import Column, Integer, String
+
 from app.config import Base
 
 class IdentifierContext(Base):

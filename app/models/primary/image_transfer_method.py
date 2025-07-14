@@ -1,3 +1,8 @@
+"""
+Defines the methods available for transferring images within the healthcare system,
+including their interfaces and operational constraints.
+"""
+
 from sqlalchemy import Column, Integer, String
 from app.config import Base
 

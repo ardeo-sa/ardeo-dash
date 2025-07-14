@@ -1,6 +1,12 @@
+"""
+Tracks the status of imaging requests and processes within the healthcare system,
+providing key details on the imaging workflow and associated entities.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 
 class ImagingStatus(Base):
     """

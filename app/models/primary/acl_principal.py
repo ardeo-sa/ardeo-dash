@@ -1,3 +1,14 @@
+"""
+Module defining ACL principal models and their relationships.
+
+This module contains the base class AclPrincipal and its polymorphic subclasses
+AclGroup and AclRole, which represent groups and roles in the access control system.
+It also includes association models (GroupUsername and RoleUsername) linking users
+to groups and roles respectively.
+
+The polymorphic design enables flexible management of different types of principals
+within the same access control framework.
+"""
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.orm import declared_attr
@@ -39,7 +50,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import composite
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.mutable import MutableDict
-
 
 
 class AclPrincipal(Base):

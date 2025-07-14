@@ -1,6 +1,12 @@
+"""
+Manages JSON Web Tokens (JWTs) used for API authentication within the system,
+tracking their status and association with users.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 
 class JwtTokens(Base):
     """

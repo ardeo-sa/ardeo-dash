@@ -1,6 +1,16 @@
+"""
+Module defining the AfFormData ORM model.
+
+This module provides a SQLAlchemy model for storing detailed consultation form data,
+including metadata, user associations, and XML-encoded form values.
+
+It supports parsing of embedded form values via a property for convenient access.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 from app.models.primary.parser.af_form_data_values_parser import parse_form_values
 
 class AfFormData(Base):

@@ -1,4 +1,11 @@
+"""
+Represents a request for imaging exchange within the healthcare system,
+capturing details about the image request,
+transaction status, and institutional involvement.
+"""
+
 from sqlalchemy import Column, Integer, String, DateTime
+
 from app.config import Base
 
 class IepImageRequest(Base):
