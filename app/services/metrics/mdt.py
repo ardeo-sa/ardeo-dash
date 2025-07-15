@@ -14,8 +14,9 @@ Metrics calculated:
 
 The function expects an active SQLAlchemy session to query the database.
 """
+
 from datetime import date
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session

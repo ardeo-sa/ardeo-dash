@@ -15,7 +15,8 @@ from app.models.primary.parser.af_form_data_values_parser import parse_form_valu
 
 class AfFormData(Base):
     """
-    Represents the form data entries within the application, capturing detailed records of consultation notes and associated metadata.
+    Represents the form data entries within the application, capturing detailed records of consultation notes and
+    associated metadata.
 
     Attributes:
     ----------
@@ -83,4 +84,11 @@ class AfFormData(Base):
     modifiedUser = relationship('Users', foreign_keys=[modified_user])
     @property
     def values(self):
+        """
+            Parses and returns the form values from the XML data.
+
+            Returns:
+                The result of parsing the XML content, typically a structured
+                representation (e.g., dict) of the form values extracted from the XML.
+        """
         return parse_form_values(self.xml)

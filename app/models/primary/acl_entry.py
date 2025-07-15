@@ -7,8 +7,9 @@ Each entry links to both the ACL resource and the principal entity.
 """
 
 from sqlalchemy import Column, Integer, ForeignKey
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 
 class Aclentry(Base):
     """

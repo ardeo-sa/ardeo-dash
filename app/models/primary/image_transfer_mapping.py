@@ -20,7 +20,8 @@ class ImageTransferMapping(Base):
     image_transfer_method_id : int Foreign key linking to the ImageTransferMethod model.
 
     Relationships:
-    image_transfer_method : Relationship with the ImageTransferMethod model to access the details of the transfer method.
+    image_transfer_method : Relationship with the ImageTransferMethod model to
+    access the details of the transfer method.
     """
     __tablename__ = 'image_transfer_mapping'
 

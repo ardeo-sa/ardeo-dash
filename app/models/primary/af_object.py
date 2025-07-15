@@ -22,7 +22,8 @@ from app.models.primary.parser.banding_data_parser import parse_banding_data
 
 class AFObject(Base):
     """
-    Serves as the base model for form objects, providing common attributes and polymorphic behavior for various form-related entities.
+    Serves as the base model for form objects, providing common attributes and polymorphic behavior for various
+    form-related entities.
     Attributes:
     afo_id : int
         Unique identifier for the form object.
@@ -255,4 +256,10 @@ class FormField(AFObject):
 
     @property
     def banding_data(self):
+        """
+            Parses and returns the banding data from the XML stored in formField_bandingDataXmlValue.
+
+            Returns:
+                Parsed banding data, typically as a structured object or dictionary extracted from the XML.
+        """
         return parse_banding_data(self.formField_bandingDataXmlValue)

@@ -7,7 +7,6 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from app.config import Base
-from app.models.primary import Pathway
 
 
 class Episode(Base):
@@ -51,4 +50,4 @@ class Episode(Base):
 
     subject = relationship('Subject',foreign_keys=[subject_id])
     pathway_id = Column(Integer, ForeignKey('pathway.id'))
-    pathway = relationship(Pathway)
+    pathway = relationship("Pathway")

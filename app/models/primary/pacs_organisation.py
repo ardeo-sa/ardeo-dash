@@ -1,3 +1,23 @@
+"""
+Represents the association between PACS and organisations, facilitating the integration of imaging systems
+within healthcare networks.
+This model ensures that PACS configurations are properly linked to their respective organisations.
+
+Attributes:
+----------
+pacs_id : int
+    Foreign key linking to the PACS model, identifying the PACS system involved.
+organisation_id : int
+    Foreign key linking to the Organisation model, identifying the organisation using the PACS.
+
+Relationships:
+-------------
+pacs :
+    Relationship with the Pacs model to access PACS details.
+organisation :
+    Relationship with the Organisation model to access organisational details.
+"""
+
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -5,7 +25,8 @@ from app.config import Base
 
 class PacsOrganisation(Base):
     """
-    Represents the association between PACS and organisations, facilitating the integration of imaging systems within healthcare networks.
+    Represents the association between PACS and organisations, facilitating the integration of imaging systems
+    within healthcare networks.
     This model ensures that PACS configurations are properly linked to their respective organisations.
     Attributes:
     pacs_id : int Foreign key linking to the PACS model, identifying the PACS system involved.

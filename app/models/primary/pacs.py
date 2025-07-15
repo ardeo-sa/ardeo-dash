@@ -1,8 +1,4 @@
 """
-Represents a menu item within the system, used for configuring system and report menus
-based on user roles. This model supports dynamic menu management, allowing for personalized user experiences.
-"""
-"""
 Represents a Picture Archiving and Communication System (PACS) for
 managing and transferring medical images within an external system.
 This model facilitates the configuration and integration of PACS for streamlined image handling.

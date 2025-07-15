@@ -14,7 +14,8 @@ from app.config import Base
 class AuditLog(Base):
     """
     Represents an audit log entry, capturing detailed records of actions performed within the application.
-     This model is essential for tracking changes, user actions, and maintaining a history of events for auditing purposes.
+     This model is essential for tracking changes, user actions, and maintaining a history of events
+     for auditing purposes.
 
     Attributes:
     audit_id : int Unique identifier for the audit log entry.
