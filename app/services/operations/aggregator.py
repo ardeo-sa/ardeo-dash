@@ -1,27 +1,34 @@
-from app.database.primary import PrimarySessionLocal
-from app.services.operations.subject_Service import subject_Service
-from app.services.operations.pathway_Service import pathway_Service
-
 """
-   Processes and aggregates admission and treatment-related data from the primary database.
+This module processes and aggregates operational data from the primary database.
 
-   This function initializes service classes for subjects and pathways,
-   then collects various metrics including:
-       - Daily, weekly, and monthly admissions and discharges
-       - Average length of stay (ALOS)
-       - Pathway adherence rate
-       - Days to treatment 
-       - using primary database
-   """
+It initializes services related to patient subjects and care pathways,
+and then triggers metrics calculations for:
+
+- Daily, weekly, and monthly admissions and discharges
+- Average length of stay (ALOS)
+- Pathway adherence rate
+- Days to treatment
+
+Note: This module is intended to be triggered as part of the main application
+initialization and does not return or persist any values itself.
+"""
+
+from app.database.primary import PrimarySessionLocal
+from app.services.operations.subject_service import SubjectService
+from app.services.operations.pathway_service import PathwayService
+
+
 def process_data():
-    session = PrimarySessionLocal()
+    """
+    Processes and aggregates admission and treatment-related data from the primary database.
+    """
+    with PrimarySessionLocal() as session:
+        subject_service = SubjectService(session)
+        subject_service.admissions_discharges_by_day()
+        subject_service.admissions_discharges_by_week()
+        subject_service.admissions_discharges_by_month()
+        subject_service.average_length_of_stay()
 
-    subject_service = subject_Service(session)
-    df_day = subject_service.admissions_discharges_by_day()
-    df_week = subject_service.admissions_discharges_by_week()
-    df_month = subject_service.admissions_discharges_by_month()
-    df_alos = subject_service.average_length_of_stay()
-
-    pathway_service = pathway_Service(session)
-    adherence_rate=pathway_service.pathway_adherence_rate()
-    days_to_treatment=pathway_service.days_to_treatment()
+        pathway_service = PathwayService(session)
+        pathway_service.pathway_adherence_rate()
+        pathway_service.days_to_treatment()

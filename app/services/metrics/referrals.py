@@ -3,10 +3,10 @@ This module defines metrics related to patient referrals, including source break
 conversion rates, referral-to-admission time, and referral volume trends over time.
 """
 from datetime import date
-from collections import defaultdict
+# from collections import defaultdict
 
 from sqlalchemy.orm import Session
-from sqlalchemy import func, cast, Date, extract
+from sqlalchemy import func, extract
 
 from app.models.admissions import ReferralAdmission
 
@@ -26,13 +26,13 @@ def referrals_by_source(session: Session, for_date: date = None) -> dict:
     results = (
         session.query(
             ReferralAdmission.referral_source,
-            func.count(ReferralAdmission.id)
+            func.count(ReferralAdmission.id).label("count") # pylint: disable=not-callable
         )
         .filter(func.date(ReferralAdmission.referral_time) == for_date)
         .group_by(ReferralAdmission.referral_source)
-        .all()
+        .all() # pylint: disable=not-callable
     )
-    return {source: count for source, count in results}
+    return dict(results)
 
 
 def referral_conversion_rate(session: Session, for_date: date = None) -> float:
@@ -102,16 +102,18 @@ def referral_volume_trend(session: Session, by: str = "day") -> dict:
     if by == "day":
         group_expr = func.date(ReferralAdmission.referral_time)
     elif by == "week":
-        group_expr = (extract("year", ReferralAdmission.referral_time), extract("week", ReferralAdmission.referral_time))
+        group_expr = (extract("year", ReferralAdmission.referral_time),
+                      extract("week", ReferralAdmission.referral_time))
     elif by == "month":
-        group_expr = (extract("year", ReferralAdmission.referral_time), extract("month", ReferralAdmission.referral_time))
+        group_expr = (extract("year", ReferralAdmission.referral_time),
+                      extract("month", ReferralAdmission.referral_time))
     else:
         raise ValueError("Invalid 'by' value. Choose from 'day', 'week', 'month'.")
 
     results = (
-        session.query(group_expr, func.count(ReferralAdmission.id))
+        session.query(group_expr, func.count(ReferralAdmission.id)) # pylint: disable=not-callable
         .group_by(group_expr)
-        .all()
+        .all() # pylint: disable=not-callable
     )
 
     return {tuple(row[0]) if isinstance(row[0], tuple) else row[0]: row[1] for row in results}

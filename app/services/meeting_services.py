@@ -1,8 +1,11 @@
-import os
-import requests
+"""
+Service module for fetching and enriching meeting data from the backend API.
+"""
 from typing import List, Dict
+import requests
 
 BASE_URL = "http://localhost:8000"  # Replace with your actual app URL if different
+TIMEOUT = 5  # seconds
 
 
 def fetch_meetings() -> List[Dict]:
@@ -17,11 +20,11 @@ def fetch_meetings() -> List[Dict]:
     #     return [{"id": "test", "timestamp": "2024-06-01T00:00:00Z", "read": False}]
 
     try:
-        meetings_resp = requests.get(f"{BASE_URL}/meetings/")
+        meetings_resp = requests.get(f"{BASE_URL}/meetings/", timeout=TIMEOUT)
         meetings_resp.raise_for_status()
         meetings = meetings_resp.json()
     except requests.RequestException as e:
-        raise Exception(f"Failed to fetch meetings: {e}")
+        raise RuntimeError(f"Failed to fetch meetings {e}") from e
 
     enriched_meetings = []
 
@@ -30,9 +33,9 @@ def fetch_meetings() -> List[Dict]:
         enriched = dict(meeting)
 
         try:
-            participants_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/participants")
-            patients_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/patients")
-            notes_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/notes")
+            participants_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/participants", timeout=TIMEOUT)
+            patients_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/patients", timeout=TIMEOUT)
+            notes_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/notes", timeout=TIMEOUT)
 
             if participants_resp.ok:
                 enriched["participants"] = participants_resp.json()

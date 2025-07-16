@@ -15,12 +15,13 @@ from datetime import date
 from app.models.admissions import ReferralAdmission, ReferralStatusEnum
 from app.models.patient import Patient
 
-def create_referral_in(patient_id: int, clinician_id: int, session) -> None:
+
+def create_referral_in(patient: Patient, clinician_id: int, session) -> None:
     """
     Creates a new referral record for a patient being referred into the system.
 
     Args:
-        patient_id (int): The ID of the patient being referred in.
+        patient (Patient): The ID of the patient being referred in.
         clinician_id (int): The ID of the clinician referring the patient in.
         session (Session): The SQLAlchemy session used for database operations.
 
@@ -28,7 +29,7 @@ def create_referral_in(patient_id: int, clinician_id: int, session) -> None:
         None
     """
     new_referral_in = ReferralAdmission(
-        patient_id=patient_id,
+        patient_id=patient.id,
         referral_date=date.today(),
         referral_status=ReferralStatusEnum.REFERRED_IN,
         referral_type="In",
@@ -37,7 +38,8 @@ def create_referral_in(patient_id: int, clinician_id: int, session) -> None:
     session.add(new_referral_in)
     session.commit()
 
-def create_referral_out(patient_id: int, clinician_id: int, session) -> None:
+
+def create_referral_out(patient: Patient, clinician_id: int, session) -> None:
     """
     Creates a new referral record for a patient being referred out of the system.
 
@@ -50,7 +52,7 @@ def create_referral_out(patient_id: int, clinician_id: int, session) -> None:
         None
     """
     new_referral_out = ReferralAdmission(
-        patient_id=patient_id,
+        patient_id=patient.id,
         referral_date=date.today(),
         referral_status=ReferralStatusEnum.REFERRED_OUT,
         referral_type="Out",
@@ -59,12 +61,13 @@ def create_referral_out(patient_id: int, clinician_id: int, session) -> None:
     session.add(new_referral_out)
     session.commit()
 
-def create_discharge_record(patient_id: int, clinician_id: int, discharge_notes: str, session) -> None:
+
+def create_discharge_record(patient: Patient, clinician_id: int, discharge_notes: str, session) -> None:
     """
     Creates a new discharge record for a patient who is being discharged from the system after recovery.
 
     Args:
-        patient_id (int): The ID of the patient being discharged.
+        patient (Patient): The ID of the patient being discharged.
         clinician_id (int): The ID of the clinician handling the discharge.
         discharge_notes (str): A note indicating the reason for discharge or any additional relevant details.
         session (Session): The SQLAlchemy session used for database operations.
@@ -73,7 +76,7 @@ def create_discharge_record(patient_id: int, clinician_id: int, discharge_notes:
         None
     """
     discharge_record = ReferralAdmission(
-        patient_id=patient_id,
+        patient_id=patient.id,
         discharge_date=date.today(),
         referral_status=ReferralStatusEnum.DISCHARGED,
         referral_type="In",  # "In" because this patient was referred in
@@ -82,6 +85,7 @@ def create_discharge_record(patient_id: int, clinician_id: int, discharge_notes:
     )
     session.add(discharge_record)
     session.commit()
+
 
 def handle_referral_and_discharge(patient_id: int, clinician_id: int, discharge_notes: str, session) -> None:
     """
@@ -98,6 +102,10 @@ def handle_referral_and_discharge(patient_id: int, clinician_id: int, discharge_
     Returns:
         None
     """
-    create_referral_in(patient_id, clinician_id, session)
-    create_referral_out(patient_id, clinician_id, session)
-    create_discharge_record(patient_id, clinician_id, discharge_notes, session)
+    patient = session.query(Patient).filter(Patient.id == patient_id).one_or_none()
+    if not patient:
+        raise ValueError(f"Patient with id {patient_id} not found")
+
+    create_referral_in(patient, clinician_id, session)
+    create_referral_out(patient, clinician_id, session)
+    create_discharge_record(patient, clinician_id, discharge_notes, session)

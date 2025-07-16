@@ -9,11 +9,11 @@ from typing import Dict, Any
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from sqlalchemy.types import Float
+# from sqlalchemy.types import Float
 
-from app.models.clinician import Clinician
+# from app.models.clinician import Clinician
 from app.models.admissions import ReferralAdmission
-from app.models.pathway import PathwayProgress
+# from app.models.pathway import PathwayProgress
 from app.models.clinician import ClinicianTask
 from app.models.appointments import Appointment
 
@@ -47,6 +47,17 @@ def get_active_clinician_count(session: Session, for_date: date) -> int:
 
 
 def avg_patients_admitted(session: Session, for_date: date, clinician_count: int) -> float:
+    """
+    Calculate the average number of patients admitted per clinician on a given date.
+
+    Args:
+        session (Session): SQLAlchemy database session.
+        for_date (date): The date for which to calculate the admissions.
+        clinician_count (int): The number of clinicians available on that date.
+
+    Returns:
+        float: The average number of admitted patients per clinician. Returns 0 if clinician_count is 0.
+    """
     total = session.query(ReferralAdmission).filter(
         func.date(ReferralAdmission.admission_time) == for_date
     ).count()
@@ -54,16 +65,37 @@ def avg_patients_admitted(session: Session, for_date: date, clinician_count: int
 
 
 def avg_patients_seen(session: Session, for_date: date, clinician_count: int) -> float:
+    """
+    Calculate the average number of patients seen (excluding no-shows) per clinician on a given date.
+
+    Args:
+        session (Session): SQLAlchemy database session.
+        for_date (date): The date for which to calculate the patient visits.
+        clinician_count (int): The number of clinicians available on that date.
+
+    Returns:
+        float: The average number of patients seen per clinician. Returns 0 if clinician_count is 0.
+    """
     total = session.query(Appointment).filter(
         func.date(Appointment.date) == for_date,
-        Appointment.no_show == False
+        Appointment.no_show is False
     ).count()
     return total / clinician_count if clinician_count else 0
 
 
 def avg_outstanding_tasks(session: Session, clinician_count: int) -> float:
+    """
+    Calculate the average number of outstanding (incomplete) tasks per clinician.
+
+    Args:
+        session (Session): SQLAlchemy database session.
+        clinician_count (int): The number of clinicians.
+
+    Returns:
+        float: The average number of outstanding tasks per clinician. Returns 0 if clinician_count is 0.
+    """
     total = session.query(ClinicianTask).filter(
-        ClinicianTask.completed == False
+        ClinicianTask.completed is False
     ).count()
     return total / clinician_count if clinician_count else 0
 

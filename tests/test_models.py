@@ -9,7 +9,7 @@ from app.models.clinician import Clinician,ClinicianTask
 from app.models.mdt import MDTMeeting,MDTParticipant,MDTAction,MDTCase
 from app.models.messaging import Message,Conversation
 from app.models.metrics import MDTMetrics,ReferralMetrics,AdminMetrics,OperationalMetrics,PatientMetrics,PathwayMetrics,ClinicianMetrics
-from app.models.Organisation import Organisation
+from app.models.organisation import Organisation
 from app.models.pathway import PathwayProgress, PathwayOutcomeEnum, PathwayStatusEnum
 from app.models.patient import Patient
 from app.models.referrals import Referral
@@ -371,7 +371,7 @@ def test_create_admin_metrics(db_session):
     assert metric.id is not None
     assert metric.metric_name == "System Uptime"
 
-# testing Organisation.py
+# testing organisation.py
 def test_create_organisation(db_session):
     org = Organisation(name="Test Org", code="TEST123")
     db_session.add(org)
