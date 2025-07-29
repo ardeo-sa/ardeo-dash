@@ -7,7 +7,7 @@ and each message includes metadata such as sender, receiver, timestamp, and read
 """
 # from datetime import datetime
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, DateTime, Boolean, ForeignKey, Text
@@ -32,7 +32,7 @@ class Conversation(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     user1_id = Column(UUID(as_uuid=True), nullable=False)
     user2_id = Column(UUID(as_uuid=True), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     # Relationships
     messages = relationship("Message", back_populates="conversation")
@@ -58,7 +58,7 @@ class Message(Base):
     sender_id = Column(UUID(as_uuid=True), nullable=False)
     receiver_id = Column(UUID(as_uuid=True), nullable=False)
     content = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=datetime.now(timezone.utc))
     read = Column(Boolean, default=False)
 
     # Relationships

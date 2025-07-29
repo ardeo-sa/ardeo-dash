@@ -1,5 +1,7 @@
 fastapi
 uvicorn
+a2wsgi
+
 sqlalchemy
 pydantic
 python-dotenv

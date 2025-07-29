@@ -4,6 +4,7 @@ import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import InvalidRequestError
 
 from app.database.metrics import Base
 
@@ -36,8 +37,16 @@ def db_session(engine, tables):
     yield session
 
     session.close()
-    transaction.rollback()
-    connection.close()
+    try:
+        if transaction.is_active:
+            transaction.rollback()
+    except InvalidRequestError:
+        pass
+
+    try:
+        connection.close()
+    except Exception:
+        pass
 
 def pytest_configure():
     os.environ["TESTING"] = "1"

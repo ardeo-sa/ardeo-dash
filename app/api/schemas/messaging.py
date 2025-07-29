@@ -14,7 +14,7 @@ Schemas:
 from uuid import UUID
 from datetime import datetime
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class MessageCreate(BaseModel):
     """
@@ -31,11 +31,7 @@ class MessageCreate(BaseModel):
     receiver_id: UUID
     content: str
 
-    class Config:
-        """
-            Enables ORM mode for converting SQLAlchemy objects to Pydantic models.
-        """
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MessageOut(BaseModel):
@@ -55,11 +51,7 @@ class MessageOut(BaseModel):
     timestamp: datetime
     read: bool
 
-    class Config:
-        """
-            Enables ORM mode for converting SQLAlchemy objects to Pydantic models.
-        """
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ConversationOut(BaseModel):
@@ -79,11 +71,7 @@ class ConversationOut(BaseModel):
     created_at: datetime
     messages: List[MessageOut]
 
-    class Config:
-        """
-            Enables ORM mode for converting SQLAlchemy objects to Pydantic models.
-        """
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ConversationCreate(BaseModel):
@@ -97,8 +85,4 @@ class ConversationCreate(BaseModel):
     user1_id: UUID
     user2_id: UUID
 
-    class Config:
-        """
-            Enables ORM mode for converting SQLAlchemy objects to Pydantic models.
-        """
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
