@@ -111,7 +111,7 @@ def test_get_admissions_discharge_counts():
     """
     mock_session = MagicMock()
     test_date = datetime.today().date()
-    mock_session.query.return_value.filter.return_value.scalar.side_effect = [3, 2]
+    mock_session.query.return_value.filter.return_value.count.side_effect = [3, 2]
 
     adm, dis = get_admissions_discharge_counts(mock_session, test_date)
     assert adm == 3

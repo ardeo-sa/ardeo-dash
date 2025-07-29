@@ -11,7 +11,7 @@ attributes such as alignment, colors, dimensions, and roles.
 The FormField subclass includes a property to parse embedded banding data XML.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
@@ -86,7 +86,7 @@ class AFObject(Base):
     afo_alignment = Column(String)
     afo_bg_colour = Column(String)
     afo_colour_code = Column(String)
-    afo_creation_date = Column(DateTime, default=datetime.utcnow)
+    afo_creation_date = Column(DateTime, default=datetime.now(timezone.utc))
     afo_description = Column(String)
     afo_domain = Column(String, nullable=False)
     field_label_position = Column(String)
@@ -95,7 +95,7 @@ class AFObject(Base):
     afo_label_align = Column(String)
     afo_label_type = Column(String)
     afo_label_url = Column(String)
-    afo_modified_date = Column(DateTime, default=datetime.utcnow)
+    afo_modified_date = Column(DateTime, default=datetime.now(timezone.utc))
     afo_name = Column(String, nullable=False)
     afo_unique_string = Column(String, nullable=False)
     afo_width = Column(Integer)

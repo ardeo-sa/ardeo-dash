@@ -3,7 +3,8 @@ Module for integrating a Dash dashboard into a FastAPI application using WSGIMid
 """
 from dash import Dash
 from fastapi import FastAPI
-from starlette.middleware.wsgi import WSGIMiddleware
+from a2wsgi import WSGIMiddleware
+
 
 from app.dash_app.dashboard import create_dashboard
 
