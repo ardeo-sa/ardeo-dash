@@ -12,3 +12,6 @@ pandas
 pymysql
 psycopg2-binary
 httpx
+
+python-json-logger
+prometheus-fastapi-instrumentator
