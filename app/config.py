@@ -7,6 +7,9 @@ from sqlalchemy.orm import declarative_base
 
 load_dotenv()
 
+DISABLE_DB = os.getenv("DISABLE_DB", "0") == "1"
+BOOTSTRAP_METRICS_DB = os.getenv("BOOTSTRAP_METRICS_DB", "false").lower() == "true"
+
 primary_db_user = os.getenv("PRIMARY_DB_USER", "user123")
 primary_db_password = os.getenv("PRIMARY_DB_PASSWORD", "pass123")
 primary_db_host = os.getenv("PRIMARY_DB_HOST", "someurl")
@@ -37,3 +40,8 @@ Base = declarative_base()
 
 METRICS_DB_URI = (f"postgresql://{metrics_db_user}:{metrics_db_password}@{metrics_db_host}:"
                   f"{metrics_db_port}/{metrics_db_name}")
+
+# Settings for data scraping
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+TIMEOUT = int(os.getenv("TIMEOUT", "5"))
+DISABLE_MEETINGS_FETCH = os.getenv("DISABLE_MEETINGS_FETCH", "false").lower() == "true"

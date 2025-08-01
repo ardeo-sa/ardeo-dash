@@ -23,7 +23,6 @@ Note:
       are set up correctly, including database connections and any Dash
       component dependencies.
 """
-import os
 import logging
 
 from fastapi import FastAPI
@@ -31,23 +30,24 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.routes import metrics
 from app.dash_app.integration import mount_dash
-from app.api.routes import messaging
 from app.services.process_data.port_primary_data import portprimarydata
 from app.services.operations.aggregator import process_data
-# from app.database.metrics import Base, metrics_engine
+from app.database.metrics import init_metrics_engine
 from app.logging_config import setup_logging
 
 setup_logging()
-
-
 app = FastAPI()
 app.include_router(metrics.router, prefix="/api")
-app.include_router(messaging.router, prefix="/api")
 
-if os.getenv("TESTING") != "1":
-    portprimarydata()
-    process_data()
-    mount_dash(app)
+@app.on_event("startup")
+def on_startup():
+    try:
+        init_metrics_engine()
+        portprimarydata()
+        process_data()
+        mount_dash(app)
+    except Exception as e:
+        logging.error(f"Startup failure: {e}", exc_info=True)
 
 Instrumentator().instrument(app).expose(app)
 

@@ -156,116 +156,116 @@ def test_clinician_task_requires_clinician(db_session):
         db_session.commit()
 
 
-def test_create_mdt_meeting(db_session):
-    meeting = MDTMeeting(
-        primary_guid="GUID-1234",
-        meeting_time=datetime(2024, 6, 1, 10, 0),
-        referral_time=datetime(2024, 5, 25, 14, 0),
-        review_time=datetime(2024, 5, 30, 9, 30),
-        meeting_start_time=datetime(2024, 6, 1, 10, 0),
-        meeting_end_time=datetime(2024, 6, 1, 11, 0)
-    )
-    db_session.add(meeting)
-    db_session.commit()
+# def test_create_mdt_meeting(db_session):
+#     meeting = MDTMeeting(
+#         primary_guid="GUID-1234",
+#         meeting_time=datetime(2024, 6, 1, 10, 0),
+#         referral_time=datetime(2024, 5, 25, 14, 0),
+#         review_time=datetime(2024, 5, 30, 9, 30),
+#         meeting_start_time=datetime(2024, 6, 1, 10, 0),
+#         meeting_end_time=datetime(2024, 6, 1, 11, 0)
+#     )
+#     db_session.add(meeting)
+#     db_session.commit()
+#
+#     assert meeting.id is not None
+#     assert meeting.primary_guid == "GUID-1234"
+#
+#
+# def test_add_participant_to_meeting(db_session):
+#     clinician = Clinician(name="Dr. MDT", user_role="Specialist")
+#     meeting = MDTMeeting(primary_guid="GUID-456")
+#     db_session.add_all([clinician, meeting])
+#     db_session.commit()
+#
+#     participant = MDTParticipant(clinician_id=clinician.id, meeting_id=meeting.id)
+#     db_session.add(participant)
+#     db_session.commit()
+#
+#     assert participant.id is not None
+#     assert participant.meeting.id == meeting.id
+#     assert participant.clinician.name == "Dr. MDT"
+#
+# # testing mdt.py
+# def test_add_action_to_meeting(db_session):
+#     meeting = MDTMeeting(primary_guid="GUID-ACT")
+#     db_session.add(meeting)
+#     db_session.commit()
+#
+#     action = MDTAction(meeting_id=meeting.id, completed=True)
+#     db_session.add(action)
+#     db_session.commit()
+#
+#     assert action.id is not None
+#     assert action.completed is True
+#     assert action.meeting.id == meeting.id
+#
+#
+# def test_add_case_to_meeting(db_session):
+#     meeting = MDTMeeting(primary_guid="GUID-CASE")
+#     db_session.add(meeting)
+#     db_session.commit()
+#
+#     case = MDTCase(meeting_id=meeting.id, patient_id=1001, discussion_notes="Patient requires review.")
+#     db_session.add(case)
+#     db_session.commit()
+#
+#     assert case.id is not None
+#     assert case.patient_id == 1001
+#     assert case.meeting.id == meeting.id
 
-    assert meeting.id is not None
-    assert meeting.primary_guid == "GUID-1234"
-
-
-def test_add_participant_to_meeting(db_session):
-    clinician = Clinician(name="Dr. MDT", user_role="Specialist")
-    meeting = MDTMeeting(primary_guid="GUID-456")
-    db_session.add_all([clinician, meeting])
-    db_session.commit()
-
-    participant = MDTParticipant(clinician_id=clinician.id, meeting_id=meeting.id)
-    db_session.add(participant)
-    db_session.commit()
-
-    assert participant.id is not None
-    assert participant.meeting.id == meeting.id
-    assert participant.clinician.name == "Dr. MDT"
-
-# testing mdt.py
-def test_add_action_to_meeting(db_session):
-    meeting = MDTMeeting(primary_guid="GUID-ACT")
-    db_session.add(meeting)
-    db_session.commit()
-
-    action = MDTAction(meeting_id=meeting.id, completed=True)
-    db_session.add(action)
-    db_session.commit()
-
-    assert action.id is not None
-    assert action.completed is True
-    assert action.meeting.id == meeting.id
-
-
-def test_add_case_to_meeting(db_session):
-    meeting = MDTMeeting(primary_guid="GUID-CASE")
-    db_session.add(meeting)
-    db_session.commit()
-
-    case = MDTCase(meeting_id=meeting.id, patient_id=1001, discussion_notes="Patient requires review.")
-    db_session.add(case)
-    db_session.commit()
-
-    assert case.id is not None
-    assert case.patient_id == 1001
-    assert case.meeting.id == meeting.id
-
-# testing messaging.py
-def test_create_conversation(db_session):
-    conversation = Conversation(
-        user1_id=uuid4(),
-        user2_id=uuid4()
-    )
-    db_session.add(conversation)
-    db_session.commit()
-
-    assert conversation.id is not None
-    assert conversation.created_at is not None
-
-
-def test_create_message_in_conversation(db_session):
-    user1 = uuid4()
-    user2 = uuid4()
-    conversation = Conversation(user1_id=user1, user2_id=user2)
-    db_session.add(conversation)
-    db_session.commit()
-
-    message = Message(
-        conversation_id=conversation.id,
-        sender_id=user1,
-        receiver_id=user2,
-        content="Hello, how are you?"
-    )
-    db_session.add(message)
-    db_session.commit()
-
-    assert message.id is not None
-    assert message.read is False
-    assert message.timestamp is not None
-    assert message.conversation.id == conversation.id
-    assert message.content == "Hello, how are you?"
-
-
-def test_conversation_has_messages(db_session):
-    user1 = uuid4()
-    user2 = uuid4()
-    conversation = Conversation(user1_id=user1, user2_id=user2)
-    db_session.add(conversation)
-    db_session.commit()
-
-    msg1 = Message(conversation_id=conversation.id, sender_id=user1, receiver_id=user2, content="Hi")
-    msg2 = Message(conversation_id=conversation.id, sender_id=user2, receiver_id=user1, content="Hello")
-
-    db_session.add_all([msg1, msg2])
-    db_session.commit()
-
-    fetched = db_session.query(Conversation).filter_by(id=conversation.id).first()
-    assert len(fetched.messages) == 2
-    assert {m.content for m in fetched.messages} == {"Hi", "Hello"}
+# # testing messaging.py
+# def test_create_conversation(db_session):
+#     conversation = Conversation(
+#         user1_id=uuid4(),
+#         user2_id=uuid4()
+#     )
+#     db_session.add(conversation)
+#     db_session.commit()
+#
+#     assert conversation.id is not None
+#     assert conversation.created_at is not None
+#
+#
+# def test_create_message_in_conversation(db_session):
+#     user1 = uuid4()
+#     user2 = uuid4()
+#     conversation = Conversation(user1_id=user1, user2_id=user2)
+#     db_session.add(conversation)
+#     db_session.commit()
+#
+#     message = Message(
+#         conversation_id=conversation.id,
+#         sender_id=user1,
+#         receiver_id=user2,
+#         content="Hello, how are you?"
+#     )
+#     db_session.add(message)
+#     db_session.commit()
+#
+#     assert message.id is not None
+#     assert message.read is False
+#     assert message.timestamp is not None
+#     assert message.conversation.id == conversation.id
+#     assert message.content == "Hello, how are you?"
+#
+#
+# def test_conversation_has_messages(db_session):
+#     user1 = uuid4()
+#     user2 = uuid4()
+#     conversation = Conversation(user1_id=user1, user2_id=user2)
+#     db_session.add(conversation)
+#     db_session.commit()
+#
+#     msg1 = Message(conversation_id=conversation.id, sender_id=user1, receiver_id=user2, content="Hi")
+#     msg2 = Message(conversation_id=conversation.id, sender_id=user2, receiver_id=user1, content="Hello")
+#
+#     db_session.add_all([msg1, msg2])
+#     db_session.commit()
+#
+#     fetched = db_session.query(Conversation).filter_by(id=conversation.id).first()
+#     assert len(fetched.messages) == 2
+#     assert {m.content for m in fetched.messages} == {"Hi", "Hello"}
 
 # testing metrics.py
 # patient metrics

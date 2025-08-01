@@ -4,13 +4,39 @@ This module initializes the SQLAlchemy engine and session for connecting to the 
 It creates:
 - `primary_engine`: A SQLAlchemy engine for managing the database connection to the primary database.
 - `PrimarySessionLocal`: A session factory used to interact with the primary database through SQLAlchemy sessions.
+    The session is configured with:
+        - autocommit=False: Disables automatic commit for the session.
+        - autoflush=False: Disables automatic flushing of changes to the database.
+        - bind=primary_engine: The session will be bound to the primary database engine.
+
 
 The engine and session are configured based on the database URI defined in the application's settings.
 """
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.config import PRIMARY_DB_URI
+from app.config import PRIMARY_DB_URI, DISABLE_DB
+
+primary_engine = None
+PrimarySessionLocal = None
+
+
+if not DISABLE_DB:
+    try:
+        primary_engine = create_engine(PRIMARY_DB_URI)
+        # Test connection immediately
+        with primary_engine.connect() as conn:
+            pass
+        PrimarySessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=primary_engine)
+
+    except Exception as e:
+        print(f"Warning: Failed to create primary DB engine/session: {e}")
+        primary_engine = None
+        PrimarySessionLocal = None
+else:
+    print("Primary DB engine creation disabled by DISABLE_DB flag")
+
+
 
 primary_engine = create_engine(PRIMARY_DB_URI)
 """
