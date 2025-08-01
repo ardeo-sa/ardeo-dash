@@ -33,6 +33,7 @@ from app.dash_app.integration import mount_dash
 from app.services.process_data.port_primary_data import portprimarydata
 from app.services.operations.aggregator import process_data
 from app.database.metrics import init_metrics_engine
+from app.database.primary import init_primary_engine
 from app.logging_config import setup_logging
 
 setup_logging()
@@ -42,6 +43,7 @@ app.include_router(metrics.router, prefix="/api")
 @app.on_event("startup")
 def on_startup():
     try:
+        init_primary_engine()
         init_metrics_engine()
         portprimarydata()
         process_data()

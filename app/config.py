@@ -7,7 +7,7 @@ from sqlalchemy.orm import declarative_base
 
 load_dotenv()
 
-DISABLE_DB = os.getenv("DISABLE_DB", "0") == "1"
+DISABLE_PRIMARY_DB = os.getenv("DISABLE_PRIMARY_DB", "false").lower() == "true"
 BOOTSTRAP_METRICS_DB = os.getenv("BOOTSTRAP_METRICS_DB", "false").lower() == "true"
 
 primary_db_user = os.getenv("PRIMARY_DB_USER", "user123")
