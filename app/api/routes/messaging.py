@@ -6,6 +6,7 @@ to send a message or fetch the full message history of a specific conversation.
 """
 from uuid import UUID
 from typing import List
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -28,7 +29,15 @@ def send_message(message: MessageCreate, db: Session = Depends(get_db)):
     Returns:
         MessageOut: The created message with metadata (e.g., timestamp, ID).
     """
-    return create_message(db, message)
+    logging.info("Sending message from %s to %s", message.sender_id, message.recipient_id)
+    try:
+        msg = create_message(db, message)
+        logging.debug("Message created successfully: %s", msg)
+        return msg
+    except Exception as e:
+        logging.exception("Error occurred while sending message: %s", e)
+        raise HTTPException(status_code=500, detail="Failed to send message")
+
 
 @router.get("/{conversation_id}", response_model=List[MessageOut])
 def fetch_messages(conversation_id: UUID, db: Session = Depends(get_db)):
@@ -45,7 +54,17 @@ def fetch_messages(conversation_id: UUID, db: Session = Depends(get_db)):
         Returns:
             List[MessageOut]: A list of messages in the conversation, ordered chronologically.
     """
-    messages = get_conversation_messages(db, conversation_id)
-    if not messages:
-        raise HTTPException(status_code=404, detail="Conversation not found or empty")
-    return messages
+    logging.info("Fetching messages for conversation ID: %s", conversation_id)
+    try:
+        messages = get_conversation_messages(db, conversation_id)
+        if not messages:
+            logging.warning("No messages found for conversation ID: %s", conversation_id)
+            raise HTTPException(status_code=404, detail="Conversation not found or empty")
+        logging.debug("Fetched %d messages from conversation ID: %s", len(messages), conversation_id)
+        return messages
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.exception("Unexpected error fetching messages for conversation ID %s: %s", conversation_id, e)
+        raise HTTPException(status_code=500, detail="Failed to fetch messages")
+

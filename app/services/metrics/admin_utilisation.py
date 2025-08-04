@@ -3,6 +3,7 @@ This module defines metrics for administrative and resource utilization, includi
 - Patient-to-clinician ratios
 - Use of diagnostics and treatment slots
 """
+import logging
 from datetime import datetime, date
 from typing import Dict, Any
 

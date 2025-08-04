@@ -7,7 +7,8 @@ of various metric categories including patient, MDT, pathway, and operational me
 The aggregated data is calculated from the primary database and persisted in
 the metrics database for reporting and analysis purposes.
 """
-from fastapi import APIRouter
+import logging
+from fastapi import APIRouter, HTTPException
 from app.services.metrics.aggregator import aggregate_all_metrics
 
 router = APIRouter()
@@ -25,5 +26,13 @@ def run_metrics_aggregation():
     Returns:
         dict: A confirmation message upon successful aggregation.
     """
-    aggregate_all_metrics()
-    return {"status": "aggregation complete"}
+    logging.info("Aggregation endpoint called: starting full metrics aggregation.")
+    try:
+        aggregate_all_metrics()
+        logging.info("Aggregation completed successfully.")
+        return {"status": "aggregation complete"}
+    except Exception as e:
+        logging.exception("Metrics aggregation failed: %s", e)
+        raise HTTPException(status_code=500, detail="Aggregation failed due to server error.")
+
+
