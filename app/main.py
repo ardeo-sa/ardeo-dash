@@ -32,8 +32,8 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from app.api.routes import metrics
 from app.dash_app.integration import mount_dash
 from app.api.routes import messaging
-from app.services.process_data.port_primary_data import portprimarydata
-from app.services.operations.process_primary_data import process_data
+from app.services.data_importers.port_primary_data import portprimarydata
+from app.services.data_processing.process_primary_data import process_data
 # from app.database.metrics import Base, metrics_engine
 from app.logging_config import setup_logging
 

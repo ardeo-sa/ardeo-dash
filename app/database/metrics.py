@@ -35,7 +35,7 @@ def init_metrics_db():
     Initializes the metrics database connection by creating the engine and session factory.
 
     This function sets the global `metrics_engine` and `MetricsSessionLocal` variables.
-    Should be called before performing any database operations.
+    Should be called before performing any database data_processing.
 
     Raises:
         ValueError: If the METRICS_DB_URI is not defined or the engine could not be initialized.

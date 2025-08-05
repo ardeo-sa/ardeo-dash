@@ -7,11 +7,11 @@ database to ensure synchronized reporting and analytics.
 """
 from app.database.metrics import MetricsSessionLocal
 from app.database.primary import PrimarySessionLocal
-# from app.services.process_data.clinician_import_service import ClinicianImportService
-from app.services.process_data.mdt_import_service import MdtImportService
-# from app.services.process_data.organisation_import_service import OrganisationImportService
-# from app.services.process_data.pathway_import_service import PathwayImportService
-# from app.services.process_data.patient_import_service import PatientImportService
+# from app.services.data_importers.clinician_import_service import ClinicianImportService
+from app.services.data_importers.mdt_import_service import MdtImportService
+# from app.services.data_importers.organisation_import_service import OrganisationImportService
+# from app.services.data_importers.pathway_import_service import PathwayImportService
+# from app.services.data_importers.patient_import_service import PatientImportService
 
 def portprimarydata():
     """

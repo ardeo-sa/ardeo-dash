@@ -6,7 +6,7 @@ invokes the `calculate_metrics()` function from the `app.services.metrics.aggreg
 module to aggregate and store operational metrics in the system.
 
 The task runs asynchronously in the background, allowing the system to process metric aggregation
-without blocking other operations.
+without blocking other data_processing.
 
 Modules:
     - `calculate_metrics`: A function that performs the aggregation of metrics.

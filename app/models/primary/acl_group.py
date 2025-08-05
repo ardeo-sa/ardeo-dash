@@ -15,7 +15,7 @@ class AclGroup(Base):
     __mapper_args__: dict Contains the polymorphic identity for this model, defining it as a 'group'.
     Relationships:
     members: relationship A one-to-many relationship with the GroupUsername model, representing the users associated
-    with this group.Includes cascading operations for when a group is deleted. """
+    with this group.Includes cascading data_processing for when a group is deleted. """
 
     __mapper_args__ = {
         'polymorphic_identity': 'group',

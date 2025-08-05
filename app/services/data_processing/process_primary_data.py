@@ -15,8 +15,8 @@ initialization and does not return or persist any values itself.
 import logging
 
 from app.database.primary import PrimarySessionLocal
-from app.services.operations.subject_service import SubjectService
-from app.services.operations.pathway_service import PathwayService
+from app.services.data_processing.subject_service import SubjectService
+from app.services.data_processing.pathway_service import PathwayService
 
 logger = logging.getLogger(__name__)
 
