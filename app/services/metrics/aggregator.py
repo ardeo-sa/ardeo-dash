@@ -8,7 +8,7 @@ Functions:
 from datetime import date
 
 from app.database.primary import PrimarySessionLocal
-from app.database.metrics import MetricsSessionLocal, init_metrics_db
+from app.database.metrics import MetricsSessionLocal
 
 from app.models.metrics import (
     PathwayMetrics,

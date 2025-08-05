@@ -157,18 +157,101 @@ fastapi_dash_metrics/
 
 
 ## Getting Started
+### Install Redis server
+#### Manual Setup (Ubuntu/Debian)
 ```bash
-# 1. Create virtual env and install dependencies
+# Update package list
+sudo apt update
+
+# Install Redis
+sudo apt install redis-server
+
+# Start Redis
+sudo systemctl start redis
+
+# (Optional) Enable Redis to start on boot
+sudo systemctl enable redis
+
+# Verify it's running
+redis-cli ping
+```
+#### Run docker
+```bash
+# Pull the latest lightweight Redis image and starts it on port 6379
+docker run -d \
+  --name redis \
+  -p 6379:6379 \
+  redis:7-alpine
+# Verify
+docker logs redis
+docker exec -it redis redis-cli ping
+```
+
+### Install PostgreSQL
+```bash
+# Install PostgreSQL
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+
+# Start PostgreSQL
+sudo systemctl start postgresql
+
+# To enable it at boot
+sudo systemctl enable postgresql
+
+# Verify
+sudo systemctl status postgresql
+
+# Connect to test
+sudo -u postgres psql
+# Run
+\conninfo
+# Quit
+\q
+```
+
+
+### Manual Setup
+```bash
+# 1. (Optional) Generate SSH key for remote access
+ssh-keygen -t ed25519 -C "your_email@example.com"
+# Then add the public key (~/.ssh/id_ed25519.pub) to your server's ~/.ssh/authorized_keys
+
+# 2. Connect via WireGuard (if required)
+# Ensure you're not on the same subnet (192.168.0.0/24) as the remote LAN
+# If needed, switch to a different network (e.g. mobile hotspot)
+
+# 3. Clone the repository and enter the project directory
+git clone git@github.com:your-org/ardeo-dash.git
+cd ardeo-dash
+
+# 4. Create virtual env and install dependencies
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
-# 2. Set up environment variables
-cp .env.example .env  # Edit DB URIs, secrets
+# 5. Set up environment variables
+cp env.example .env  # Edit DB URIs, secrets
 
-# 3. Run backend and dashboard
+# 6. Ensure required services are running (e.g., Redis, PostgreSQL)
+# Start Redis (use instructions above to enable it)
+# redis-server (when redis installed from sources)
+
+# Start PostgreSQL (use instructions above to enable it)
+# sudo systemctl start postgresql
+
+# 7. Run backend and dashboard
 python run.py
 
 # 4. (Optional) Run background metrics aggregation
 celery -A app.tasks.worker worker --loglevel=info
-
 ```
+### Docker
+```bash
+# Start all services with Docker
+docker compose up -d
+```
+
+## Troubleshooting
+* Connection Refused errors? Make sure Redis, Postgres, or other services your app depends on are running.
+* WireGuard traffic not routing correctly? Avoid using the same LAN subnet as the remote peer (e.g., 192.168.0.0/24).
+* Can't SSH to internal IPs via VPN? Ensure your local IP doesn't conflict and the server allows forwarding.
