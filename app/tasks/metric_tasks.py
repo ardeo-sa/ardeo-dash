@@ -6,7 +6,7 @@ invokes the `calculate_metrics()` function from the `app.services.metrics.aggreg
 module to aggregate and store operational metrics in the system.
 
 The task runs asynchronously in the background, allowing the system to process metric aggregation
-without blocking other operations.
+without blocking other data_processing.
 
 Modules:
     - `calculate_metrics`: A function that performs the aggregation of metrics.
@@ -16,8 +16,12 @@ Usage:
     To execute the metric aggregation asynchronously, call the `run_metric_aggregation` task
     within the Celery worker framework.
 """
+import logging
+
 from app.services.metrics.aggregator import aggregate_all_metrics
 from app.tasks.worker import celery
+
+logger = logging.getLogger(__name__)
 
 @celery.task
 def run_metric_aggregation():
