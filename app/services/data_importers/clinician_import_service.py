@@ -8,10 +8,15 @@ by consolidating user roles, and stores the resulting Clinician records into the
 
 This facilitates synchronizing clinician information between the primary user system and the metrics reporting system.
 """
+import logging
+
 from sqlalchemy.orm import Session
 
 from app.models.clinician import Clinician
 from app.models.primary.users import Users
+
+logger = logging.getLogger(__name__)
+
 
 class ClinicianImportService:
     """
@@ -35,8 +40,15 @@ class ClinicianImportService:
 
     def import_clinician(self):
         """ username and roles(as concatenated string)  are fetched and stored from primary db to metrics db """
+        logger.info("Starting clinician import process.")
+
         # Query all users with their roles (ORM style)
-        users = self.primary_db.query(Users).outerjoin(Users.roles).all()
+        try:
+            users = self.primary_db.query(Users).outerjoin(Users.roles).all()
+            logger.debug(f"Fetched {len(users)} users from primary DB.")
+        except Exception as e:
+            logger.exception("Failed to fetch users from primary DB.")
+            raise
 
         clinicians = {}
 
@@ -55,6 +67,13 @@ class ClinicianImportService:
             clinician.user_role = list(set(role_values))  # Deduplicate roles
 
             clinicians[user.user_id] = clinician
+            logger.debug(f"Prepared Clinician: id={user.user_id}, name={user.username}, roles={clinician.user_role}")
 
-        self.secondary_db.add_all(clinicians.values())
-        self.secondary_db.commit()
+        try:
+            self.secondary_db.add_all(clinicians.values())
+            self.secondary_db.commit()
+            logger.info(f"Successfully imported {len(clinicians)} clinicians to secondary DB.")
+        except Exception as e:
+            logger.exception("Failed to write clinicians to secondary DB.")
+            self.secondary_db.rollback()
+            raise
