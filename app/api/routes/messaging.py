@@ -15,6 +15,7 @@ from app.database.metrics import get_db
 from app.api.schemas.messaging import MessageCreate, MessageOut
 from app.services.messaging_service import create_message, get_conversation_messages
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/messages", tags=["Messaging"])
 
 @router.post("/", response_model=MessageOut)
@@ -29,13 +30,13 @@ def send_message(message: MessageCreate, db: Session = Depends(get_db)):
     Returns:
         MessageOut: The created message with metadata (e.g., timestamp, ID).
     """
-    logging.info("Sending message from %s to %s", message.sender_id, message.recipient_id)
+    logger.info("Sending message from %s to %s", message.sender_id, message.recipient_id)
     try:
         msg = create_message(db, message)
-        logging.debug("Message created successfully: %s", msg)
+        logger.debug("Message created successfully: %s", msg)
         return msg
     except Exception as e:
-        logging.exception("Error occurred while sending message: %s", e)
+        logger.exception("Error occurred while sending message: %s", e)
         raise HTTPException(status_code=500, detail="Failed to send message")
 
 
@@ -54,17 +55,17 @@ def fetch_messages(conversation_id: UUID, db: Session = Depends(get_db)):
         Returns:
             List[MessageOut]: A list of messages in the conversation, ordered chronologically.
     """
-    logging.info("Fetching messages for conversation ID: %s", conversation_id)
+    logger.info("Fetching messages for conversation ID: %s", conversation_id)
     try:
         messages = get_conversation_messages(db, conversation_id)
         if not messages:
-            logging.warning("No messages found for conversation ID: %s", conversation_id)
+            logger.warning("No messages found for conversation ID: %s", conversation_id)
             raise HTTPException(status_code=404, detail="Conversation not found or empty")
-        logging.debug("Fetched %d messages from conversation ID: %s", len(messages), conversation_id)
+        logger.debug("Fetched %d messages from conversation ID: %s", len(messages), conversation_id)
         return messages
     except HTTPException:
         raise
     except Exception as e:
-        logging.exception("Unexpected error fetching messages for conversation ID %s: %s", conversation_id, e)
+        logger.exception("Unexpected error fetching messages for conversation ID %s: %s", conversation_id, e)
         raise HTTPException(status_code=500, detail="Failed to fetch messages")
 

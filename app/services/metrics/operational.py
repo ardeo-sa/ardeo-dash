@@ -33,6 +33,8 @@ from app.models.treatments import Treatment
 
 TOTAL_BEDS = 100  # Placeholder for real-time config or DB-driven count
 
+logger = logging.getLogger(__name__)
+
 
 def get_admissions_discharge_counts(session: Session, date_: datetime.date) -> Tuple[int, int]:
     """
@@ -59,8 +61,8 @@ def get_admissions_discharge_counts(session: Session, date_: datetime.date) -> T
         ReferralAdmission.discharge_time < end
     ).count()
 
-    logging.debug("Admissions on %s: %d", date_, admissions)
-    logging.debug("Discharges on %s: %d", date_, discharges)
+    logger.debug("Admissions on %s: %d", date_, admissions)
+    logger.debug("Discharges on %s: %d", date_, discharges)
     return admissions, discharges
 
 
@@ -78,7 +80,7 @@ def calculate_avg_length_of_stay(session: Session) -> float:
     los_list = [(a.discharge_time - a.admit_time).days for a in stays if a.admit_time and a.discharge_time]
     avg = sum(los_list) / len(los_list) if los_list else 0
 
-    logging.debug("Average Length of Stay: %.2f days over %d discharges", avg, len(los_list))
+    logger.debug("Average Length of Stay: %.2f days over %d discharges", avg, len(los_list))
     return avg
 
 
@@ -99,7 +101,7 @@ def calculate_avg_mdt_wait_time(session: Session) -> float:
     wait_days = [(m.review_time - m.referral_time).days for m in meetings]
     avg = sum(wait_days) / len(wait_days) if wait_days else 0
 
-    logging.debug("Average MDT Wait Time: %.2f days across %d meetings", avg, len(wait_days))
+    logger.debug("Average MDT Wait Time: %.2f days across %d meetings", avg, len(wait_days))
     return avg
 
 
@@ -132,7 +134,7 @@ def calculate_readmissions(session: Session, days: int = 30) -> int:
         if a.discharge_time:
             last_discharge[a.patient_id] = a.discharge_time
 
-    logging.debug("Readmissions within %d days: %d", days, count)
+    logger.debug("Readmissions within %d days: %d", days, count)
     return count
 
 
@@ -151,7 +153,7 @@ def calculate_no_show_rate(session: Session) -> float:
     no_shows = sum(1 for a in appts if not a.attended and not a.cancelled)
     rate = (no_shows / total) * 100 if total else 0
 
-    logging.debug("Appointment No-Show Rate: %.2f%% (%d out of %d)", rate, no_shows, total)
+    logger.debug("Appointment No-Show Rate: %.2f%% (%d out of %d)", rate, no_shows, total)
     return rate
 
 
@@ -173,7 +175,7 @@ def calculate_bed_occupancy(session: Session, date_: datetime.date, total_beds: 
     ).count()
     rate = (occupied / total_beds) * 100
 
-    logging.debug("Bed Occupancy Rate on %s: %.2f%% (%d out of %d beds)", date_, rate, occupied, total_beds)
+    logger.debug("Bed Occupancy Rate on %s: %.2f%% (%d out of %d beds)", date_, rate, occupied, total_beds)
     return rate
 
 
@@ -199,7 +201,7 @@ def calculate_admit_to_treatment_time(session: Session) -> float:
     gaps = [(start - admit).days for admit, start in pairs if start > admit]
     avg = sum(gaps) / len(gaps) if gaps else 0
 
-    logging.debug("Avg Admission to Treatment Time: %.2f days across %d records", avg, len(gaps))
+    logger.debug("Avg Admission to Treatment Time: %.2f days across %d records", avg, len(gaps))
     return avg
 
 
@@ -215,7 +217,7 @@ def aggregate_operational_metrics(session: Session, date_: datetime.date = None)
         Dict[str, Any]: A dictionary containing metric names and their computed values.
     """
     date_ = date_ or datetime.today().date()
-    logging.info("Aggregating operational metrics for %s", date_)
+    logger.info("Aggregating operational metrics for %s", date_)
 
     admissions, discharges = get_admissions_discharge_counts(session, date_)
 
@@ -231,5 +233,5 @@ def aggregate_operational_metrics(session: Session, date_: datetime.date = None)
         "admission_to_treatment_start": calculate_admit_to_treatment_time(session),
     }
 
-    logging.debug("Aggregated Operational Metrics: %s", metrics)
+    logger.debug("Aggregated Operational Metrics: %s", metrics)
     return metrics

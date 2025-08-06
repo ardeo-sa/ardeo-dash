@@ -16,8 +16,12 @@ Usage:
     To execute the metric aggregation asynchronously, call the `run_metric_aggregation` task
     within the Celery worker framework.
 """
+import logging
+
 from app.services.metrics.aggregator import aggregate_all_metrics
 from app.tasks.worker import celery
+
+logger = logging.getLogger(__name__)
 
 @celery.task
 def run_metric_aggregation():

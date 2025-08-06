@@ -38,7 +38,7 @@ from app.services.data_processing.process_primary_data import process_data
 from app.logging_config import setup_logging
 
 setup_logging()
-
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.include_router(metrics.router, prefix="/api")
@@ -54,5 +54,5 @@ Instrumentator().instrument(app).expose(app)
 @app.get("/health")
 def health():
     """Endpoint to check app health status"""
-    logging.info("Health endpoint called")
+    logger.info("Health endpoint called")
     return {"status": "ok"}

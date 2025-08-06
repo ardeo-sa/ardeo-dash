@@ -25,6 +25,9 @@ from app.services.metrics.referrals import aggregate_referral_metrics
 from app.services.metrics.clinician_performance import aggregate_clinician_metrics
 from app.services.metrics.admin_utilisation import aggregate_admin_metrics
 
+logger = logging.getLogger(__name__)
+
+
 def aggregate_all_metrics():
     """
     Aggregates and stores all metrics, including operational, MDT metrics, pathway metrics, referral, clinician
@@ -45,11 +48,11 @@ def aggregate_all_metrics():
         None
     """
     today = date.today()
-    logging.info("Starting full metrics aggregation for %s", today)
+    logger.info("Starting full metrics aggregation for %s", today)
 
     try:
         init_metrics_db()
-        logging.debug("Metrics database initialized.")
+        logger.debug("Metrics database initialized.")
 
         with PrimarySessionLocal() as primary_db, MetricsSessionLocal() as metrics_db:
             record_counts = {}
@@ -64,7 +67,7 @@ def aggregate_all_metrics():
                     unit=unit
                 ))
             record_counts['operational'] = len(operational)
-            logging.debug("Operational metrics aggregated: %d", record_counts['operational'])
+            logger.debug("Operational metrics aggregated: %d", record_counts['operational'])
 
             # ----- MDT Metrics -----
             mdt = aggregate_mdt_metrics(primary_db)
@@ -78,7 +81,7 @@ def aggregate_all_metrics():
                     action_completion_rate=True
                 ))
             record_counts['mdt'] = len(mdt)
-            logging.debug("MDT metrics aggregated: %d", record_counts['mdt'])
+            logger.debug("MDT metrics aggregated: %d", record_counts['mdt'])
 
             # ----- Pathway Metrics -----
             pathway = aggregate_pathway_metrics(primary_db)
@@ -91,7 +94,7 @@ def aggregate_all_metrics():
                     no_show_rate=unit
                 ))
             record_counts['pathway'] = len(pathway)
-            logging.debug("Pathway metrics aggregated: %d", record_counts['pathway'])
+            logger.debug("Pathway metrics aggregated: %d", record_counts['pathway'])
 
 
             # ----- Referral Metrics -----
@@ -104,7 +107,7 @@ def aggregate_all_metrics():
                     unit=unit
                 ))
             record_counts['referral'] = len(referral)
-            logging.debug("Referral metrics aggregated: %d", record_counts['referral'])
+            logger.debug("Referral metrics aggregated: %d", record_counts['referral'])
 
             # ----- Clinician Metrics -----
             clinician = aggregate_clinician_metrics(primary_db)
@@ -116,7 +119,7 @@ def aggregate_all_metrics():
                     unit=unit
                 ))
             record_counts['clinician'] = len(clinician)
-            logging.debug("Clinician metrics aggregated: %d", record_counts['clinician'])
+            logger.debug("Clinician metrics aggregated: %d", record_counts['clinician'])
 
             # ----- Admin Metrics -----
             admin = aggregate_admin_metrics(primary_db)
@@ -128,12 +131,12 @@ def aggregate_all_metrics():
                     unit=unit
                 ))
             record_counts['admin'] = len(admin)
-            logging.debug("Admin metrics aggregated: %d", record_counts['admin'])
+            logger.debug("Admin metrics aggregated: %d", record_counts['admin'])
 
             metrics_db.commit()
-            logging.info("Metrics aggregation complete and committed: %s", record_counts)
+            logger.info("Metrics aggregation complete and committed: %s", record_counts)
 
     except Exception as e:
-        logging.exception("Aggregation failed due to error: %s", e)
+        logger.exception("Aggregation failed due to error: %s", e)
         raise
 

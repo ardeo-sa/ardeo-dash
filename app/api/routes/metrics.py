@@ -13,6 +13,7 @@ from app.services.metrics.aggregator import aggregate_all_metrics
 
 router = APIRouter()
 
+logger = logging.getLogger(__name__)
 
 @router.post("/metrics/aggregate")
 def run_metrics_aggregation():
@@ -26,13 +27,13 @@ def run_metrics_aggregation():
     Returns:
         dict: A confirmation message upon successful aggregation.
     """
-    logging.info("Aggregation endpoint called: starting full metrics aggregation.")
+    logger.info("Aggregation endpoint called: starting full metrics aggregation.")
     try:
         aggregate_all_metrics()
-        logging.info("Aggregation completed successfully.")
+        logger.info("Aggregation completed successfully.")
         return {"status": "aggregation complete"}
     except Exception as e:
-        logging.exception("Metrics aggregation failed: %s", e)
+        logger.exception("Metrics aggregation failed: %s", e)
         raise HTTPException(status_code=500, detail="Aggregation failed due to server error.")
 
 

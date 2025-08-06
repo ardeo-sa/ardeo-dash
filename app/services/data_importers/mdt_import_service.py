@@ -16,12 +16,13 @@ in one transaction to ensure data consistency.
 import logging
 from datetime import datetime
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.mdt import MDTMeeting, MDTParticipant, MDTAction, MDTCase
-from app.services.meeting_services import fetch_meetings
+from app.models.primary.mdt import PrimaryMDTMeeting
 
 logger = logging.getLogger(__name__)
+
 
 class MdtImportService:
     """
@@ -31,13 +32,14 @@ class MdtImportService:
     This includes meeting times, participants, patient cases, and actions derived from notes.
     """
 
-    def __init__(self, secondary_db: Session):
+    def __init__(self, primary_db: Session, secondary_db: Session):
         """
         Initialize the MDT import service with a database session.
 
         Args:
             secondary_db (Session): SQLAlchemy session used for writing to the secondary metrics database.
         """
+        self.primary_db = primary_db
         self.secondary_db = secondary_db
 
     def import_mdt(self):
@@ -54,19 +56,27 @@ class MdtImportService:
         """
         logger.info("Starting MDT import process.")
         try:
-            results = fetch_meetings()
-            logger.debug(f"Fetched {len(results)} MDT meetings.")
+            primary_meetings = (
+                self.primary_db.query(PrimaryMDTMeeting)
+                .options(
+                    joinedload(PrimaryMDTMeeting.notes),
+                    joinedload(PrimaryMDTMeeting.patients),
+                    joinedload(PrimaryMDTMeeting.participants),
+                )
+                .all()
+            )
+            logger.debug(f"Fetched {len(primary_meetings)} MDT meetings.")
         except Exception as e:
             logger.exception("Failed to fetch MDT meetings.")
             raise
 
         meeting_map = {}
 
-        for item in results:  # list of meetings
+        for item in primary_meetings:  # list of meetings
             try:
-                meeting_id = item["id"]
-                start = datetime.fromisoformat(item["start_time"])
-                end = datetime.fromisoformat(item["end_time"])
+                meeting_id = item.id
+                start = item.start_time
+                end = item.end_time
                 duration = end - start
 
                 # Create meeting object
@@ -76,39 +86,40 @@ class MdtImportService:
                     meeting_end_time=item["end_time"],
                     meeting_time=datetime(1970, 1, 1) + duration  # Epoch + duration for standard time format
                 )
-                meeting_map[meeting_id] = meeting
                 logger.debug(f"Created MDTMeeting object for meeting_id={meeting_id}.")
 
-                # Add actions from notes
-                for note in item.get("notes", []):
-                    if note.get("content"):
+                # Actions from notes
+                for note in item.notes:
+                    if note.content:
                         action = MDTAction(
                             completed=True,
                             meeting=meeting
                         )
                         meeting.actions.append(action)
-                        logger.debug(f"Added MDTAction for meeting_id={meeting_id}.")
+                        logger.debug(f"Added MDTAction to meeting_id={meeting_id}.")
 
-                # Add patient cases
-                for patient in item.get("patients", []):
-                    case = MDTCase(
-                        patient_id=patient["id"],
+                # Patient cases
+                for case in item.patients:
+                    mdt_case = MDTCase(
+                        patient_id=case.patient_id,
                         discussion_notes=None,
                         meeting=meeting
                     )
-                    meeting.cases.append(case)
-                    logger.debug(f"Added MDTCase for patient_id={patient['id']} in meeting_id={meeting_id}.")
+                    meeting.cases.append(mdt_case)
+                    logger.debug(f"Added MDTCase for patient_id={case.patient_id} in meeting_id={meeting_id}.")
 
-                # Add participants
-                for participant in item.get("participants", []):
-                    user_id = participant.get("id")
-                    if user_id and not any(p.clinician_id == user_id for p in meeting.participants):
+                # Participants
+                for participant in item.participants:
+                    clinician_id = participant.clinician_id
+                    if clinician_id and not any(p.clinician_id == clinician_id for p in meeting.participants):
                         participant_obj = MDTParticipant(
-                            clinician_id=user_id,
+                            clinician_id=clinician_id,
                             meeting=meeting
                         )
                         meeting.participants.append(participant_obj)
-                        logger.debug(f"Added MDTParticipant with clinician_id={user_id} to meeting_id={meeting_id}.")
+                        logger.debug(f"Added MDTParticipant with clinician_id={clinician_id} to meeting_id={meeting_id}.")
+
+                meeting_map[meeting_id] = meeting
 
             except Exception as e:
                 logger.exception(f"Error processing meeting_id={item.get('id')}. Skipping.")

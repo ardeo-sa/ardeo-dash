@@ -24,13 +24,15 @@ from sqlalchemy.orm import Session
 from app.models.mdt import MDTMeeting, MDTParticipant, MDTAction
 
 
+logger = logging.getLogger(__name__)
+
 def calculate_mdt_meeting_count(session: Session, for_date: date = None) -> int:
     """
     Computes mdt meeting count
     """
     for_date = for_date or date.today()
     count = session.query(MDTMeeting).filter(func.date(MDTMeeting.meeting_time) == for_date).count()
-    logging.debug("MDT meeting count for %s: %d", for_date, count)
+    logger.debug("MDT meeting count for %s: %d", for_date, count)
     return count
 
 
@@ -40,7 +42,7 @@ def calculate_mdt_avg_attendance(session: Session) -> float:
     """
     meeting_ids = session.query(MDTMeeting.id).all()
     if not meeting_ids:
-        logging.debug("No MDT meetings found for average attendance calculation.")
+        logger.debug("No MDT meetings found for average attendance calculation.")
         return 0
 
     total_attendance = 0
@@ -48,7 +50,7 @@ def calculate_mdt_avg_attendance(session: Session) -> float:
         count = session.query(MDTParticipant).filter(MDTParticipant.meeting_id == meeting_id).count()
         total_attendance += count
     avg = total_attendance / len(meeting_ids)
-    logging.debug("MDT average attendance: %d participants across %d meetings => %.2f avg",
+    logger.debug("MDT average attendance: %d participants across %d meetings => %.2f avg",
                   total_attendance, len(meeting_ids), avg)
     return avg
 
@@ -63,7 +65,7 @@ def calculate_mdt_avg_wait_time(session: Session) -> float:
     ).all()
     wait_times = [(m.review_time - m.referral_time).days for m in meetings]
     avg = sum(wait_times) / len(wait_times) if wait_times else 0
-    logging.debug("MDT avg wait time: %s days across %d meetings", avg, len(wait_times))
+    logger.debug("MDT avg wait time: %s days across %d meetings", avg, len(wait_times))
     return avg
 
 
@@ -77,7 +79,7 @@ def calculate_mdt_action_completion_rate(session: Session) -> float:
 
     completed = sum(1 for action in actions if action.completed)
     rate = (completed / len(actions)) * 100
-    logging.debug("MDT action completion rate: %d/%d => %.2f%%", completed, len(actions), rate)
+    logger.debug("MDT action completion rate: %d/%d => %.2f%%", completed, len(actions), rate)
     return rate
 
 
@@ -105,7 +107,7 @@ def calculate_mdt_avg_case_discussion_time(session: Session) -> float:
             total_minutes += duration
             total_cases += case_count
     avg = (total_minutes / total_cases) if total_cases > 0 else 0
-    logging.debug("MDT avg case discussion time: %.2f minutes across %d cases", avg, total_cases)
+    logger.debug("MDT avg case discussion time: %.2f minutes across %d cases", avg, total_cases)
     return avg
 
 
@@ -114,7 +116,7 @@ def aggregate_mdt_metrics(session: Session, for_date: date = None) -> Dict[str, 
     Aggregates all MDT metrics and returns them as a dictionary.
     """
     for_date = for_date or date.today()
-    logging.info("Aggregating MDT metrics for %s", for_date)
+    logger.info("Aggregating MDT metrics for %s", for_date)
 
     metrics = {
         "date": for_date,
@@ -125,5 +127,5 @@ def aggregate_mdt_metrics(session: Session, for_date: date = None) -> Dict[str, 
         "mdt_avg_case_discussion_time": calculate_mdt_avg_case_discussion_time(session),
     }
 
-    logging.debug("Aggregated MDT metrics: %s", metrics)
+    logger.debug("Aggregated MDT metrics: %s", metrics)
     return metrics

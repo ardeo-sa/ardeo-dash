@@ -32,7 +32,7 @@ def port_primary_data():
 
     try:
         logger.info("Importing MDT data.")
-        mdt_import_service = MdtImportService(secondary_session)
+        mdt_import_service = MdtImportService(primary_session, secondary_session)
         mdt_import_service.import_mdt()
         logger.info("MDT data import completed.")
 
