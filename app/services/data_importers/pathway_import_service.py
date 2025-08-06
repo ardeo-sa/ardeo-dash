@@ -6,6 +6,7 @@ It pulls data from multiple models in the primary database including `Episode`, 
 `Referrals`, `PathwayForms`, and `AfFormData`, performs aggregation and transformation, and
 writes results into the `PathwayProgress` model in the secondary database.
 """
+import logging
 from datetime import timedelta
 
 from sqlalchemy import func, distinct, or_, and_, literal_column
@@ -20,6 +21,9 @@ from app.models.primary.pathway import Pathway
 from app.models.primary.pathway_forms import PathwayForms
 from app.models.primary.af_form_data import AfFormData
 from app.models.primary.pathway import pathway_form_map
+
+logger = logging.getLogger(__name__)
+
 
 class PathwayImportService:
     """
@@ -47,6 +51,7 @@ class PathwayImportService:
 
             Currently delegates to `import_pathway_progress` to perform the import logic.
         """
+        logger.info("Starting pathway import process.")
         self.import_pathway_progress()
 
     def import_pathway_progress(self):
@@ -60,48 +65,54 @@ class PathwayImportService:
 
            The processed data is then written to the `PathwayProgress` table in the secondary database.
         """
+        logger.info("Querying pathway progress data from primary DB.")
         session = self.primary_db
 
-        results = (
-            session.query(
-                Episode.episode_id.label("id"),
-                Subject.subject_id.label("patient_id"),
-                Episode.start_date.label("admission_time"),
-                Episode.modified_date.label("modified_date"),
-                Episode.status.label("episode_status"),
-                Referrals.referral_status.label("referral_status"),
-                func.count(distinct(pathway_form_map.c.formsSet_KEY)).\
-                label("steps_total"), # pylint: disable=not-callable
-                func.count(distinct(AfFormData.afo_id)).label("steps_completed"),# pylint: disable=not-callable
-                func.min(AfFormData.creation_date).label("treatment_start_time"),
-                func.max(AfFormData.creation_date).label("treatment_end_time"),
-                func.timestampdiff(
-                    literal_column("MINUTE"),
-                    Episode.start_date,
-                    Episode.modified_date
-                ).label("diagnosis_minutes")
+        try:
+            results = (
+                session.query(
+                    Episode.episode_id.label("id"),
+                    Subject.subject_id.label("patient_id"),
+                    Episode.start_date.label("admission_time"),
+                    Episode.modified_date.label("modified_date"),
+                    Episode.status.label("episode_status"),
+                    Referrals.referral_status.label("referral_status"),
+                    func.count(distinct(pathway_form_map.c.formsSet_KEY)).\
+                    label("steps_total"), # pylint: disable=not-callable
+                    func.count(distinct(AfFormData.afo_id)).label("steps_completed"),# pylint: disable=not-callable
+                    func.min(AfFormData.creation_date).label("treatment_start_time"),
+                    func.max(AfFormData.creation_date).label("treatment_end_time"),
+                    func.timestampdiff(
+                        literal_column("MINUTE"),
+                        Episode.start_date,
+                        Episode.modified_date
+                    ).label("diagnosis_minutes")
+                )
+                .join(Subject, Subject.subject_id == Episode.subject_id)
+                .join(Referrals, Referrals.episode_id == Episode.episode_id)
+                .outerjoin(Pathway, or_(
+                    Pathway.id == Episode.pathway_id,
+                    Pathway.id == Referrals.pathway_id
+                ))
+                .join(pathway_form_map, pathway_form_map.c.pathway_id.in_([
+                    Episode.pathway_id, Referrals.pathway_id
+                ]))
+                .join(PathwayForms, PathwayForms.pathway_form_id == pathway_form_map.c.formsSet_KEY)
+                .outerjoin(AfFormData, and_(
+                    AfFormData.episode_id == Episode.episode_id,
+                    AfFormData.afo_id == PathwayForms.afobject_id
+                ))
+                .group_by(
+                    Episode.episode_id, Subject.subject_id,
+                    Episode.start_date, Episode.modified_date,
+                    Episode.status, Referrals.referral_status
+                )
+                .all()
             )
-            .join(Subject, Subject.subject_id == Episode.subject_id)
-            .join(Referrals, Referrals.episode_id == Episode.episode_id)
-            .outerjoin(Pathway, or_(
-                Pathway.id == Episode.pathway_id,
-                Pathway.id == Referrals.pathway_id
-            ))
-            .join(pathway_form_map, pathway_form_map.c.pathway_id.in_([
-                Episode.pathway_id, Referrals.pathway_id
-            ]))
-            .join(PathwayForms, PathwayForms.pathway_form_id == pathway_form_map.c.formsSet_KEY)
-            .outerjoin(AfFormData, and_(
-                AfFormData.episode_id == Episode.episode_id,
-                AfFormData.afo_id == PathwayForms.afobject_id
-            ))
-            .group_by(
-                Episode.episode_id, Subject.subject_id,
-                Episode.start_date, Episode.modified_date,
-                Episode.status, Referrals.referral_status
-            )
-            .all()
-        )
+            logger.info(f"Fetched {len(results)} pathway records.")
+        except Exception as e:
+            logger.exception("Failed to query pathway data.")
+            raise
 
         def map_status(episode_status, referral_status):
             """
@@ -139,25 +150,35 @@ class PathwayImportService:
             return PathwayStatusEnum.ACTIVE
 
         progress_records = []
-        for row in results:
-            status = map_status(row.episode_status, row.referral_status)
-            progress = PathwayProgress(
-                id=row.id,
-                patient_id=row.patient_id,
-                steps_total=row.steps_total or 0,
-                steps_completed=row.steps_completed or 0,
-                status=status,
-                outcome=PathwayOutcomeEnum.UNKNOWN,
-                readmitted=False,
-                admission_time=row.admission_time,
-                treatment_start_time=row.treatment_start_time,
-                treatment_end_time=row.treatment_end_time,
-                diagnosis_time=(row.admission_time + timedelta(minutes=row.diagnosis_minutes)
-                                if row.diagnosis_minutes and row.admission_time else None),
-                had_complication=False,
-                had_relapse=False
-            )
-            progress_records.append(progress)
+        for i, row in enumerate(results, start=1):
+            try:
+                status = map_status(row.episode_status, row.referral_status)
+                progress = PathwayProgress(
+                    id=row.id,
+                    patient_id=row.patient_id,
+                    steps_total=row.steps_total or 0,
+                    steps_completed=row.steps_completed or 0,
+                    status=status,
+                    outcome=PathwayOutcomeEnum.UNKNOWN,
+                    readmitted=False,
+                    admission_time=row.admission_time,
+                    treatment_start_time=row.treatment_start_time,
+                    treatment_end_time=row.treatment_end_time,
+                    diagnosis_time=(row.admission_time + timedelta(minutes=row.diagnosis_minutes)
+                                    if row.diagnosis_minutes and row.admission_time else None),
+                    had_complication=False,
+                    had_relapse=False
+                )
+                progress_records.append(progress)
+                logger.debug(f"[{i}] Mapped progress for episode_id={row.id}")
+            except Exception:
+                logger.exception(f"Failed to map pathway progress for episode_id={row.id}")
 
-        self.secondary_db.add_all(progress_records)
-        self.secondary_db.commit()
+        try:
+            self.secondary_db.add_all(progress_records)
+            self.secondary_db.commit()
+            logger.info(f"Successfully committed {len(progress_records)} pathway progress records.")
+        except Exception as e:
+            self.secondary_db.rollback()
+            logger.exception("Failed to commit pathway progress records to secondary DB.")
+            raise

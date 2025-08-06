@@ -8,11 +8,15 @@ maps them into the appropriate format, and writes them into the secondary (metri
 This allows metrics-specific systems to maintain an up-to-date view of organisation data
 without duplicating logic from the primary system.
 """
+import logging
 
 from sqlalchemy.orm import Session
+
 from app.models.primary import Organisation as PrimaryOrganisation
 from app.models.organisation import Organisation as MetricOrganisation
 from app.models.primary.users import Users
+
+logger = logging.getLogger(__name__)
 
 class OrganisationImportService:
     """
@@ -44,17 +48,35 @@ class OrganisationImportService:
         This method creates `MetricOrganisation` instances from `PrimaryOrganisation`
         records and commits them in bulk to ensure consistency.
         """
-        organisations = self.primary_db.query(PrimaryOrganisation).outerjoin(Users.roles).all()
+        logger.info("Starting organisation import process.")
+
+        try:
+            organisations = self.primary_db.query(PrimaryOrganisation).outerjoin(Users.roles).all()
+            logger.debug(f"Fetched {len(organisations)} organisations from primary DB.")
+        except Exception as e:
+            logger.exception("Failed to fetch organisations from primary DB.")
+            raise
 
         organisationsmetric = {}
 
         for org in organisations:
-            metricorg = MetricOrganisation(
-                id=org.id,
-                name=org.name,
-                code=org.code
-            )
-            organisationsmetric[org.id] = metricorg
+            try:
+                metricorg = MetricOrganisation(
+                    id=org.id,
+                    name=org.name,
+                    code=org.code
+                )
+                organisationsmetric[org.id] = metricorg
+                logger.debug(f"Prepared organisation: id={org.id}, name={org.name}")
+            except Exception as e:
+                logger.exception(f"Failed to process organisation: id={org.id}")
+                continue
 
-        self.secondary_db.add_all(organisationsmetric.values())
-        self.secondary_db.commit()
+        try:
+            self.secondary_db.add_all(organisationsmetric.values())
+            self.secondary_db.commit()
+            logger.info(f"Successfully imported {len(organisationsmetric)} organisations.")
+        except Exception as e:
+            self.secondary_db.rollback()
+            logger.exception("Failed to commit organisations to metrics DB.")
+            raise
