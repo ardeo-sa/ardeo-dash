@@ -11,6 +11,7 @@ form mappings like `PathwayForms`, `pathway_form_map`, and `pathway_formsummary_
 
 Returns results as pandas DataFrames for integration with reporting or dashboard layers.
 """
+import logging
 from collections import defaultdict
 
 import pandas as pd
@@ -25,6 +26,8 @@ from app.models.primary.af_form_data import AfFormData
 from app.models.primary.pathway_forms import PathwayForms
 from app.models.primary.pathway import pathway_formsummary_map_order
 from app.models.primary.pathway_form_summary_map import PathwayFormSummaryMap
+
+logger = logging.getLogger(__name__)
 
 
 class PathwayService:
@@ -41,6 +44,7 @@ class PathwayService:
             db (Session): SQLAlchemy session object for database access.
         """
         self.db = db
+        logger.debug("PathwayService initialized")
 
     def _get_pathway_form_map(self):
         """
@@ -49,10 +53,12 @@ class PathwayService:
         Returns:
             defaultdict(set): Mapping pathway_id -> set of formsSet_KEY.
         """
+        logger.debug("Fetching pathway_form_map")
         pfm_records = self.db.query(pathway_form_map).all()
         pf_map = defaultdict(set)
         for pf in pfm_records:
             pf_map[pf.pathway_id].add(pf.formsSet_KEY)
+        logger.debug(f"Loaded {len(pf_map)} pathway form map entries")
         return pf_map
 
     def _get_mandatory_form_lookup(self):
@@ -62,13 +68,16 @@ class PathwayService:
         Returns:
             dict: Mapping pathway_form_id -> afobject_id for mandatory forms.
         """
+        logger.debug("Fetching mandatory forms from PathwayForms")
         mandatory_pathway_forms = self.db.query(PathwayForms).filter(
             PathwayForms.is_mandatory is True
         ).all()
-        return {
+        result = {
             pf.pathway_form_id: pf.afobject_id
             for pf in mandatory_pathway_forms
         }
+        logger.debug(f"Loaded {len(result)} mandatory form mappings")
+        return result
 
     def _get_submitted_forms_map(self, af_forms):
         """
@@ -80,10 +89,12 @@ class PathwayService:
         Returns:
             defaultdict(set): Mapping episode_id -> set of submitted afobject_ids.
         """
+        logger.debug("Building submitted forms map")
         submitted_map = defaultdict(set)
         for af in af_forms:
             if af.afo_id:
                 submitted_map[af.episode_id].add(af.afo_id)
+        logger.debug(f"Created submitted forms map for {len(submitted_map)} episodes")
         return submitted_map
 
     def _get_referral_map(self):
@@ -93,10 +104,12 @@ class PathwayService:
         Returns:
             defaultdict(list): Mapping episode_id -> list of Referrals.
         """
+        logger.debug("Fetching all Referrals")
         referrals = self.db.query(Referrals).all()
         referral_map = defaultdict(list)
         for rd in referrals:
             referral_map[rd.episode_id].append(rd)
+        logger.debug(f"Created referral map for {len(referral_map)} episodes")
         return referral_map
 
     def _get_min_index_map(self):
@@ -106,11 +119,13 @@ class PathwayService:
         Returns:
             dict: Mapping of pathway_id to tuple (pathway_form_summary_id, child_index).
         """
+        logger.debug("Fetching pathway_formsummary_map_order entries")
         pfmo_all = self.db.query(pathway_formsummary_map_order).all()
         min_map = {}
         for p in pfmo_all:
             if p.pathway_id not in min_map or p.child_index < min_map[p.pathway_id][1]:
                 min_map[p.pathway_id] = (p.pathway_form_summary_id, p.child_index)
+        logger.debug(f"Created min index map for {len(min_map)} pathways")
         return min_map
 
     def _get_summary_map(self):
@@ -120,8 +135,11 @@ class PathwayService:
         Returns:
             dict: Mapping of pathway_form_summary_id to afobject_id.
         """
+        logger.debug("Fetching PathwayFormSummaryMap entries")
         pfsm_all = self.db.query(PathwayFormSummaryMap).all()
-        return {pfs.pathway_form_summary_id: pfs.afobject_id for pfs in pfsm_all}
+        result = {pfs.pathway_form_summary_id: pfs.afobject_id for pfs in pfsm_all}
+        logger.debug(f"Created summary map for {len(result)} summaries")
+        return result
 
     def _get_aff_instance_map(self, af_forms):
         """
@@ -137,6 +155,7 @@ class PathwayService:
         for af in af_forms:
             if af.afo_id:
                 aff_map[af.episode_id][af.afo_id] = af.creation_date
+        logger.debug(f"Created instance map for {len(aff_map)} episodes")
         return aff_map
 
     def pathway_adherence_rate(self):
@@ -152,6 +171,7 @@ class PathwayService:
             pd.DataFrame: A DataFrame with episode ID, subject ID, total mandatory forms,
                           submitted forms, and adherence percentage.
         """
+        logger.info("Calculating pathway adherence rate")
         # Load data
         episodes = self.db.query(Episode).join(Subject).all()
         af_forms = self.db.query(AfFormData).all()
@@ -194,6 +214,7 @@ class PathwayService:
                 "adherence_percentage": adherence
             })
 
+        logger.info(f"Calculated adherence for {len(results)} episodes")
         return pd.DataFrame(results)
 
     def days_to_treatment(self):
@@ -204,6 +225,7 @@ class PathwayService:
             pd.DataFrame: DataFrame with subject ID, episode ID, episode start date,
                           treatment start date, and days to treatment.
         """
+        logger.info("Calculating days to treatment")
         episodes = self.db.query(Episode).filter(Episode.start_date.isnot(None)).all()
         af_forms = self.db.query(AfFormData).all()
 
@@ -247,4 +269,5 @@ class PathwayService:
                 "days_to_treatment_start": days_to_treatment
             })
 
+        logger.info(f"Calculated days to treatment for {len(records)} episodes")
         return pd.DataFrame(records)

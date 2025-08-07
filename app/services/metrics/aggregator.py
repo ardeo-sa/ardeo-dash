@@ -4,7 +4,7 @@ This module aggregates various types of metrics from the primary database and st
 Functions:
 - `aggregate_all_metrics`: The main entry point for aggregating and saving all metrics.
 """
-
+import logging
 from datetime import date
 
 from app.database.primary import PrimarySessionLocal
@@ -24,6 +24,9 @@ from app.services.metrics.mdt import aggregate_mdt_metrics
 from app.services.metrics.referrals import aggregate_referral_metrics
 from app.services.metrics.clinician_performance import aggregate_clinician_metrics
 from app.services.metrics.admin_utilisation import aggregate_admin_metrics
+
+logger = logging.getLogger(__name__)
+
 
 def aggregate_all_metrics():
     """
@@ -45,68 +48,95 @@ def aggregate_all_metrics():
         None
     """
     today = date.today()
-    init_metrics_db()
+    logger.info("Starting full metrics aggregation for %s", today)
 
-    with PrimarySessionLocal() as primary_db, MetricsSessionLocal() as metrics_db:
-        # ----- Operational Metrics -----
-        for name, (value, unit) in aggregate_operational_metrics(primary_db).items():
-            metrics_db.add(OperationalMetrics(
-                date=today,
-                metric_name=name,
-                value=value,
-                unit=unit
-            ))
+    try:
+        init_metrics_db()
+        logger.debug("Metrics database initialized.")
 
-        # ----- MDT Metrics -----
-        for name, (value, unit) in aggregate_mdt_metrics(primary_db).items():
-            metrics_db.add(MDTMetrics(
-                date=today,
-                metric_name=name,
-                meeting_count=value,
-                avg_attendance=value,
-                avg_wait_time=unit,
-                action_completion_rate=True
-            ))
+        with PrimarySessionLocal() as primary_db, MetricsSessionLocal() as metrics_db:
+            record_counts = {}
 
-        # ----- Pathway Metrics -----
-        for name, (value, unit) in aggregate_pathway_metrics(primary_db).items():
-            metrics_db.add(PathwayMetrics(
-                date=today,
-                metric_name=name,
-                avg_admission_to_treatment_days=value,
-                readmission_rate_30d=value,
-                no_show_rate=unit
-            ))
-        # ----- Referral Metrics -----
-        referral_metrics_dict = aggregate_referral_metrics(primary_db, today)
-        for name, (value, unit) in referral_metrics_dict.items():
-            metrics_db.add(
-                ReferralMetrics(
+            # ----- Operational Metrics -----
+            operational = aggregate_operational_metrics(primary_db)
+            for name, (value, unit) in operational.items():
+                metrics_db.add(OperationalMetrics(
                     date=today,
                     metric_name=name,
                     value=value,
                     unit=unit
-                )
-            )
+                ))
+            record_counts['operational'] = len(operational)
+            logger.debug("Operational metrics aggregated: %d", record_counts['operational'])
 
-        # ----- Clinician Metrics -----
-        clinician_metrics_dict = aggregate_clinician_metrics(primary_db)
-        for name, (value, unit) in clinician_metrics_dict.items():
-            metrics_db.add(ClinicianMetrics(
-                date=today,
-                metric_name=name,
-                value=value,
-                unit=unit
-            ))
+            # ----- MDT Metrics -----
+            mdt = aggregate_mdt_metrics(primary_db)
+            for name, (value, unit) in mdt.items():
+                metrics_db.add(MDTMetrics(
+                    date=today,
+                    metric_name=name,
+                    meeting_count=value,
+                    avg_attendance=value,
+                    avg_wait_time=unit,
+                    action_completion_rate=True
+                ))
+            record_counts['mdt'] = len(mdt)
+            logger.debug("MDT metrics aggregated: %d", record_counts['mdt'])
 
-        # ----- Admin Metrics -----
-        admin_metrics_dict = aggregate_admin_metrics(primary_db)
-        for name, (value, unit) in admin_metrics_dict.items():
-            metrics_db.add(AdminMetrics(
-                date=today,
-                metric_name=name,
-                value=value,
-                unit=unit
-            ))
+            # ----- Pathway Metrics -----
+            pathway = aggregate_pathway_metrics(primary_db)
+            for name, (value, unit) in pathway.items():
+                metrics_db.add(PathwayMetrics(
+                    date=today,
+                    metric_name=name,
+                    avg_admission_to_treatment_days=value,
+                    readmission_rate_30d=value,
+                    no_show_rate=unit
+                ))
+            record_counts['pathway'] = len(pathway)
+            logger.debug("Pathway metrics aggregated: %d", record_counts['pathway'])
 
-        metrics_db.commit()
+
+            # ----- Referral Metrics -----
+            referral = aggregate_referral_metrics(primary_db, today)
+            for name, (value, unit) in referral.items():
+                metrics_db.add(ReferralMetrics(
+                    date=today,
+                    metric_name=name,
+                    value=value,
+                    unit=unit
+                ))
+            record_counts['referral'] = len(referral)
+            logger.debug("Referral metrics aggregated: %d", record_counts['referral'])
+
+            # ----- Clinician Metrics -----
+            clinician = aggregate_clinician_metrics(primary_db)
+            for name, (value, unit) in clinician.items():
+                metrics_db.add(ClinicianMetrics(
+                    date=today,
+                    metric_name=name,
+                    value=value,
+                    unit=unit
+                ))
+            record_counts['clinician'] = len(clinician)
+            logger.debug("Clinician metrics aggregated: %d", record_counts['clinician'])
+
+            # ----- Admin Metrics -----
+            admin = aggregate_admin_metrics(primary_db)
+            for name, (value, unit) in admin.items():
+                metrics_db.add(AdminMetrics(
+                    date=today,
+                    metric_name=name,
+                    value=value,
+                    unit=unit
+                ))
+            record_counts['admin'] = len(admin)
+            logger.debug("Admin metrics aggregated: %d", record_counts['admin'])
+
+            metrics_db.commit()
+            logger.info("Metrics aggregation complete and committed: %s", record_counts)
+
+    except Exception as e:
+        logger.exception("Aggregation failed due to error: %s", e)
+        raise
+

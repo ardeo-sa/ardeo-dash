@@ -8,8 +8,13 @@ a dictionary keyed by metric names with associated values and units.
 
 Requires an SQLAlchemy session to interact with the database.
 """
+import logging
+
 from sqlalchemy.orm import Session
+
 from app.models.pathway import PathwayProgress
+
+logger = logging.getLogger(__name__)
 
 def calculate_pathway_adherence_rate(session: Session) -> float:
     """
@@ -24,7 +29,9 @@ def calculate_pathway_adherence_rate(session: Session) -> float:
         for p in progress
         if p.steps_total > 0
     ]
-    return (sum(adherence_rates) / len(adherence_rates) * 100) if adherence_rates else 0
+    value = (sum(adherence_rates) / len(adherence_rates) * 100) if adherence_rates else 0
+    logger.info(f"Calculated pathway adherence rate: {value:.2f}%")
+    return value
 
 
 def calculate_pathway_dropout_rate(session: Session) -> float:
@@ -38,7 +45,9 @@ def calculate_pathway_dropout_rate(session: Session) -> float:
     if not progress:
         return 0
     dropouts = sum(1 for p in progress if p.status == "dropped")
-    return (dropouts / len(progress)) * 100
+    value = (dropouts / len(progress)) * 100
+    logger.info(f"Calculated pathway dropout rate: {value:.2f}%")
+    return value
 
 
 def calculate_pathway_success_rate(session: Session) -> float:
@@ -52,7 +61,9 @@ def calculate_pathway_success_rate(session: Session) -> float:
     if not progress:
         return 0
     successes = sum(1 for p in progress if p.outcome == "success")
-    return (successes / len(progress)) * 100
+    value = (successes / len(progress)) * 100
+    logger.info(f"Calculated pathway success rate: {value:.2f}%")
+    return value
 
 
 def calculate_pathway_failure_rate(session: Session) -> float:
@@ -66,7 +77,9 @@ def calculate_pathway_failure_rate(session: Session) -> float:
     if not progress:
         return 0
     failures = sum(1 for p in progress if p.outcome == "failure")
-    return (failures / len(progress)) * 100
+    value = (failures / len(progress)) * 100
+    logger.info(f"Calculated pathway failure rate: {value:.2f}%")
+    return value
 
 
 def calculate_readmission_rate(session: Session) -> float:
@@ -80,7 +93,9 @@ def calculate_readmission_rate(session: Session) -> float:
     if not progress:
         return 0
     readmitted = sum(1 for p in progress if getattr(p, "readmitted", False))
-    return (readmitted / len(progress)) * 100
+    value = (readmitted / len(progress)) * 100
+    logger.info(f"Calculated readmission rate: {value:.2f}%")
+    return value
 
 
 def calculate_admit_to_treatment_time(session: Session) -> float:
@@ -96,7 +111,9 @@ def calculate_admit_to_treatment_time(session: Session) -> float:
         for p in progress
         if p.admission_time and p.treatment_start_time
     ]
-    return sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    value = sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    logger.info(f"Calculated admit-to-treatment time: {value:.2f} days")
+    return value
 
 
 def calculate_diagnosis_to_treatment_time(session: Session) -> float:
@@ -112,7 +129,9 @@ def calculate_diagnosis_to_treatment_time(session: Session) -> float:
         for p in progress
         if hasattr(p, "diagnosis_time") and p.diagnosis_time and p.treatment_start_time
     ]
-    return sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    value = sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    logger.info(f"Calculated diagnosis-to-treatment time: {value:.2f} days")
+    return value
 
 
 def calculate_treatment_duration(session: Session) -> float:
@@ -128,7 +147,9 @@ def calculate_treatment_duration(session: Session) -> float:
         for p in progress
         if hasattr(p, "treatment_end_time") and p.treatment_start_time and p.treatment_end_time
     ]
-    return sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    value = sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    logger.info(f"Calculated treatment duration: {value:.2f} days")
+    return value
 
 
 def calculate_complication_rate(session: Session) -> float:
@@ -143,7 +164,9 @@ def calculate_complication_rate(session: Session) -> float:
         p for p in progress
         if hasattr(p, "had_complication") and p.had_complication
     ]
-    return (len(complications) / len(progress)) * 100 if progress else 0
+    value = (len(complications) / len(progress)) * 100 if progress else 0
+    logger.info(f"Calculated complication rate: {value:.2f}%")
+    return value
 
 
 def calculate_relapse_rate(session: Session) -> float:
@@ -158,7 +181,9 @@ def calculate_relapse_rate(session: Session) -> float:
         p for p in progress
         if hasattr(p, "had_relapse") and p.had_relapse
     ]
-    return (len(relapses) / len(progress)) * 100 if progress else 0
+    value = (len(relapses) / len(progress)) * 100 if progress else 0
+    logger.info(f"Calculated relapse rate: {value:.2f}%")
+    return value
 
 
 def aggregate_pathway_metrics(session: Session) -> dict:
@@ -168,7 +193,8 @@ def aggregate_pathway_metrics(session: Session) -> dict:
     Returns:
         dict: Dictionary of metric_name -> (value, unit).
     """
-    return {
+    logger.info("Aggregating pathway metrics...")
+    metrics = {
         "pathway_adherence_rate": (calculate_pathway_adherence_rate(session), "percent"),
         "pathway_dropout_rate": (calculate_pathway_dropout_rate(session), "percent"),
         "pathway_success_rate": (calculate_pathway_success_rate(session), "percent"),
@@ -180,3 +206,5 @@ def aggregate_pathway_metrics(session: Session) -> dict:
         "pathway_complication_rate": (calculate_complication_rate(session), "percent"),
         "pathway_relapse_rate": (calculate_relapse_rate(session), "percent"),
     }
+    logger.info("Pathway metrics aggregation complete.")
+    return metrics

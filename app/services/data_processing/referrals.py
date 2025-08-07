@@ -10,6 +10,7 @@ and completion of care.
 The module utilizes the `ReferralAdmission` model, patient data, and clinician information to log these events.
 Each referral record is committed to the database to ensure persistent storage.
 """
+import logging
 from datetime import date
 
 from app.models.admissions import ReferralAdmission, ReferralStatusEnum
@@ -23,7 +24,7 @@ def create_referral_in(patient: Patient, clinician_id: int, session) -> None:
     Args:
         patient (Patient): The ID of the patient being referred in.
         clinician_id (int): The ID of the clinician referring the patient in.
-        session (Session): The SQLAlchemy session used for database operations.
+        session (Session): The SQLAlchemy session used for database data_processing.
 
     Returns:
         None
@@ -46,7 +47,7 @@ def create_referral_out(patient: Patient, clinician_id: int, session) -> None:
     Args:
         patient_id (int): The ID of the patient being referred out.
         clinician_id (int): The ID of the clinician referring the patient out.
-        session (Session): The SQLAlchemy session used for database operations.
+        session (Session): The SQLAlchemy session used for database data_processing.
 
     Returns:
         None
@@ -70,7 +71,7 @@ def create_discharge_record(patient: Patient, clinician_id: int, discharge_notes
         patient (Patient): The ID of the patient being discharged.
         clinician_id (int): The ID of the clinician handling the discharge.
         discharge_notes (str): A note indicating the reason for discharge or any additional relevant details.
-        session (Session): The SQLAlchemy session used for database operations.
+        session (Session): The SQLAlchemy session used for database data_processing.
 
     Returns:
         None
@@ -97,7 +98,7 @@ def handle_referral_and_discharge(patient_id: int, clinician_id: int, discharge_
         patient_id (int): The ID of the patient.
         clinician_id (int): The ID of the clinician.
         discharge_notes (str): A note indicating the reason for discharge.
-        session (Session): The SQLAlchemy session used for database operations.
+        session (Session): The SQLAlchemy session used for database data_processing.
 
     Returns:
         None

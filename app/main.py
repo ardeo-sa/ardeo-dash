@@ -40,6 +40,8 @@ setup_logging()
 app = FastAPI()
 app.include_router(metrics.router, prefix="/api")
 
+logger = logging.getLogger(__name__)
+
 @app.on_event("startup")
 def on_startup():
     try:
@@ -49,12 +51,12 @@ def on_startup():
         process_data()
         mount_dash(app)
     except Exception as e:
-        logging.error(f"Startup failure: {e}", exc_info=True)
+        logger.error(f"Startup failure: {e}", exc_info=True)
 
 Instrumentator().instrument(app).expose(app)
 
 @app.get("/health")
 def health():
     """Endpoint to check app health status"""
-    logging.info("Health endpoint called")
+    logger.info("Health endpoint called")
     return {"status": "ok"}
