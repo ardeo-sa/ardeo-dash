@@ -11,7 +11,7 @@ Each class contains relationships to other entities involved in the MDT process.
 """
 # app/models/mdt.py
 
-from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey, String
+from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
 from app.database.metrics import Base
@@ -37,13 +37,19 @@ class MDTMeeting(Base):
     __tablename__ = "mdt_meetings"
 
     id = Column(Integer, primary_key=True)
-    primary_guid= Column(String, nullable=False)
+    primary_guid = Column(String, nullable=False)
     meeting_time = Column(DateTime)
     referral_time = Column(DateTime)
     review_time = Column(DateTime)
     meeting_start_time = Column(DateTime)
     meeting_end_time = Column(DateTime)
+    meeting_location = Column(String)
+    meeting_title = Column(String, nullable=False)
+    speciality = Column(String)
+    is_virtual_meeting = Column(Boolean)
+    organisation_id = Column(Integer, ForeignKey('organisation.id'))
 
+    organisation = relationship('Organisation', foreign_keys=[organisation_id])
     participants = relationship("MDTParticipant", back_populates="meeting")
     actions = relationship("MDTAction", back_populates="meeting")
     cases = relationship("MDTCase", back_populates="meeting")
@@ -65,9 +71,14 @@ class MDTParticipant(Base):
     id = Column(Integer, primary_key=True)
     meeting_id = Column(Integer, ForeignKey("mdt_meetings.id"))
     clinician_id = Column(Integer, ForeignKey("clinician.id"))
+    attended_meeting = Column(Boolean)
+    is_chairperson = Column(Boolean, nullable=False)
+    is_coordinator = Column(Boolean, nullable=False)
+    is_presence_mandatory = Column(Boolean, nullable=False)
 
     meeting = relationship("MDTMeeting", back_populates="participants")
-    clinician = relationship('Clinician', foreign_keys=[clinician_id] )
+    clinician = relationship('Clinician', foreign_keys=[clinician_id])
+    approvals = relationship("MDTCaseApproval", back_populates="case")
 
 class MDTAction(Base):
     """
@@ -82,12 +93,14 @@ class MDTAction(Base):
             meeting (MDTMeeting): The MDT meeting this action is associated with.
     """
     __tablename__ = "mdt_actions"
-
     id = Column(Integer, primary_key=True)
     meeting_id = Column(Integer, ForeignKey("mdt_meetings.id"))
+    case_id = Column(Integer, ForeignKey("mdt_cases.id"), nullable=False)  # ✅ link to case
     completed = Column(Boolean, default=False)
+    action_notes = Column(String)
 
     meeting = relationship("MDTMeeting", back_populates="actions")
+    case = relationship("MDTCase", back_populates="actions")
 
 
 class MDTCase(Base):
@@ -107,7 +120,23 @@ class MDTCase(Base):
 
     id = Column(Integer, primary_key=True)
     meeting_id = Column(Integer, ForeignKey("mdt_meetings.id"))
-    patient_id = Column(Integer)  # optional: ForeignKey to patient table if it exists
+    patient_id = Column(Integer)
     discussion_notes = Column(String, nullable=True)
 
+    actions = relationship("MDTAction", back_populates="case")
     meeting = relationship("MDTMeeting", back_populates="cases")
+
+class MDTCaseApproval(Base):
+    """
+    Represents an approval/feedback from a participant for a specific case.
+    """
+    __tablename__ = "mdt_case_approvals"
+
+    id = Column(Integer, primary_key=True)
+    case_id = Column(Integer, ForeignKey("mdt_cases.id"))
+    participant_id = Column(Integer, ForeignKey("mdt_participants.id"))
+    approved = Column(Boolean, nullable=False)
+    notes = Column(Text, nullable=True)
+
+    case = relationship("MDTCase", back_populates="approvals")
+    participant = relationship("MDTParticipant", back_populates="approvals")
