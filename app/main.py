@@ -30,8 +30,8 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.routes import metrics
 from app.dash_app.integration import mount_dash
-from app.services.process_data.port_primary_data import portprimarydata
-from app.services.operations.aggregator import process_data
+from app.services.data_importers.port_primary_data import port_primary_data
+from app.services.data_processing.process_primary_data import process_data
 from app.database.metrics import init_metrics_engine
 from app.database.primary import init_primary_engine
 from app.logging_config import setup_logging
@@ -47,7 +47,7 @@ def on_startup():
     try:
         init_primary_engine()
         init_metrics_engine()
-        portprimarydata()
+        port_primary_data()
         process_data()
         mount_dash(app)
     except Exception as e:
