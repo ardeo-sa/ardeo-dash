@@ -17,3 +17,4 @@ httpx
 
 python-json-logger
 prometheus-fastapi-instrumentator
+cryptography
