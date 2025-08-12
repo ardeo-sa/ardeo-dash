@@ -136,7 +136,7 @@ def aggregate_all_metrics():
 
             metrics_db.commit()
             logger.info("Metrics aggregation complete and committed: %s", record_counts)
-            
+
         except Exception:
             metrics_db.rollback()
             raise

@@ -211,7 +211,7 @@ sudo -u postgres psql
 ```
 
 
-### Manual Setup
+### Dashboard: Manual Setup
 ```bash
 # 1. (Optional) Generate SSH key for remote access
 ssh-keygen -t ed25519 -C "your_email@example.com"
@@ -242,13 +242,27 @@ cp env.example .env  # Edit DB URIs, secrets
 # 7. Run backend and dashboard
 python run.py
 
-# 4. (Optional) Run background metrics aggregation
+# 8. (Optional) Run background metrics aggregation
 celery -A app.tasks.worker worker --loglevel=info
+
 ```
 ### Docker
 ```bash
 # Start all services with Docker
 docker compose up -d
+```
+### To run in prod
+```bash
+# 1. Create dedicated user
+sudo useradd -r -s /bin/false dash-runner
+
+# 2. enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable ardeo-dash.service
+sudo systemctl start ardeo-dash.service
+
+# 3. Check logs
+journalctl -u ardeo-dash.service -f 
 ```
 
 ## Troubleshooting
