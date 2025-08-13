@@ -8,8 +8,7 @@ import logging
 from datetime import date
 
 from app.database.primary import PrimarySessionLocal
-from app.database.metrics import MetricsSessionLocal
-
+from app.database.metrics import MetricsSessionLocal, init_metrics_engine
 from app.models.metrics import (
     PathwayMetrics,
     OperationalMetrics,
@@ -51,12 +50,15 @@ def aggregate_all_metrics():
     logger.info("Starting full metrics aggregation for %s", today)
 
     try:
-        init_metrics_db()
+        init_metrics_engine()
         logger.debug("Metrics database initialized.")
 
-        with PrimarySessionLocal() as primary_db, MetricsSessionLocal() as metrics_db:
-            record_counts = {}
+        primary_db = PrimarySessionLocal()
+        metrics_db = MetricsSessionLocal()
 
+        record_counts = {}
+
+        try:
             # ----- Operational Metrics -----
             operational = aggregate_operational_metrics(primary_db)
             for name, (value, unit) in operational.items():
@@ -96,7 +98,6 @@ def aggregate_all_metrics():
             record_counts['pathway'] = len(pathway)
             logger.debug("Pathway metrics aggregated: %d", record_counts['pathway'])
 
-
             # ----- Referral Metrics -----
             referral = aggregate_referral_metrics(primary_db, today)
             for name, (value, unit) in referral.items():
@@ -135,6 +136,14 @@ def aggregate_all_metrics():
 
             metrics_db.commit()
             logger.info("Metrics aggregation complete and committed: %s", record_counts)
+
+        except Exception:
+            metrics_db.rollback()
+            raise
+
+        finally:
+            primary_db.close()
+            metrics_db.close()
 
     except Exception as e:
         logger.exception("Aggregation failed due to error: %s", e)
