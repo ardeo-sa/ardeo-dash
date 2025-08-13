@@ -34,6 +34,4 @@ def run_metrics_aggregation():
         return {"status": "aggregation complete"}
     except Exception as e:
         logger.exception("Metrics aggregation failed: %s", e)
-        raise HTTPException(status_code=500, detail="Aggregation failed due to server error.")
-
-
+        raise HTTPException(status_code=500, detail="Aggregation failed due to server error.") from e

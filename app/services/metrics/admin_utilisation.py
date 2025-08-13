@@ -107,3 +107,4 @@ def aggregate_admin_metrics(session: Session, date_: date = None) -> Dict[str, A
     logger.debug("Aggregated admin metrics: %s", metrics)
     return metrics
 
+

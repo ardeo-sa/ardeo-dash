@@ -28,6 +28,8 @@ import logging
 from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from app.api.routes import metrics
 from app.dash_app.integration import mount_dash
 from app.services.data_importers.port_primary_data import port_primary_data
@@ -42,21 +44,45 @@ app.include_router(metrics.router, prefix="/api")
 
 logger = logging.getLogger(__name__)
 
+
 @app.on_event("startup")
 def on_startup():
+    """
+    Startup event for FastAPI.
+
+    This function is executed when the FastAPI app starts.
+    It performs the following initialization steps:
+        1. Initializes the primary database engine.
+        2. Initializes the metrics database engine.
+        3. Imports and ports primary data.
+        4. Processes primary data.
+        5. Mounts the Dash application to `/dashboard`.
+
+    Any exceptions during startup are logged as errors with traceback.
+    """
     try:
         init_primary_engine()
         init_metrics_engine()
         port_primary_data()
         process_data()
         mount_dash(app)
-    except Exception as e:
-        logger.error(f"Startup failure: {e}", exc_info=True)
+    except (SQLAlchemyError, RuntimeError) as e:
+        logger.error("Startup failure: %s", e, exc_info=True)
 
-Instrumentator().instrument(app).expose(app)
 
 @app.get("/health")
 def health():
-    """Endpoint to check app health status"""
+    """
+    Health check endpoint.
+
+    Returns a simple JSON response indicating that the API is running.
+
+    Returns:
+        dict: A dictionary with a single key 'status' set to 'ok'.
+    """
     logger.info("Health endpoint called")
     return {"status": "ok"}
+
+
+# Instrumentation for Prometheus monitoring
+Instrumentator().instrument(app).expose(app)

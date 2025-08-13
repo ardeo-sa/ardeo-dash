@@ -6,6 +6,8 @@ from dash import Dash
 from fastapi import FastAPI
 from a2wsgi import WSGIMiddleware
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from app.dash_app.dashboard import create_dashboard
 
 logger = logging.getLogger(__name__)
@@ -24,5 +26,5 @@ def mount_dash(app: FastAPI):
         dash_app.layout = create_dashboard()
         app.mount("/dashboard", WSGIMiddleware(dash_app.server))
         logger.info("Dash application mounted at /dashboard.")
-    except Exception as e:
-        logger.exception("Failed to mount Dash application.")
+    except SQLAlchemyError as e:
+        logger.exception("Failed to mount Dash application %s", e)

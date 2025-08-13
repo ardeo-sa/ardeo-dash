@@ -17,6 +17,7 @@ import logging
 from datetime import datetime
 
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.models.mdt import MDTMeeting, MDTParticipant, MDTAction, MDTCase
 from app.models.primary.mdt import PrimaryMDTMeeting
@@ -67,7 +68,7 @@ class MdtImportService:
             )
             logger.debug(f"Fetched {len(primary_meetings)} MDT meetings.")
         except Exception as e:
-            logger.exception("Failed to fetch MDT meetings.")
+            logger.exception("Failed to fetch MDT meetings. %s", e)
             raise
 
         meeting_map = {}
@@ -84,7 +85,7 @@ class MdtImportService:
                     primary_guid=str(meeting_id),
                     meeting_start_time=item["start_time"],
                     meeting_end_time=item["end_time"],
-                    meeting_time=datetime(1970, 1, 1) + duration  # Epoch + duration for standard time format
+                    meeting_time=datetime(1970, 1, 1) + duration
                 )
                 logger.debug(f"Created MDTMeeting object for meeting_id={meeting_id}.")
 
@@ -117,12 +118,14 @@ class MdtImportService:
                             meeting=meeting
                         )
                         meeting.participants.append(participant_obj)
-                        logger.debug(f"Added MDTParticipant with clinician_id={clinician_id} to meeting_id={meeting_id}.")
+                        logger.debug(f"Added MDTParticipant with clinician_id={clinician_id} to "
+                                     f"meeting_id={meeting_id}.")
 
                 meeting_map[meeting_id] = meeting
 
-            except Exception as e:
-                logger.exception(f"Error processing meeting_id={item.get('id')}. Skipping.")
+
+            except (SQLAlchemyError, ValueError) as e:
+                logger.exception(f"Error processing meeting_id={item.get('id')}. Skipping. %s", e)
                 continue
 
         # Save all meetings and related data
@@ -132,5 +135,5 @@ class MdtImportService:
             logger.info(f"Successfully imported {len(meeting_map)} MDT meetings.")
         except Exception as e:
             self.secondary_db.rollback()
-            logger.exception("Failed to commit MDT meetings to the secondary DB.")
+            logger.exception("Failed to commit MDT meetings to the secondary DB. %s", e)
             raise

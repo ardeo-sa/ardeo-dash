@@ -3,6 +3,8 @@ import logging
 from dash import dcc, html
 import pandas as pd
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from app.database.metrics import MetricsSessionLocal
 from app.models.metrics import PatientMetrics
 
@@ -25,8 +27,8 @@ def get_data():
             if df.empty:
                 logger.warning("PatientMetrics data is empty.")
             return df
-    except Exception as e:
-        logger.exception("Failed to fetch data from metrics database.")
+    except SQLAlchemyError as e:
+        logger.exception("Failed to fetch data from metrics database %s", e)
         return pd.DataFrame()  # Return empty DataFrame to avoid crashing dashboard
 
 

@@ -111,7 +111,7 @@ class PathwayImportService:
             )
             logger.info(f"Fetched {len(results)} pathway records.")
         except Exception as e:
-            logger.exception("Failed to query pathway data.")
+            logger.exception("Failed to query pathway data. %s", e)
             raise
 
         def map_status(episode_status, referral_status):
@@ -171,8 +171,8 @@ class PathwayImportService:
                 )
                 progress_records.append(progress)
                 logger.debug(f"[{i}] Mapped progress for episode_id={row.id}")
-            except Exception:
-                logger.exception(f"Failed to map pathway progress for episode_id={row.id}")
+            except (AttributeError, TypeError) as e:
+                logger.exception(f"Failed to map pathway progress for episode_id={row.id} {e}", e)
 
         try:
             self.secondary_db.add_all(progress_records)
@@ -180,5 +180,5 @@ class PathwayImportService:
             logger.info(f"Successfully committed {len(progress_records)} pathway progress records.")
         except Exception as e:
             self.secondary_db.rollback()
-            logger.exception("Failed to commit pathway progress records to secondary DB.")
+            logger.exception("Failed to commit pathway progress records to secondary DB. %s", e)
             raise

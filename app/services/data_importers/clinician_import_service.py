@@ -47,7 +47,7 @@ class ClinicianImportService:
             users = self.primary_db.query(Users).outerjoin(Users.roles).all()
             logger.debug(f"Fetched {len(users)} users from primary DB.")
         except Exception as e:
-            logger.exception("Failed to fetch users from primary DB.")
+            logger.exception("Failed to fetch users from primary DB. %s", e)
             raise
 
         clinicians = {}
@@ -74,6 +74,6 @@ class ClinicianImportService:
             self.secondary_db.commit()
             logger.info(f"Successfully imported {len(clinicians)} clinicians to secondary DB.")
         except Exception as e:
-            logger.exception("Failed to write clinicians to secondary DB.")
+            logger.exception("Failed to write clinicians to secondary DB. %s", e)
             self.secondary_db.rollback()
             raise
