@@ -4,7 +4,7 @@ This module sets up environment variables, in-memory databases, and SQLAlchemy s
 for running tests in isolation. It also provides lightweight factory fixtures for common
 records used across the model test suite.
 """
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name, unused-import, import-outside-toplevel, broad-exception-caught
 import os
 import importlib
 import pytest
@@ -32,31 +32,7 @@ def test_engine():
 
 
 @pytest.fixture(scope="session")
-def load_models():
-    """Import model modules to ensure their tables are registered on the Base metadata."""
-    # Import all model modules that define tables in the metrics DB.
-    # If your project structure differs, adjust this list accordingly.
-    import app.models.admissions  # noqa: F401
-    import app.models.appointments  # noqa: F401
-    import app.models.clinician  # noqa: F401
-    import app.models.metrics  # noqa: F401
-    import app.models.organisation  # noqa: F401
-    import app.models.pathway  # noqa: F401
-    import app.models.patient  # noqa: F401
-    import app.models.referrals  # noqa: F401
-    import app.models.treatments  # noqa: F401
-    # Optional modules (only if they exist and define tables)
-    try:
-        import app.models.messaging  # noqa: F401
-    except Exception:  # pragma: no cover
-        pass
-    try:
-        import app.models.mdt  # noqa: F401
-    except Exception:  # pragma: no cover
-        pass
-
-@pytest.fixture(scope="session")
-def test_tables(test_engine, load_models):
+def test_tables(test_engine):
     """Create all tables before tests and drop them afterwards."""
     Base.metadata.create_all(bind=test_engine)
     yield
@@ -148,3 +124,47 @@ def pathway_progress(db_session, patient):
 def pytest_configure():
     """Set global pytest configuration before tests run."""
     os.environ["TESTING"] = "1"
+
+
+# @pytest.fixture(scope="session")
+# def load_models():
+#     """Import model modules to ensure their tables are registered on the Base metadata."""
+#     # Import all model modules that define tables in the metrics DB.
+#     # If your project structure differs, adjust this list accordingly.
+#     import app.models.admissions  # noqa: F401
+#     import app.models.appointments  # noqa: F401
+#     import app.models.clinician  # noqa: F401
+#     import app.models.metrics  # noqa: F401
+#     import app.models.organisation  # noqa: F401
+#     import app.models.pathway  # noqa: F401
+#     import app.models.patient  # noqa: F401
+#     import app.models.referrals  # noqa: F401
+#     import app.models.treatments  # noqa: F401
+#     # Optional modules (only if they exist and define tables)
+#     try:
+#         import app.models.messaging  # noqa: F401
+#     except Exception:  # pragma: no cover
+#         pass
+#     try:
+#         import app.models.mdt  # noqa: F401
+#     except Exception:  # pragma: no cover
+#         pass
+
+@pytest.fixture(scope="session", autouse=True)
+def load_models():
+    """Ensure all models are imported to register with SQLAlchemy."""
+    # Imports here to avoid circular dependency issues
+    try:
+        import app.models.admissions
+        import app.models.appointments
+        import app.models.clinician
+        import app.models.metrics
+        import app.models.organisation
+        import app.models.pathway
+        import app.models.patient
+        import app.models.referrals
+        import app.models.treatments
+        import app.models.messaging
+        import app.models.mdt
+    except Exception:  # noqa: E722
+        pass
