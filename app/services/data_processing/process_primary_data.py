@@ -14,7 +14,9 @@ initialization and does not return or persist any values itself.
 """
 import logging
 
-from app.database.primary import PrimarySessionLocal
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.database.primary import PRIMARY_SESSION_LOCAL as PrimarySessionLocal
 from app.services.data_processing.subject_service import SubjectService
 from app.services.data_processing.pathway_service import PathwayService
 
@@ -54,5 +56,5 @@ def process_data():
 
         logger.info("Primary data processing complete")
 
-    except Exception as e:
-        logger.exception(f"Error occurred during primary data processing: {e}")
+    except (SQLAlchemyError, AttributeError, TypeError) as e:
+        logger.exception("Error occurred during primary data processing %s", e)

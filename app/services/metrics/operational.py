@@ -30,6 +30,7 @@ from app.models.mdt import MDTMeeting
 # from app.models.metrics import OperationalMetrics
 from app.models.treatments import Treatment
 # from app.models.patient import Patient
+from app.services.metrics.utils import avg_days_between
 
 TOTAL_BEDS = 100  # Placeholder for real-time config or DB-driven count
 
@@ -94,14 +95,9 @@ def calculate_avg_mdt_wait_time(session: Session) -> float:
     Returns:
         float: The average wait time in days.
     """
-    meetings = session.query(MDTMeeting).filter(
-        MDTMeeting.referral_time.isnot(None),
-        MDTMeeting.review_time.isnot(None)
-    ).all()
-    wait_days = [(m.review_time - m.referral_time).days for m in meetings]
-    avg = sum(wait_days) / len(wait_days) if wait_days else 0
+    avg = avg_days_between(session, MDTMeeting, "referral_time", "review_time")
 
-    logger.debug("Average MDT Wait Time: %.2f days across %d meetings", avg, len(wait_days))
+    logger.debug("Average MDT Wait Time: %.2f days", avg)
     return avg
 
 
@@ -207,30 +203,29 @@ def calculate_admit_to_treatment_time(session: Session) -> float:
 
 def aggregate_operational_metrics(session: Session, date_: datetime.date = None) -> Dict[str, Any]:
     """
-    Computes all operational metrics for a given date.
+    Computes all operational metrics for a given date, returning values with their units.
 
     Args:
         session (Session): The SQLAlchemy session to query the database.
         date_ (datetime.date, optional): The date for which metrics are calculated. Defaults to today.
 
     Returns:
-        Dict[str, Any]: A dictionary containing metric names and their computed values.
+        Dict[str, Any]: A dictionary with metric names as keys and (value, unit) tuples as values.
     """
     date_ = date_ or datetime.today().date()
     logger.info("Aggregating operational metrics for %s", date_)
 
     admissions, discharges = get_admissions_discharge_counts(session, date_)
 
-    metrics = {
-        "date": date_,
-        "daily_admissions": admissions,
-        "daily_discharges": discharges,
-        "average_length_of_stay": calculate_avg_length_of_stay(session),
-        "average_mdt_wait_time": calculate_avg_mdt_wait_time(session),
-        "readmission_rate_30d": calculate_readmissions(session),
-        "appointment_no_show_rate": calculate_no_show_rate(session),
-        "bed_occupancy_rate": calculate_bed_occupancy(session, date_),
-        "admission_to_treatment_start": calculate_admit_to_treatment_time(session),
+    metrics: Dict[str, Tuple[float, str]] = {
+        "daily_admissions": (admissions, "count"),
+        "daily_discharges": (discharges, "count"),
+        "average_length_of_stay": (calculate_avg_length_of_stay(session), "days"),
+        "average_mdt_wait_time": (calculate_avg_mdt_wait_time(session), "days"),
+        "readmission_rate_30d": (calculate_readmissions(session), "percent"),
+        "appointment_no_show_rate": (calculate_no_show_rate(session), "percent"),
+        "bed_occupancy_rate": (calculate_bed_occupancy(session, date_), "percent"),
+        "admission_to_treatment_start": (calculate_admit_to_treatment_time(session), "days"),
     }
 
     logger.debug("Aggregated Operational Metrics: %s", metrics)

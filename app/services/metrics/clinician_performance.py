@@ -6,7 +6,7 @@ associated tables like admissions, pathway progress, appointments, and task assi
 """
 import logging
 from datetime import date, datetime
-from typing import Dict, Any
+from typing import Dict
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -110,7 +110,7 @@ def avg_outstanding_tasks(session: Session, clinician_count: int) -> float:
     return avg
 
 
-def aggregate_clinician_metrics(session: Session, date_: date = None) -> Dict[str, Any]:
+def aggregate_clinician_metrics(session: Session, date_: date = None) -> Dict[str, tuple]:
     """
     Aggregates system-level clinician metrics averaged per active clinician.
 
@@ -119,18 +119,18 @@ def aggregate_clinician_metrics(session: Session, date_: date = None) -> Dict[st
         date_ (date, optional): Date to calculate metrics for. Defaults to today.
 
     Returns:
-        Dict[str, Any]: Dictionary of metric_name -> value.
+        Dict[str, tuple]: Dictionary of metric_name -> (value, unit).
     """
     date_ = date_ or datetime.today().date()
     logger.info("Aggregating clinician metrics for date: %s", date_)
+
     clinician_count = get_active_clinician_count(session, date_)
 
     metrics = {
-        "date": date_,
-        "active_clinicians": clinician_count,
-        "avg_patients_admitted": avg_patients_admitted(session, date_, clinician_count),
-        "avg_patients_seen": avg_patients_seen(session, date_, clinician_count),
-        "avg_outstanding_tasks": avg_outstanding_tasks(session, clinician_count),
+        "active_clinicians": (clinician_count, "count"),
+        "avg_patients_admitted": (avg_patients_admitted(session, date_, clinician_count), "patients"),
+        "avg_patients_seen": (avg_patients_seen(session, date_, clinician_count), "patients"),
+        "avg_outstanding_tasks": (avg_outstanding_tasks(session, clinician_count), "tasks"),
     }
 
     logger.debug("Clinician metrics for %s: %s", date_, metrics)

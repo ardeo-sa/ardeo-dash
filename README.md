@@ -210,7 +210,6 @@ sudo -u postgres psql
 \q
 ```
 
-
 ### Dashboard: Manual Setup
 ```bash
 # 1. (Optional) Generate SSH key for remote access

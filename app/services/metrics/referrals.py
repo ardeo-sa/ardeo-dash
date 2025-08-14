@@ -8,6 +8,7 @@ from datetime import date
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func, extract
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.models.admissions import ReferralAdmission
 
@@ -171,17 +172,9 @@ def aggregate_referral_metrics(session: Session, for_date: date = None) -> dict:
             metric_name = f"referral_source_count_{source.lower().replace(' ', '_')}"
             metrics[metric_name] = (count, "count")
 
-        # metrics.update({
-        #     f"referral_source_count_{source.lower().replace(' ', '_')}": (count, "count")
-        #     for source, count in referrals_by_src.items()
-        # })
-
-        # Aggregate metrics
-        conversion = referral_conversion_rate(session, for_date)
-        metrics["referral_conversion_rate"] = (conversion, "percent")
-
-        referral_time = referral_to_admission_time(session, for_date)
-        metrics["referral_to_admission_time"] = (referral_time, "days")
+        # Overall metrics
+        metrics["referral_conversion_rate"] = (referral_conversion_rate(session, for_date), "percent")
+        metrics["referral_to_admission_time"] = (referral_to_admission_time(session, for_date), "days")
 
         # Add referral volume trend by day
         daily_trend = referral_volume_trend(session, by="day")
@@ -191,7 +184,9 @@ def aggregate_referral_metrics(session: Session, for_date: date = None) -> dict:
 
         logger.info(f"Aggregated referral metrics for {for_date}: {metrics}")
 
-    except Exception as e:
-        logger.exception(f"Error while aggregating referral metrics for {for_date}: {e}")
 
+    except (SQLAlchemyError, KeyError, TypeError) as e:
+        logger.exception(
+            "Error while aggregating referral metrics for %s, %s", for_date, e
+        )
     return metrics

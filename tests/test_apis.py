@@ -1,11 +1,16 @@
+"""API integration tests for messaging, metrics, and meeting services."""
+
 from uuid import uuid4
-from fastapi.testclient import TestClient
-from app.main import app
 from unittest.mock import patch, MagicMock
 
+from fastapi.testclient import TestClient
+
+from app.main import app
+from app.services.meeting_services import fetch_meetings
+
 client = TestClient(app)
-#  to test messaging api
-# Sample message
+
+# Sample message payload for messaging API tests
 message_input = {
     "conversation_id": str(uuid4()),
     "sender_id": str(uuid4()),
@@ -13,8 +18,10 @@ message_input = {
     "content": "Hello, this is a test message"
 }
 
+
 @patch("app.api.routes.messaging.create_message")
 def test_send_message(mock_create_message):
+    """Test sending a message through the messaging API."""
     mock_create_message.return_value = {
         "id": str(uuid4()),
         "timestamp": "2024-06-19T12:00:00Z",
@@ -24,18 +31,15 @@ def test_send_message(mock_create_message):
 
     assert response.status_code == 200
     data = response.json()
-
     assert "id" in data
     assert "timestamp" in data
     assert data["read"] is False
 
-# Sample UUID for conversation
+
 @patch("app.api.routes.messaging.get_conversation_messages")
 def test_fetch_messages_success(mock_get_messages):
-    # Define a valid conversation_id
+    """Test retrieving messages for a given conversation ID."""
     conversation_id = str(uuid4())
-
-    # Return a non-empty list of mocked messages
     mock_get_messages.return_value = [
         {
             "id": str(uuid4()),
@@ -49,19 +53,17 @@ def test_fetch_messages_success(mock_get_messages):
         }
     ]
 
-    # Use the same conversation_id in the request path
     response = client.get(f"/api/messages/{conversation_id}")
     assert response.status_code == 200
-
     data = response.json()
     assert isinstance(data, list)
     assert len(data) == 2
-
     assert "id" in data[0]
     assert "timestamp" in data[0]
     assert "read" in data[0]
 
-#  to test metrics api
+
+# pylint: disable=too-many-arguments,too-many-positional-arguments
 @patch("app.services.metrics.aggregator.aggregate_admin_metrics")
 @patch("app.services.metrics.aggregator.aggregate_clinician_metrics")
 @patch("app.services.metrics.aggregator.aggregate_referral_metrics")
@@ -72,7 +74,7 @@ def test_fetch_messages_success(mock_get_messages):
 @patch("app.services.metrics.aggregator.MetricsSessionLocal")
 @patch("app.services.metrics.aggregator.init_metrics_db")
 def test_run_metrics_aggregation(
-    mock_init_metrics_db,
+    mock_init_metrics_db,  # pylint: disable=unused-argument
     mock_metrics_session,
     mock_primary_session,
     mock_operational_metrics,
@@ -82,7 +84,7 @@ def test_run_metrics_aggregation(
     mock_clinician_metrics,
     mock_admin_metrics
 ):
-    # Setup fake return values for each aggregation
+    """Test running the metrics aggregation endpoint with mocked aggregators."""
     mock_operational_metrics.return_value = {
         "OpMetric1": (123, "units")
     }
@@ -107,19 +109,15 @@ def test_run_metrics_aggregation(
         "AdminMetric1": (2, "actions")
     }
 
-    # Setup mock DB sessions
     mock_primary = MagicMock()
     mock_metrics = MagicMock()
     mock_primary_session.return_value.__enter__.return_value = mock_primary
     mock_metrics_session.return_value.__enter__.return_value = mock_metrics
 
-
     response = client.post("/api/metrics/aggregate")
+    assert response.status_code in (200, 204)
 
-    assert response.status_code == 200 or response.status_code == 204
-    # Check what metric objects were added
     added_metrics = [call[0][0] for call in mock_metrics.add.call_args_list]
-    # Group by class name
     metric_type_names = [metric.__class__.__name__ for metric in added_metrics]
     assert "OperationalMetrics" in metric_type_names
     assert "MDTMetrics" in metric_type_names
@@ -131,17 +129,14 @@ def test_run_metrics_aggregation(
 
 @patch("app.services.meeting_services.requests.get")
 def test_fetch_meetings_mocked(mock_requests_get):
-    # Prepare fake response object
+    """Test fetching meetings with requests.get mocked."""
     mock_response = MagicMock()
     mock_response.status_code = 200
-    mock_response.json.return_value = [{"id": "mocked-id", "timestamp": "2024-06-26T12:00:00Z", "read": False}]
-
-    # Set return value of requests.get
+    mock_response.json.return_value = [
+        {"id": "mocked-id", "timestamp": "2024-06-26T12:00:00Z", "read": False}
+    ]
     mock_requests_get.return_value = mock_response
 
-    # Now call the endpoint (or service directly if preferred)
-    from app.services.meeting_services import fetch_meetings
     result = fetch_meetings()
-
     assert isinstance(result, list)
     assert result[0]["id"] == "mocked-id"
