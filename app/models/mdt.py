@@ -77,8 +77,8 @@ class MDTParticipant(Base):
     is_presence_mandatory = Column(Boolean, nullable=False)
 
     meeting = relationship("MDTMeeting", back_populates="participants")
-    clinician = relationship('Clinician', foreign_keys=[clinician_id])
-    approvals = relationship("MDTCaseApproval", back_populates="case")
+    clinician = relationship("Clinician", foreign_keys=[clinician_id])
+    approvals = relationship("MDTCaseApproval", back_populates="participant")
 
 class MDTAction(Base):
     """
@@ -125,6 +125,7 @@ class MDTCase(Base):
 
     actions = relationship("MDTAction", back_populates="case")
     meeting = relationship("MDTMeeting", back_populates="cases")
+    approvals = relationship("MDTCaseApproval", back_populates="case")
 
 class MDTCaseApproval(Base):
     """

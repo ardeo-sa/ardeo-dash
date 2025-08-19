@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session, contains_eager, joinedload
+from sqlalchemy.orm import Session
 from app.models.clinician import Clinician
 from app.models.primary.Users import Users
 
@@ -16,29 +16,35 @@ class ClinicianImportService:
         self.secondary_db = secondary_db
 
     def import_clinician(self):
-        """ username and roles(as concatenated string)  are fetched and stored from primary db to metrics db """
-        # Query all users with their roles (ORM style)
+        """Fetch username and roles from primary DB and upsert into metrics DB."""
+        # Query all users with their roles
         users = self.primary_db.query(Users).outerjoin(Users.roles).all()
 
-        clinicians = {}
-
         for user in users:
-            clinician = Clinician(
-                id=user.user_id,
-                name=user.username
-            )
+            # Check if clinician already exists in secondary DB
+            existing_clinician = self.secondary_db.query(Clinician).filter_by(id=user.user_id).first()
 
-            # Collect role values as strings
+            # Collect role values as strings (deduplicated)
             role_values = [
                 role.value
                 for role in user.roles
                 if role is not None
             ]
-            clinician.user_role = list(set(role_values))  # Deduplicate roles
+            role_values = list(set(role_values))
 
-            clinicians[user.user_id] = clinician
+            if existing_clinician:
+                # Update existing record
+                existing_clinician.name = user.username
+                existing_clinician.user_role = role_values
+            else:
+                # Create new record
+                new_clinician = Clinician(
+                    id=user.user_id,
+                    name=user.username,
+                    user_role=role_values
+                )
+                self.secondary_db.add(new_clinician)
 
-        self.secondary_db.add_all(clinicians.values())
         self.secondary_db.commit()
 
 
