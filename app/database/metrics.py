@@ -36,10 +36,10 @@ def init_metrics_engine():
         Base.metadata.create_all(bind=metrics_engine)
     else:
         try:
-            with metrics_engine.connect() as conn:
+            with metrics_engine.connect() as _:
                 pass  # Test connection
         except OperationalError as e:
-            raise RuntimeError(f"Error: Cannot connect to metrics database: {e}")
+            raise RuntimeError(f"Error: Cannot connect to metrics database: {e}") from e
 
 def get_db() -> Session:
     """

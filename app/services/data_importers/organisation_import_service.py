@@ -11,6 +11,7 @@ without duplicating logic from the primary system.
 import logging
 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.models.primary import Organisation as PrimaryOrganisation
 from app.models.organisation import Organisation as MetricOrganisation
@@ -54,7 +55,7 @@ class OrganisationImportService:
             organisations = self.primary_db.query(PrimaryOrganisation).outerjoin(Users.roles).all()
             logger.debug(f"Fetched {len(organisations)} organisations from primary DB.")
         except Exception as e:
-            logger.exception("Failed to fetch organisations from primary DB.")
+            logger.exception("Failed to fetch organisations from primary DB. %s", e)
             raise
 
         organisationsmetric = {}
@@ -68,8 +69,8 @@ class OrganisationImportService:
                 )
                 organisationsmetric[org.id] = metricorg
                 logger.debug(f"Prepared organisation: id={org.id}, name={org.name}")
-            except Exception as e:
-                logger.exception(f"Failed to process organisation: id={org.id}")
+            except SQLAlchemyError as e:
+                logger.exception(f"Failed to process organisation: id={org.id} {e}")
                 continue
 
         try:
@@ -78,5 +79,5 @@ class OrganisationImportService:
             logger.info(f"Successfully imported {len(organisationsmetric)} organisations.")
         except Exception as e:
             self.secondary_db.rollback()
-            logger.exception("Failed to commit organisations to metrics DB.")
+            logger.exception("Failed to commit organisations to metrics DB. %s", e)
             raise

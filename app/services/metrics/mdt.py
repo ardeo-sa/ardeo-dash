@@ -16,7 +16,7 @@ The function expects an active SQLAlchemy session to query the database.
 """
 import logging
 from datetime import date
-from typing import Dict, Any
+# from typing import Dict, Any
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -111,21 +111,20 @@ def calculate_mdt_avg_case_discussion_time(session: Session) -> float:
     return avg
 
 
-def aggregate_mdt_metrics(session: Session, for_date: date = None) -> Dict[str, Any]:
+def aggregate_mdt_metrics(session: Session, for_date: date = None) -> dict:
     """
-    Aggregates all MDT metrics and returns them as a dictionary.
+    Aggregates all MDT metrics and returns them as a dictionary of (value, unit) tuples.
     """
     for_date = for_date or date.today()
     logger.info("Aggregating MDT metrics for %s", for_date)
 
     metrics = {
-        "date": for_date,
-        "mdt_meeting_count": calculate_mdt_meeting_count(session, for_date),
-        "mdt_avg_attendance": calculate_mdt_avg_attendance(session),
-        "mdt_avg_wait_time": calculate_mdt_avg_wait_time(session),
-        "mdt_action_completion_rate": calculate_mdt_action_completion_rate(session),
-        "mdt_avg_case_discussion_time": calculate_mdt_avg_case_discussion_time(session),
+        "mdt_meeting_count": (calculate_mdt_meeting_count(session, for_date), "meetings"),
+        "mdt_avg_attendance": (calculate_mdt_avg_attendance(session), "attendees"),
+        "mdt_avg_wait_time": (calculate_mdt_avg_wait_time(session), "days"),
+        "mdt_action_completion_rate": (calculate_mdt_action_completion_rate(session), "percent"),
+        "mdt_avg_case_discussion_time": (calculate_mdt_avg_case_discussion_time(session), "minutes"),
     }
 
-    logger.debug("Aggregated MDT metrics: %s", metrics)
+    logger.debug("Aggregated MDT metrics for %s: %s", for_date, metrics)
     return metrics

@@ -12,7 +12,7 @@ Tables modeled:
 - mdt_participants
 """
 
-from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, Boolean
+from sqlalchemy import Column, String, DateTime, Integer, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()

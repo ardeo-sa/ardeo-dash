@@ -10,7 +10,7 @@ and completion of care.
 The module utilizes the `ReferralAdmission` model, patient data, and clinician information to log these events.
 Each referral record is committed to the database to ensure persistent storage.
 """
-import logging
+# import logging
 from datetime import date
 
 from app.models.admissions import ReferralAdmission, ReferralStatusEnum

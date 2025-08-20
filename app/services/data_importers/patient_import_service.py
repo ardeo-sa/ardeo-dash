@@ -12,6 +12,7 @@ Assumptions:
 import logging
 
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.exc import IntegrityError
 
 from app.models.admissions import ReferralAdmission, ReferralStatusEnum
 from app.models.patient import Patient
@@ -117,15 +118,17 @@ class PatientImportService:
                     receiving_organisation_id=ref.referring_to_organisation,
                     pathway_id=ref.pathway_id,
                     discharge_notes= ""
-                    # """ discharge_notes not updated yet can be derived from comments table not ported to primary db """
+                    # """ discharge_notes not updated yet can be derived from comments
+                    # table not ported to primary db """
                 )
 
                 self.secondary_db.add(referral)
                 imported_referrals += 1
                 logger.debug(f"[{i}] Added referral for patient {patient.id}.")
-            except Exception:
-                logger.exception(f"[{i}] Failed to process referral with id={ref.id if ref else 'N/A'}.")
-
+            except (AttributeError, TypeError, IntegrityError) as e:
+                logger.exception(
+                    "[%d] Failed to process referral with id=%s: %s", i, ref.id if ref else "N/A", e
+                )
         try:
             self.secondary_db.commit()
             logger.info(

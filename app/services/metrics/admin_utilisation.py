@@ -5,7 +5,7 @@ This module defines metrics for administrative and resource utilization, includi
 """
 import logging
 from datetime import datetime, date
-from typing import Dict, Any
+from typing import Dict, Tuple
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -82,28 +82,27 @@ def calculate_treatment_slot_utilization(session: Session, for_date: date = None
     return count
 
 
-def aggregate_admin_metrics(session: Session, date_: date = None) -> Dict[str, Any]:
+def aggregate_admin_metrics(session: Session, date_: date = None) -> Dict[str, Tuple[float, str]]:
     """
-    Aggregates key administrative and resource utilization metrics for a given day.
+    Aggregates key administrative and resource utilization metrics for a given day,
+    returning values with their units.
 
     Args:
         session (Session): SQLAlchemy session to query the database.
         date_ (date, optional): Date for which metrics should be calculated. Defaults to today.
 
     Returns:
-        Dict[str, Any]: Dictionary containing metric names and their computed values.
+        Dict[str, Tuple[float, str]]: Dictionary with metric names as keys and (value, unit) tuples as values.
     """
     date_ = date_ or datetime.today().date()
     logger.info("Aggregating admin metrics for date: %s", date_)
 
-    metrics = {
-        "date": date_,
-        "patient_to_clinician_ratio": calculate_patient_to_clinician_ratio(session, date_),
-        "imaging_utilization": calculate_imaging_utilization(session, date_),
-        "lab_test_utilization": calculate_lab_test_utilization(session, date_),
-        "treatment_slot_utilization": calculate_treatment_slot_utilization(session, date_),
+    metrics: Dict[str, Tuple[float, str]] = {
+        "patient_to_clinician_ratio": (calculate_patient_to_clinician_ratio(session, date_), "ratio"),
+        "imaging_utilization": (calculate_imaging_utilization(session, date_), "percent"),
+        "lab_test_utilization": (calculate_lab_test_utilization(session, date_), "percent"),
+        "treatment_slot_utilization": (calculate_treatment_slot_utilization(session, date_), "percent"),
     }
 
-    logger.debug("Aggregated admin metrics: %s", metrics)
+    logger.debug("Aggregated admin metrics with units: %s", metrics)
     return metrics
-

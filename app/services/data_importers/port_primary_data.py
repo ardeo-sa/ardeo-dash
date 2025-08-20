@@ -8,7 +8,7 @@ database to ensure synchronized reporting and analytics.
 import logging
 
 from app.database.metrics import MetricsSessionLocal
-from app.database.primary import PrimarySessionLocal
+from app.database.primary import PRIMARY_SESSION_LOCAL as PrimarySessionLocal
 from app.services.data_importers.clinician_import_service import ClinicianImportService
 from app.services.data_importers.mdt_import_service import MdtImportService
 from app.services.data_importers.organisation_import_service import OrganisationImportService
