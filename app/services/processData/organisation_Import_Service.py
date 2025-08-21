@@ -1,8 +1,6 @@
-from sqlalchemy.orm import Session, contains_eager, joinedload
-from app.models.clinician import Clinician
+from sqlalchemy.orm import Session
 from app.models.primary import Organisation as PrimaryOrganisation
 from app.models import Organisation as MetricOrganisation
-from app.models.primary.Users import Users
 
 """ organisations from primary database is copied to organisations table of metrics database """
 class OrganisationImportService:
@@ -18,29 +16,24 @@ class OrganisationImportService:
         self.secondary_db = secondary_db
 
     def import_organisation(self):
-        # Query all users with their roles (ORM style)
-        organisations = self.primary_db.query(PrimaryOrganisation).outerjoin(Users.roles).all()
-
-        organisationsmetric = {}
+        """Fetch organisations from primary DB and upsert into metrics DB."""
+        organisations = self.primary_db.query(PrimaryOrganisation).all()
 
         for org in organisations:
-            metricorg = MetricOrganisation(
-                id=org.id,
-                name = org.name,
-                code = org.code
-            )
-            organisationsmetric[org.id] = metricorg
+            # Check if organisation already exists in secondary DB
+            existing_org = self.secondary_db.query(MetricOrganisation).filter_by(id=org.id).first()
 
-        self.secondary_db.add_all(organisationsmetric.values())
+            if existing_org:
+                # Update existing record
+                existing_org.name = org.name
+                existing_org.code = org.code
+            else:
+                # Create new record
+                new_org = MetricOrganisation(
+                    id=org.id,
+                    name=org.name,
+                    code=org.code
+                )
+                self.secondary_db.add(new_org)
+
         self.secondary_db.commit()
-
-
-
-
-
-
-
-
-
-
-

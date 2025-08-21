@@ -19,11 +19,8 @@ class PathwayImportService:
         self.primary_db = primary_db
         self.secondary_db = secondary_db
 
-    def import_pathway(self):
-        # If you want to use this as an entry point:
-        self.import_pathway_progress()
 
-    def import_pathway_progress(self):
+    def import_pathway(self):
         session = self.primary_db
 
         results = (
@@ -84,25 +81,48 @@ class PathwayImportService:
 
             return PathwayStatusEnum.ACTIVE
 
-        progress_records = []
         for row in results:
             status = map_status(row.episode_status, row.referral_status)
-            progress = PathwayProgress(
-                id=row.id,
-                patient_id=row.patient_id,
-                steps_total=row.steps_total or 0,
-                steps_completed=row.steps_completed or 0,
-                status=status,
-                outcome=PathwayOutcomeEnum.UNKNOWN,
-                readmitted=False,
-                admission_time=row.admission_time,
-                treatment_start_time=row.treatment_start_time,
-                treatment_end_time=row.treatment_end_time,
-                diagnosis_time=(row.admission_time + timedelta(minutes=row.diagnosis_minutes) if row.diagnosis_minutes and row.admission_time else None),
-                had_complication=False,
-                had_relapse=False
-            )
-            progress_records.append(progress)
 
-        self.secondary_db.add_all(progress_records)
+            existing_progress = self.secondary_db.query(PathwayProgress).filter_by(id=row.id).first()
+
+            if existing_progress:
+                # Update existing record
+                existing_progress.patient_id = row.patient_id
+                existing_progress.steps_total = row.steps_total or 0
+                existing_progress.steps_completed = row.steps_completed or 0
+                existing_progress.status = status
+                existing_progress.outcome = PathwayOutcomeEnum.UNKNOWN
+                existing_progress.readmitted = False
+                existing_progress.admission_time = row.admission_time
+                existing_progress.treatment_start_time = row.treatment_start_time
+                existing_progress.treatment_end_time = row.treatment_end_time
+                existing_progress.diagnosis_time = (
+                    row.admission_time + timedelta(minutes=row.diagnosis_minutes)
+                    if row.diagnosis_minutes and row.admission_time else None
+                )
+                existing_progress.had_complication = False
+                existing_progress.had_relapse = False
+            else:
+                # Insert new record
+                new_progress = PathwayProgress(
+                    id=row.id,
+                    patient_id=row.patient_id,
+                    steps_total=row.steps_total or 0,
+                    steps_completed=row.steps_completed or 0,
+                    status=status,
+                    outcome=PathwayOutcomeEnum.UNKNOWN,
+                    readmitted=False,
+                    admission_time=row.admission_time,
+                    treatment_start_time=row.treatment_start_time,
+                    treatment_end_time=row.treatment_end_time,
+                    diagnosis_time=(
+                        row.admission_time + timedelta(minutes=row.diagnosis_minutes)
+                        if row.diagnosis_minutes and row.admission_time else None
+                    ),
+                    had_complication=False,
+                    had_relapse=False
+                )
+                self.secondary_db.add(new_progress)
+
         self.secondary_db.commit()
