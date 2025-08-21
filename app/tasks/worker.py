@@ -35,15 +35,10 @@ celery.conf.update(
     task_time_limit=30 * 60,
     beat_schedule={
         "run-portprimarydata-every-10-mins": {
-            "task": "worker.portprimarydata",
+            "task": "portprimarydata",
             "schedule": 600,
         },
     },
     timezone="Asia/Kolkata"
 )
-if __name__ == "__main__":
-    celery.worker_main([
-        "worker",
-        "--loglevel=info",
-        "--pool=solo"   # required on Windows, optional on Linux/macOS
-])
+import   app.services.processData.portPrimaryData
