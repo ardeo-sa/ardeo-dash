@@ -44,7 +44,7 @@ celery.conf.update(
         },
         "run-metric-aggregation-every-hour": {
             "task": "run_metric_aggregation",
-            "schedule": 3600,
+            "schedule": crontab(minute=5),
         },
     },
     timezone="Europe/London"

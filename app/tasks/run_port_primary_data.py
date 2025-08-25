@@ -1,3 +1,6 @@
+"""
+Celery task module for porting primary data into the metrics database.
+"""
 from app.tasks.worker import celery
 from app.services.data_importers.port_primary_data import port_primary_data
 
