@@ -1,8 +1,12 @@
+"""
+Represents a clinical episode within the healthcare system,
+capturing essential details and associations for managing patient care.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from app.config import Base
 from sqlalchemy.orm import relationship
 
-from app.models.primary import Pathway
+from app.config import Base
 
 
 class Episode(Base):
@@ -46,4 +50,4 @@ class Episode(Base):
 
     subject = relationship('Subject',foreign_keys=[subject_id])
     pathway_id = Column(Integer, ForeignKey('pathway.id'))
-    pathway = relationship(Pathway)
+    pathway = relationship("Pathway")

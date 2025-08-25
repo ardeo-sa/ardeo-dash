@@ -1,8 +1,12 @@
+"""
+Represents metadata for documents stored within the system,
+capturing essential information about each document for efficient management and retrieval.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from app.config import Base
 from sqlalchemy.orm import relationship
 
-
+from app.config import Base
 
 class Documents(Base):
     """

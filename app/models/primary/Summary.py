@@ -1,6 +1,11 @@
+"""
+Stores summary records with key information and metadata.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 
 class Summary(Base):
     """

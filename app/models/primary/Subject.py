@@ -1,6 +1,16 @@
+"""
+Represents a patient within the healthcare system, storing demographic, contact, and medical data.
+
+Relationships:
+- users: creator of the record.
+- provider_details: healthcare providers linked to the subject over time.
+- episodes: clinical episodes associated with the subject.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 
 class Subject(Base):
     """

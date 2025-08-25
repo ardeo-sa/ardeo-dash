@@ -1,6 +1,15 @@
+"""
+Represents an organisation within the system, capturing essential details such as its address,
+operational status, and integration with identifier contexts.
+This model supports the management of organisations as entities in a larger network,
+facilitating coordination and data sharing.
+
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 
 class Organisation(Base):
     """
@@ -8,6 +17,7 @@ class Organisation(Base):
     operational status, and integration with identifier contexts.
     This model supports the management of organisations as entities in a larger network,
     facilitating coordination and data sharing.
+
     Attributes:
     id : int Unique identifier for the organisation.
     address : str Physical address of the organisation.
@@ -19,8 +29,10 @@ class Organisation(Base):
     name : str  Name of the organisation.
     modified_date : datetime Date when the organisation's details were last modified.
     postcode : str Postal code for the organisation's location.
-    hosts_virtual_mdm : str Flag indicating if the organisation hosts a virtual Master Data Management (MDM) system ("Yes" or "No").
+    hosts_virtual_mdm : str Flag indicating if the organisation hosts a virtual Master Data Management (MDM)
+    system ("Yes" or "No").
     context_id : intForeign key linking to the IdentifierContext, indicating the namespace for patient identifiers.
+
     Relationships:
     identifier_context : Relationship with the IdentifierContext model, providing access to the context details.
     """

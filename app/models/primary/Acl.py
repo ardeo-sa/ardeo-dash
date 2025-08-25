@@ -1,3 +1,11 @@
+"""
+Module defining the ACL (Access Control List) ORM model.
+
+This module provides a SQLAlchemy model representing access control lists that
+manage permissions for resources. Each ACL has a unique identifier, a resource name,
+and an owner responsible for managing access entries.
+"""
+
 from sqlalchemy import Column, Integer, String
 from app.config import Base
 

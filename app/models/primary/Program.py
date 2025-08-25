@@ -1,3 +1,11 @@
+"""
+Defines the Program model representing medical programs in the healthcare system.
+
+This module includes the Program SQLAlchemy model, which stores information about scheduled
+programs, their associated consultants, institutions, and medical specialities. It is used to
+organize and track structured clinical activities within healthcare institutions.
+"""
+
 from sqlalchemy import Column, Integer, String, DateTime
 from app.config import Base
 

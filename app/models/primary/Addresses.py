@@ -1,8 +1,14 @@
+"""
+Module defining the Addresses association ORM model.
+
+This module contains the model for managing associations between contacts and their addresses,
+enabling efficient tracking and retrieval of multiple addresses linked to individual contacts.
+"""
+
 from sqlalchemy import Column, Integer, ForeignKey
-from app.config import Base
 from sqlalchemy.orm import relationship
 
-
+from app.config import Base
 
 class Addresses(Base):
     """

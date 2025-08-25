@@ -1,6 +1,12 @@
+"""
+Represents system users, managing their authentication, profile details, and role assignments.
+Central to user management and access control with many-to-many roles and organizational association.
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Table
-from app.config import Base
 from sqlalchemy.orm import relationship
+
+from app.config import Base
 
 # Now that 'roles' table is defined, define the association table
 user_roles = Table(
@@ -87,6 +93,6 @@ class Users(Base):
     user_surname = Column(String)
     username = Column(String, nullable=False)
     using2FA = Column(String, nullable=False)
-    roles = relationship("Roles", secondary=user_roles, backref="users", lazy="joined")  # eager fetching like FetchType.EAGER)
+    roles = relationship("Roles", secondary=user_roles, backref="users", lazy="joined")
     organisation_id = Column(Integer, ForeignKey('organisation.id'))
     organisation = relationship('Organisation')

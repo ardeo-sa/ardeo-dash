@@ -1,3 +1,7 @@
+"""
+Medical speciality for categorizing healthcare disciplines.
+"""
+
 from sqlalchemy import Column, Integer, String
 from app.config import Base
 

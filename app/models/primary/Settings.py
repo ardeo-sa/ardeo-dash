@@ -1,3 +1,13 @@
+"""
+Stores system-wide configuration settings.
+
+Attributes:
+- id: Unique setting identifier.
+- description: Purpose of the setting.
+- Property_key: Setting key.
+- Property_value: Setting value.
+"""
+
 from sqlalchemy import Column, Integer, String
 from app.config import Base
 

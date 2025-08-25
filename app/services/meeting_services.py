@@ -1,9 +1,10 @@
-import os
-import requests
+"""
+Service module for fetching and enriching meeting data from the backend API.
+"""
 from typing import List, Dict
+import requests
 
-BASE_URL = "http://localhost:8000"  # Replace with your actual app URL if different
-
+from app.config import BASE_URL, TIMEOUT, DISABLE_MEETINGS_FETCH
 
 def fetch_meetings() -> List[Dict]:
     """
@@ -11,17 +12,20 @@ def fetch_meetings() -> List[Dict]:
 
     Returns:
         List[Dict]: List of enriched meetings.
+        Empty list if fetching fails
     """
 
-    # if os.getenv("TESTING") == "1":
-    #     return [{"id": "test", "timestamp": "2024-06-01T00:00:00Z", "read": False}]
+    if DISABLE_MEETINGS_FETCH:
+        print("Meeting fetch disabled by env var DISABLE_MEETINGS_FETCH")
+        return []
 
     try:
-        meetings_resp = requests.get(f"{BASE_URL}/meetings/")
+        meetings_resp = requests.get(f"{BASE_URL}/meetings/", timeout=TIMEOUT)
         meetings_resp.raise_for_status()
         meetings = meetings_resp.json()
     except requests.RequestException as e:
-        raise Exception(f"Failed to fetch meetings: {e}")
+        print(f"Warning: Failed to fetch meetings: {e}")
+        return []  # Return empty list instead of raising
 
     enriched_meetings = []
 
@@ -30,9 +34,9 @@ def fetch_meetings() -> List[Dict]:
         enriched = dict(meeting)
 
         try:
-            participants_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/participants")
-            patients_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/patients")
-            notes_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/notes")
+            participants_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/participants", timeout=TIMEOUT)
+            patients_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/patients", timeout=TIMEOUT)
+            notes_resp = requests.get(f"{BASE_URL}/meetings/{meeting_id}/notes", timeout=TIMEOUT)
 
             if participants_resp.ok:
                 enriched["participants"] = participants_resp.json()
