@@ -23,8 +23,8 @@ from app.tasks.worker import celery
 
 logger = logging.getLogger(__name__)
 
-@celery.task
-def run_metric_aggregation():
+@celery.task(name="run_metric_aggregation")
+def run_metric_aggregation_task():
     """
         Celery task that triggers the aggregation of operational metrics.
 
@@ -37,4 +37,6 @@ def run_metric_aggregation():
         Returns:
             None
         """
+    logger.info("Starting metrics aggregation task.")
     aggregate_all_metrics()
+    logger.info("Metrics aggregation task completed.")

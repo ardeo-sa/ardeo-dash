@@ -18,7 +18,6 @@ from app.tasks.worker import celery
 
 logger = logging.getLogger(__name__)
 
-@celery.task(name="portprimarydata")
 def port_primary_data():
     """
         Migrates data from the primary database to the metrics database.
