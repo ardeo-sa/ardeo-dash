@@ -10,7 +10,6 @@ attributes such as alignment, colors, dimensions, and roles.
 
 The FormField subclass includes a property to parse embedded banding data XML.
 """
-
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
