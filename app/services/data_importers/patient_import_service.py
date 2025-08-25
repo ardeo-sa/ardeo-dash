@@ -12,7 +12,7 @@ Assumptions:
 import logging
 
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.models.admissions import ReferralAdmission, ReferralStatusEnum
 from app.models.patient import Patient
@@ -57,7 +57,6 @@ class PatientImportService:
             Commits all data in a single batch at the end for performance.
         """
         logger.info("Starting import of patients and referrals.")
-
         try:
             referrals_with_episodes = (
                 self.primary_db.query(Referrals)
@@ -68,9 +67,9 @@ class PatientImportService:
                 )
                 .all()
             )
-            logger.info(f"Fetched {len(referrals_with_episodes)} referrals with associated episodes.")
-        except Exception:
-            logger.exception("Failed to fetch referrals and episodes.")
+            logger.debug(f"Fetched {len(referrals_with_episodes)} referrals with associated episodes from primary DB.")
+        except Exception as e:
+            logger.exception("Failed to fetch referrals and episodes. %s", e)
             raise
 
         referral_status_enum = {
@@ -81,59 +80,103 @@ class PatientImportService:
             4: ReferralStatusEnum.REFERRED_IN,
         }
 
-        imported_patients = 0
-        imported_referrals = 0
+        inserted_patients = 0
+        updated_patients = 0
+        inserted_referrals = 0
+        updated_referrals = 0
 
+        # --- Process each referral ---
         for i, ref in enumerate(referrals_with_episodes, start=1):
             try:
-                ep=ref.episode
-                subj =ep.subject
+                ep = ref.episode
+                subj = ep.subject
 
-                # Create Patient
-                patient = Patient(
-                    primary_guid=subj.guid,
-                    name=subj.fullname,
-                    admission_date=ep.start_date,
-                    discharge_date=ep.modified_date,
-                    status=ep.status
+                # --- UPSERT PATIENT ---
+                existing_patient = (
+                    self.secondary_db.query(Patient)
+                    .filter_by(primary_guid=subj.guid)
+                    .first()
                 )
 
-                self.secondary_db.add(patient)
-                self.secondary_db.flush()
-                imported_patients += 1
-                logger.debug(f"[{i}] Added patient {subj.guid} with episode_id {ep.episode_id}.")
+                if existing_patient:
+                    existing_patient.name = subj.fullname
+                    existing_patient.admission_date = ep.start_date
+                    existing_patient.discharge_date = ep.modified_date
+                    existing_patient.status = ep.status
+                    patient = existing_patient
+                    updated_patients += 1
+                    logger.debug(f"[{i}] Updated patient {subj.guid} with episode_id={ep.episode_id}")
+                else:
+                    patient = Patient(
+                        primary_guid=subj.guid,
+                        name=subj.fullname,
+                        admission_date=ep.start_date,
+                        discharge_date=ep.modified_date,
+                        status=ep.status,
+                    )
+                    self.secondary_db.add(patient)
+                    self.secondary_db.flush()  # assign patient.id
+                    inserted_patients += 1
+                    logger.debug(f"[{i}] Inserted patient {subj.guid} with episode_id={ep.episode_id}")
 
-                # Create ReferralAdmissions (if any)
+                # --- UPSERT REFERRAL ---
                 status_enum = referral_status_enum.get(ref.referral_status, ReferralStatusEnum.PENDING)
 
-                referral = ReferralAdmission(
-                    admit_time=ep.start_date,
-                    discharge_time=ep.modified_date,
-                    patient_id=patient.id,
-                    referral_date=ref.referral_date,
-                    referral_status=status_enum,
-                    referral_type="In",
-                    referring_clinician_id=ref.referred_from_user_id,
-                    receiving_clinician_id=ref.referred_to_user_id,
-                    receiving_organisation_id=ref.referring_to_organisation,
-                    pathway_id=ref.pathway_id,
-                    discharge_notes= ""
-                    # """ discharge_notes not updated yet can be derived from comments
-                    # table not ported to primary db """
+                existing_referral = (
+                    self.secondary_db.query(ReferralAdmission)
+                    .filter_by(
+                        patient_id=patient.id,
+                        referral_date=ref.referral_date,
+                        pathway_id=ref.pathway_id,
+                    )
+                    .first()
                 )
 
-                self.secondary_db.add(referral)
-                imported_referrals += 1
-                logger.debug(f"[{i}] Added referral for patient {patient.id}.")
-            except (AttributeError, TypeError, IntegrityError) as e:
+                if existing_referral:
+                    existing_referral.admit_time = ep.start_date
+                    existing_referral.discharge_time = ep.modified_date
+                    existing_referral.referral_status = status_enum
+                    existing_referral.referral_type = "In"
+                    existing_referral.referring_clinician_id = ref.referred_from_user_id
+                    existing_referral.receiving_clinician_id = ref.referred_to_user_id
+                    existing_referral.receiving_organisation_id = ref.referring_to_organisation
+                    existing_referral.discharge_notes = ""
+                    updated_referrals += 1
+                    logger.debug(f"[{i}] Updated referral for patient_id={patient.id}")
+                else:
+                    new_referral = ReferralAdmission(
+                        admit_time=ep.start_date,
+                        discharge_time=ep.modified_date,
+                        patient_id=patient.id,
+                        referral_date=ref.referral_date,
+                        referral_status=status_enum,
+                        referral_type="In",
+                        referring_clinician_id=ref.referred_from_user_id,
+                        receiving_clinician_id=ref.referred_to_user_id,
+                        receiving_organisation_id=ref.referring_to_organisation,
+                        pathway_id=ref.pathway_id,
+                        discharge_notes="",
+                    )
+                    self.secondary_db.add(new_referral)
+                    inserted_referrals += 1
+                    logger.debug(f"[{i}] Inserted referral for patient_id={patient.id}")
+
+            except (AttributeError, TypeError, IntegrityError, SQLAlchemyError) as e:
                 logger.exception(
-                    "[%d] Failed to process referral with id=%s: %s", i, ref.id if ref else "N/A", e
+                    "[%d] Failed to process referral id=%s: %s", i, getattr(ref, "id", "N/A"), e
                 )
+                continue
+
+        # --- Commit ---
         try:
             self.secondary_db.commit()
             logger.info(
-                f"Import complete: {imported_patients} patients and {imported_referrals} referrals committed.")
-        except Exception:
+                f"Referral import complete: "
+                f"{inserted_patients} inserted, {updated_patients} updated patients; "
+                f"{inserted_referrals} inserted, {updated_referrals} updated referrals."
+            )
+        except Exception as e:
             self.secondary_db.rollback()
-            logger.exception("Failed to commit data to secondary database.")
+            logger.exception("Failed to commit referral import to secondary DB. %s", e)
             raise
+

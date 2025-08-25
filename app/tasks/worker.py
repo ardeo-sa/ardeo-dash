@@ -41,4 +41,4 @@ celery.conf.update(
     },
     timezone="Europe/London"
 )
-import   app.services.processData.portPrimaryData
+import app.services.data_importers.port_primary_data
