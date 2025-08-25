@@ -15,7 +15,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.models.primary import Organisation as PrimaryOrganisation
 from app.models.organisation import Organisation as MetricOrganisation
-from app.models.primary.users import Users
 
 logger = logging.getLogger(__name__)
 
@@ -52,31 +51,50 @@ class OrganisationImportService:
         logger.info("Starting organisation import process.")
 
         try:
-            organisations = self.primary_db.query(PrimaryOrganisation).outerjoin(Users.roles).all()
+            organisations = self.primary_db.query(PrimaryOrganisation).all()
             logger.debug(f"Fetched {len(organisations)} organisations from primary DB.")
         except Exception as e:
             logger.exception("Failed to fetch organisations from primary DB. %s", e)
             raise
 
-        organisationsmetric = {}
+        inserted_count = 0
+        updated_count = 0
 
         for org in organisations:
             try:
-                metricorg = MetricOrganisation(
-                    id=org.id,
-                    name=org.name,
-                    code=org.code
+                existing_org = (
+                    self.secondary_db.query(MetricOrganisation)
+                    .filter_by(id=org.id)
+                    .first()
                 )
-                organisationsmetric[org.id] = metricorg
-                logger.debug(f"Prepared organisation: id={org.id}, name={org.name}")
+
+                if existing_org:
+                    # Update existing record
+                    existing_org.name = org.name
+                    existing_org.code = org.code
+                    updated_count += 1
+                    logger.debug(f"Updated organisation: id={org.id}, name={org.name}")
+                else:
+                    # Create new record
+                    new_org = MetricOrganisation(
+                        id=org.id,
+                        name=org.name,
+                        code=org.code,
+                    )
+                    self.secondary_db.add(new_org)
+                    inserted_count += 1
+                    logger.debug(f"Inserted organisation: id={org.id}, name={org.name}")
+
             except SQLAlchemyError as e:
                 logger.exception(f"Failed to process organisation: id={org.id} {e}")
-                continue
+                continue  # skip faulty org but continue loop
 
         try:
-            self.secondary_db.add_all(organisationsmetric.values())
             self.secondary_db.commit()
-            logger.info(f"Successfully imported {len(organisationsmetric)} organisations.")
+            logger.info(
+                f"Successfully imported {inserted_count} organisations "
+                f"and updated {updated_count} organisations into metrics DB."
+            )
         except Exception as e:
             self.secondary_db.rollback()
             logger.exception("Failed to commit organisations to metrics DB. %s", e)

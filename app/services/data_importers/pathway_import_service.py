@@ -10,6 +10,7 @@ import logging
 from datetime import timedelta
 
 from sqlalchemy import func, distinct, or_, and_, literal_column
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.models.admissions import ReferralStatusEnum
@@ -77,9 +78,8 @@ class PathwayImportService:
                     Episode.modified_date.label("modified_date"),
                     Episode.status.label("episode_status"),
                     Referrals.referral_status.label("referral_status"),
-                    func.count(distinct(pathway_form_map.c.formsSet_KEY)).\
-                    label("steps_total"), # pylint: disable=not-callable
-                    func.count(distinct(AfFormData.afo_id)).label("steps_completed"),# pylint: disable=not-callable
+                    func.count(distinct(pathway_form_map.c.formsSet_KEY)).label("steps_total"),
+                    func.count(distinct(AfFormData.afo_id)).label("steps_completed"),
                     func.min(AfFormData.creation_date).label("treatment_start_time"),
                     func.max(AfFormData.creation_date).label("treatment_end_time"),
                     func.timestampdiff(
@@ -109,75 +109,97 @@ class PathwayImportService:
                 )
                 .all()
             )
-            logger.info(f"Fetched {len(results)} pathway records.")
+            logger.debug(f"Fetched {len(results)} pathway records from primary DB.")
         except Exception as e:
             logger.exception("Failed to query pathway data. %s", e)
             raise
 
+            # Helper function for status mapping
+
         def map_status(episode_status, referral_status):
-            """
-                Maps episode and referral status values to a unified `PathwayStatusEnum` value.
+            if episode_status and episode_status.lower() == "discharged":
+                return PathwayStatusEnum.COMPLETED
+            elif episode_status and episode_status.lower() == "suspended":
+                return PathwayStatusEnum.DROPPED
+            elif episode_status and episode_status.lower() == "active":
+                return PathwayStatusEnum.ACTIVE
 
-                Args:
-                    episode_status (str): The status of the episode (e.g., "active", "discharged").
-                    referral_status (ReferralStatusEnum): Enum value representing the referral status.
-
-                Returns:
-                    PathwayStatusEnum: The mapped pathway status.
-            """
-            if episode_status:
-                status_lower = episode_status.lower()
-                if status_lower == "discharged":
+            if referral_status is not None:
+                if referral_status == ReferralStatusEnum.COMPLETED:
                     return PathwayStatusEnum.COMPLETED
-                if status_lower == "suspended":
+                elif referral_status == ReferralStatusEnum.REFERRED_OUT:
                     return PathwayStatusEnum.DROPPED
-                if status_lower == "active":
+                elif referral_status in (ReferralStatusEnum.PENDING, ReferralStatusEnum.REFERRED_IN):
                     return PathwayStatusEnum.ACTIVE
-
-            if referral_status in {
-                ReferralStatusEnum.COMPLETED,
-                ReferralStatusEnum.REFERRED_OUT,
-                ReferralStatusEnum.PENDING,
-                ReferralStatusEnum.REFERRED_IN,
-            }:
-                return {
-                    ReferralStatusEnum.COMPLETED: PathwayStatusEnum.COMPLETED,
-                    ReferralStatusEnum.REFERRED_OUT: PathwayStatusEnum.DROPPED,
-                    ReferralStatusEnum.PENDING: PathwayStatusEnum.ACTIVE,
-                    ReferralStatusEnum.REFERRED_IN: PathwayStatusEnum.ACTIVE,
-                }[referral_status]
 
             return PathwayStatusEnum.ACTIVE
 
-        progress_records = []
+        inserted_count = 0
+        updated_count = 0
+
         for i, row in enumerate(results, start=1):
             try:
                 status = map_status(row.episode_status, row.referral_status)
-                progress = PathwayProgress(
-                    id=row.id,
-                    patient_id=row.patient_id,
-                    steps_total=row.steps_total or 0,
-                    steps_completed=row.steps_completed or 0,
-                    status=status,
-                    outcome=PathwayOutcomeEnum.UNKNOWN,
-                    readmitted=False,
-                    admission_time=row.admission_time,
-                    treatment_start_time=row.treatment_start_time,
-                    treatment_end_time=row.treatment_end_time,
-                    diagnosis_time=(row.admission_time + timedelta(minutes=row.diagnosis_minutes)
-                                    if row.diagnosis_minutes and row.admission_time else None),
-                    had_complication=False,
-                    had_relapse=False
+
+                existing_progress = (
+                    self.secondary_db.query(PathwayProgress)
+                    .filter_by(id=row.id)
+                    .first()
                 )
-                progress_records.append(progress)
-                logger.debug(f"[{i}] Mapped progress for episode_id={row.id}")
-            except (AttributeError, TypeError) as e:
-                logger.exception(f"Failed to map pathway progress for episode_id={row.id} {e}", e)
+
+                if existing_progress:
+                    # Update existing record
+                    existing_progress.patient_id = row.patient_id
+                    existing_progress.steps_total = row.steps_total or 0
+                    existing_progress.steps_completed = row.steps_completed or 0
+                    existing_progress.status = status
+                    existing_progress.outcome = PathwayOutcomeEnum.UNKNOWN
+                    existing_progress.readmitted = False
+                    existing_progress.admission_time = row.admission_time
+                    existing_progress.treatment_start_time = row.treatment_start_time
+                    existing_progress.treatment_end_time = row.treatment_end_time
+                    existing_progress.diagnosis_time = (
+                        row.admission_time + timedelta(minutes=row.diagnosis_minutes)
+                        if row.diagnosis_minutes and row.admission_time else None
+                    )
+                    existing_progress.had_complication = False
+                    existing_progress.had_relapse = False
+                    updated_count += 1
+                    logger.debug(f"[{i}] Updated PathwayProgress for episode_id={row.id}")
+                else:
+                    # Insert new record
+                    new_progress = PathwayProgress(
+                        id=row.id,
+                        patient_id=row.patient_id,
+                        steps_total=row.steps_total or 0,
+                        steps_completed=row.steps_completed or 0,
+                        status=status,
+                        outcome=PathwayOutcomeEnum.UNKNOWN,
+                        readmitted=False,
+                        admission_time=row.admission_time,
+                        treatment_start_time=row.treatment_start_time,
+                        treatment_end_time=row.treatment_end_time,
+                        diagnosis_time=(
+                            row.admission_time + timedelta(minutes=row.diagnosis_minutes)
+                            if row.diagnosis_minutes and row.admission_time else None
+                        ),
+                        had_complication=False,
+                        had_relapse=False,
+                    )
+                    self.secondary_db.add(new_progress)
+                    inserted_count += 1
+                    logger.debug(f"[{i}] Inserted PathwayProgress for episode_id={row.id}")
+
+            except (AttributeError, TypeError, SQLAlchemyError) as e:
+                logger.exception(f"[{i}] Failed to process pathway progress for episode_id={row.id}. {e}")
+                continue
 
         try:
-            self.secondary_db.add_all(progress_records)
             self.secondary_db.commit()
-            logger.info(f"Successfully committed {len(progress_records)} pathway progress records.")
+            logger.info(
+                f"Successfully upserted {inserted_count} new and {updated_count} existing "
+                f"PathwayProgress records into secondary DB."
+            )
         except Exception as e:
             self.secondary_db.rollback()
             logger.exception("Failed to commit pathway progress records to secondary DB. %s", e)

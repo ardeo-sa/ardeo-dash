@@ -22,13 +22,23 @@ Note:
     (`redis://localhost:6379/0`), or update the broker URL accordingly.
 """
 from celery import Celery
+from celery.schedules import crontab
 
 celery = Celery(
     "worker",
-    broker="redis://localhost:6379/0"
+    broker="redis://localhost:6379/0",
+    backend="redis://localhost:6379/0"
 )
 
 celery.conf.update(
     task_track_started=True,
     task_time_limit=30 * 60,
+    beat_schedule={
+        "run-portprimarydata-every-10-mins": {
+            "task": "portprimarydata",
+            "schedule": 600,
+        },
+    },
+    timezone="Europe/London"
 )
+import app.services.data_importers.port_primary_data
