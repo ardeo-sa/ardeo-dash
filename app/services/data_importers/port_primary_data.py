@@ -14,7 +14,6 @@ from app.services.data_importers.mdt_import_service import MdtImportService
 from app.services.data_importers.organisation_import_service import OrganisationImportService
 from app.services.data_importers.pathway_import_service import PathwayImportService
 from app.services.data_importers.patient_import_service import PatientImportService
-from app.tasks.worker import celery
 
 logger = logging.getLogger(__name__)
 

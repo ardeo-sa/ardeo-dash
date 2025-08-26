@@ -11,6 +11,7 @@ This facilitates synchronizing clinician information between the primary user sy
 import logging
 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.models.clinician import Clinician
 from app.models.primary.users import Users
@@ -81,7 +82,8 @@ class ClinicianImportService:
 
                 processed_count += 1
 
-            except Exception as e:
+
+            except SQLAlchemyError as e:
                 logger.exception("Error processing user id=%s. %s", user.user_id, e)
                 continue  # skip to next user instead of failing whole batch
 

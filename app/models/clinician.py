@@ -33,6 +33,7 @@ class Clinician(Base):
     referrals_received = relationship('ReferralAdmission', back_populates='receiving_clinician',
                                       foreign_keys='ReferralAdmission.receiving_clinician_id')
     tasks = relationship('ClinicianTask', back_populates='clinician')
+    appointments = relationship('Appointment', back_populates='clinician')
 
 
 class ClinicianTask(Base):

@@ -21,7 +21,7 @@ from app.models.primary.episode import Episode
 from app.models.primary.referrals import Referrals
 
 logger = logging.getLogger(__name__)
-
+# pylint: disable=too-many-statements
 
 class PatientImportService:
     """
@@ -179,4 +179,3 @@ class PatientImportService:
             self.secondary_db.rollback()
             logger.exception("Failed to commit referral import to secondary DB. %s", e)
             raise
-

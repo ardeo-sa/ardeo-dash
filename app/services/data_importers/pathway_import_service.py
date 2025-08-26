@@ -24,6 +24,8 @@ from app.models.primary.af_form_data import AfFormData
 from app.models.primary.pathway import pathway_form_map
 
 logger = logging.getLogger(__name__)
+# pylint: disable=not-callable
+# pylint: disable=too-many-statements
 
 
 class PathwayImportService:
@@ -119,17 +121,17 @@ class PathwayImportService:
         def map_status(episode_status, referral_status):
             if episode_status and episode_status.lower() == "discharged":
                 return PathwayStatusEnum.COMPLETED
-            elif episode_status and episode_status.lower() == "suspended":
+            if episode_status and episode_status.lower() == "suspended":
                 return PathwayStatusEnum.DROPPED
-            elif episode_status and episode_status.lower() == "active":
+            if episode_status and episode_status.lower() == "active":
                 return PathwayStatusEnum.ACTIVE
 
             if referral_status is not None:
                 if referral_status == ReferralStatusEnum.COMPLETED:
                     return PathwayStatusEnum.COMPLETED
-                elif referral_status == ReferralStatusEnum.REFERRED_OUT:
+                if referral_status == ReferralStatusEnum.REFERRED_OUT:
                     return PathwayStatusEnum.DROPPED
-                elif referral_status in (ReferralStatusEnum.PENDING, ReferralStatusEnum.REFERRED_IN):
+                if referral_status in (ReferralStatusEnum.PENDING, ReferralStatusEnum.REFERRED_IN):
                     return PathwayStatusEnum.ACTIVE
 
             return PathwayStatusEnum.ACTIVE

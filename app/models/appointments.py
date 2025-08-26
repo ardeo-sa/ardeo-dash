@@ -29,13 +29,14 @@ class Appointment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
+    clinician_id = Column(Integer, ForeignKey("clinician.id"))
     scheduled_time = Column(DateTime)
     attended = Column(Boolean)
     cancelled = Column(Boolean)
 
     # Relationships
-    patient = relationship('Patient', foreign_keys=[patient_id],back_populates="appointments")# Links to Patient model
-    # clinician = relationship('Clinician', back_populates='appointments')  # If Clinician model exists
+    patient = relationship('Patient', back_populates="appointments")
+    clinician = relationship('Clinician', back_populates='appointments')
 
     def __repr__(self):
         return f"<Appointment(id={self.id}, patient_id={self.patient_id}, scheduled_time={self.scheduled_time})>"

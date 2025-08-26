@@ -27,7 +27,7 @@ def test_enum_values():
     assert {e.value for e in ReferralStatusEnum} == expected
 
 
-def test_create_referral_admission(db_session, patient, clinician, organisation, pathway):
+def test_create_referral_admission(db_session, patient, clinician, organisation, pathway_progress):
     """
     Test that a ReferralAdmission can be created and retrieved from the database.
     """
@@ -41,7 +41,7 @@ def test_create_referral_admission(db_session, patient, clinician, organisation,
         referring_clinician_id=clinician.id,
         receiving_clinician_id=clinician.id,
         receiving_organisation_id=organisation.id,
-        pathway_id=pathway.id,
+        pathway_id=pathway_progress.id,
         discharge_notes="Patient recovered well.",
     )
     db_session.add(referral)
