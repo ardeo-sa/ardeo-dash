@@ -8,9 +8,9 @@ records used across the model test suite.
 import os
 import importlib
 import uuid
-import pytest
 from datetime import date, datetime
 
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import InvalidRequestError
@@ -167,6 +167,7 @@ def pathway_progress(db_session, patient):
 
 @pytest.fixture
 def referral(db_session, patient, clinician):
+    """Create referral"""
     from app.models.referrals import Referral
     r = Referral(
         patient_id=patient.id,
