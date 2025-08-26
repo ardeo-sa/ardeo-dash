@@ -1,8 +1,6 @@
 """
 Test suite for the referral models.
 """
-
-from datetime import date
 from app.models.referrals import Referral
 
 

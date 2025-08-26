@@ -9,7 +9,7 @@ import os
 import importlib
 import uuid
 import pytest
-from datetime import date
+from datetime import date, datetime
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -19,6 +19,7 @@ from sqlalchemy.engine import Engine
 
 from app.database.metrics import Base
 from app.models.clinician import Clinician
+from app.models.treatments import Treatment, TreatmentSlotBooking
 
 import app.config
 
@@ -176,3 +177,25 @@ def referral(db_session, patient, clinician):
     db_session.add(r)
     db_session.commit()
     return r
+
+
+@pytest.fixture
+def treatment(db_session):
+    """Create and persist a Treatment record for reporting tests."""
+    t = Treatment(name="Chemotherapy")
+    db_session.add(t)
+    db_session.commit()
+    return t
+
+
+@pytest.fixture
+def treatment_slot_booking(db_session, treatment):
+    """Create a TreatmentSlotBooking linked to a Treatment."""
+    slot = TreatmentSlotBooking(
+        treatment_id=treatment.id,
+        patient_id=None,
+        slot_time=datetime(2024, 1, 1, 10, 0)
+    )
+    db_session.add(slot)
+    db_session.commit()
+    return slot
