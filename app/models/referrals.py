@@ -1,4 +1,3 @@
-# app/models/referral.py
 """
     This module defines the `Referral` SQLAlchemy model, representing a referral record in the healthcare system.
 
@@ -9,7 +8,8 @@
         patient_id (int): Foreign key referencing the associated patient.
         source (str): The source from which the referral was made (e.g., doctor, department).
 """
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.database.metrics import Base
 
@@ -30,5 +30,11 @@ class Referral(Base):
     __tablename__ = "referrals"
 
     id = Column(Integer, primary_key=True)
-    patient_id = Column(Integer)
-    source = Column(String)
+    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
+    clinician_id = Column(Integer, ForeignKey("clinician.id"), nullable=True)
+    source = Column(String, nullable=True)
+    notes = Column(String, nullable=True)
+    referral_date = Column(Date, nullable=True)
+
+    patient = relationship("Patient")
+    clinician = relationship("Clinician")
