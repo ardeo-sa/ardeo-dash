@@ -27,15 +27,12 @@ def get_real_data():
         return pd.DataFrame()
 
 
-def get_synthetic_data():
-    """Load synthetic data from CSV (the existing repo style)."""
-    return load_data("app/dash_app/data/synthetic_metrics.csv")
-
-
 def get_data_loader(source: str):
     """
     Returns a data loader function based on source.
     Used to inject into callbacks so they don’t care about the backend.
+    - In 'real' mode, always return DB data (ignores file_path).
+    - In 'synthetic' mode, load CSV from the given file_path.
     """
     if source == "real":
         return lambda _: get_real_data()

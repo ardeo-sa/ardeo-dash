@@ -9,7 +9,7 @@ so it can be mounted inside FastAPI, with a switch for real/synthetic data.
 from dash import Dash
 from app.dash_app.layout import create_layout
 from app.dash_app.callbacks import register_callbacks
-from app.dash_app.dashboard import get_data_loader
+from app.dash_app.data_sources import get_data_loader
 
 
 def create_dash_app(data_source: str = "synthetic") -> Dash:
