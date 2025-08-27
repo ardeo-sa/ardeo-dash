@@ -44,6 +44,7 @@ app.include_router(metrics.router, prefix="/api")
 
 logger = logging.getLogger(__name__)
 
+mount_dash(app)
 
 @app.on_event("startup")
 def on_startup():
@@ -65,7 +66,6 @@ def on_startup():
         init_metrics_engine()
         port_primary_data()
         process_data()
-        mount_dash(app)
     except (SQLAlchemyError, RuntimeError) as e:
         logger.error("Startup failure: %s", e, exc_info=True)
 

@@ -45,3 +45,11 @@ METRICS_DB_URI = (f"postgresql://{metrics_db_user}:{metrics_db_password}@{metric
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 TIMEOUT = int(os.getenv("TIMEOUT", "5"))
 DISABLE_MEETINGS_FETCH = os.getenv("DISABLE_MEETINGS_FETCH", "false").lower() == "true"
+
+# Dashboard data source toggle
+ARDEO_DATA_SOURCE = os.getenv("ARDEO_DATA_SOURCE", "synthetic").lower()
+if ARDEO_DATA_SOURCE not in ("synthetic", "real"):
+    raise ValueError(
+        f"Invalid ARDEO_DATA_SOURCE={ARDEO_DATA_SOURCE}. "
+        "Must be 'synthetic' or 'real'."
+    )
