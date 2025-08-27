@@ -41,7 +41,7 @@ def register_mdt_callbacks(app, data_loader):
         Returns:
             html.Div: The updated layout containing KPI cards and Plotly graphs.
         """
-        df = data_loader('app/dash_app/data/mdt_metrics_wide.csv')
+        df = data_loader('mdt_metrics_wide.csv')
 
         if start_date and end_date:
             # Filter data

@@ -22,8 +22,8 @@ def create_dash_app(data_source: str = "synthetic") -> Dash:
     dash_app = Dash(
         __name__,
         suppress_callback_exceptions=True,
-        requests_pathname_prefix="/dashboard/",
-        assets_url_path="/dashboard/assets"
+        # requests_pathname_prefix="/dashboard/",
+        # assets_url_path="/dashboard/assets"
     )
     dash_app.title = "Healthcare Dashboard"
 

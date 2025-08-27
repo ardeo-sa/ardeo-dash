@@ -34,7 +34,7 @@ def mount_dash(app: FastAPI, data_source: DataSource | None = None) -> None:
     logger.info("Mounting Dash app with %s data", data_source)
     try:
         dash_app = create_dash_app(data_source=source)
-        app.mount("/dashboard", WSGIMiddleware(dash_app.server))
+        app.mount("/", WSGIMiddleware(dash_app.server))
         logger.info("Dash application mounted at /dashboard")
     except Exception as e:
         logger.exception("Failed to mount Dash application %s", e)

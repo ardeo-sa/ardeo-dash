@@ -12,7 +12,7 @@ def admin_layout():
     Returns:
         html.Div: Layout containing date picker and content container.
     """
-    df = load_data('data/admin_metrics_wide.csv')
+    df = load_data('admin_metrics_wide.csv')
     return html.Div([
         html.Div([
             html.H3('Select Date Range', className='date-range-title'),

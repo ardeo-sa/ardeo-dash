@@ -12,7 +12,7 @@ import plotly.express as px
 # from utils.data_loader import load_data
 
 
-def register_operational_callbacks(app):
+def register_operational_callbacks(app, data_loader):
     """
     Register callbacks related to the Operational Metrics tab.
 
@@ -40,7 +40,7 @@ def register_operational_callbacks(app):
         Returns:
             html.Div: The updated layout containing KPI cards and Plotly graphs.
         """
-        df = load_data('data/operational_metrics_wide.csv')
+        df = data_loader('operational_metrics_wide.csv')
 
         if start_date and end_date:
             # Filter data
