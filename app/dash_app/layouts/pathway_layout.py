@@ -3,7 +3,7 @@ Layout definition for the Pathway Metrics tab.
 """
 
 from dash import html, dcc
-from utils.data_loader import load_data
+from ..utils.data_loader import load_data
 
 def pathway_layout():
     """

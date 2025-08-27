@@ -3,7 +3,7 @@ Layout definition for the Operational Metrics tab.
 """
 
 from dash import html, dcc
-from utils.data_loader import load_data
+from ..utils.data_loader import load_data
 
 def operational_layout():
     """

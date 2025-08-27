@@ -19,7 +19,12 @@ def create_dash_app(data_source: str = "synthetic") -> Dash:
     Args:
         data_source: "real" (database) or "synthetic" (sample CSV data).
     """
-    dash_app = Dash(__name__, suppress_callback_exceptions=True)
+    dash_app = Dash(
+        __name__,
+        suppress_callback_exceptions=True,
+        requests_pathname_prefix="/dashboard/",
+        assets_url_path="/dashboard/assets"
+    )
     dash_app.title = "Healthcare Dashboard"
 
     data_loader = get_data_loader(data_source)

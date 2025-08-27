@@ -6,12 +6,12 @@ callbacks for each feature-specific callback module.
 """
 
 from dash import Output, Input
-from layouts.operational_layout import operational_layout
-from layouts.pathway_layout import pathway_layout
-from layouts.clinician_layout import clinician_layout
-from layouts.admin_layout import admin_layout
-from layouts.mdt_layout import mdt_layout
-from layouts.referral_layout import referral_layout
+from ..layouts.operational_layout import operational_layout
+from ..layouts.pathway_layout import pathway_layout
+from ..layouts.clinician_layout import clinician_layout
+from ..layouts.admin_layout import admin_layout
+from ..layouts.mdt_layout import mdt_layout
+from ..layouts.referral_layout import referral_layout
 from .operational_callbacks import register_operational_callbacks
 from .pathway_callbacks import register_pathway_callbacks
 from .clinician_callbacks import register_clinician_callbacks
