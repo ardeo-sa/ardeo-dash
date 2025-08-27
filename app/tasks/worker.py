@@ -27,18 +27,25 @@ from celery.schedules import crontab
 celery = Celery(
     "worker",
     broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0"
+    backend="redis://localhost:6379/0",
+    include=[
+        "app.tasks.run_port_primary_data",
+        "app.tasks.run_metric_aggregation",
+    ]
 )
 
 celery.conf.update(
     task_track_started=True,
     task_time_limit=30 * 60,
     beat_schedule={
-        "run-portprimarydata-every-10-mins": {
+        "run-portprimarydata-every-30-mins": {
             "task": "portprimarydata",
-            "schedule": 600,
+            "schedule": 1800,
+        },
+        "run-metric-aggregation-every-hour": {
+            "task": "run_metric_aggregation",
+            "schedule": crontab(minute=5),
         },
     },
     timezone="Europe/London"
 )
-import app.services.data_importers.port_primary_data

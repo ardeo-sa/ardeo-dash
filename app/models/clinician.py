@@ -24,15 +24,17 @@ class Clinician(Base):
     __tablename__ = "clinician"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String)
-    user_role = Column(String)
+    primary_guid = Column(String, unique=True, nullable=False)
+    name = Column(String, nullable=False)
+    user_role = Column(String, nullable=False)
 
     # Relationships
     referrals_made = relationship('ReferralAdmission', back_populates='referring_clinician',
                                   foreign_keys='ReferralAdmission.referring_clinician_id')
     referrals_received = relationship('ReferralAdmission', back_populates='receiving_clinician',
                                       foreign_keys='ReferralAdmission.receiving_clinician_id')
-    tasks = relationship('ClinicianTask', back_populates='clinician')
+    tasks = relationship('ClinicianTask', back_populates='clinician', cascade="all, delete-orphan")
+    appointments = relationship('Appointment', back_populates='clinician')
 
 
 class ClinicianTask(Base):

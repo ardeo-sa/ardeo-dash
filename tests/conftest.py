@@ -7,14 +7,55 @@ records used across the model test suite.
 # pylint: disable=redefined-outer-name, unused-import, import-outside-toplevel, broad-exception-caught
 import os
 import importlib
-import pytest
+import uuid
+from datetime import date, datetime
 
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 from app.database.metrics import Base
+from app.models.clinician import Clinician
+from app.models.treatments import Treatment, TreatmentSlotBooking
+
 import app.config
+
+
+
+def pytest_configure():
+    """Set global pytest configuration before tests run."""
+    os.environ["TESTING"] = "1"
+
+
+@pytest.fixture(scope="session", autouse=True)
+def load_models():
+    """Ensure all models are imported to register with SQLAlchemy."""
+    # Imports here to avoid circular dependency issues
+    try:
+        import app.models.admissions
+        import app.models.appointments
+        import app.models.clinician
+        import app.models.metrics
+        import app.models.organisation
+        import app.models.pathway
+        import app.models.patient
+        import app.models.referrals
+        import app.models.treatments
+        import app.models.messaging
+        import app.models.mdt
+    except Exception:  # noqa: E722
+        pass
+
+
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    """Ensure SQLite enforces foreign key constraints during tests."""
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
 
 
 @pytest.fixture(autouse=True)
@@ -80,9 +121,12 @@ def patient(db_session):
 
 @pytest.fixture
 def clinician(db_session):
-    """Create and persist a simple Clinician record."""
-    from app.models.clinician import Clinician
-    c = Clinician(name="Dr. Tester", user_role="Consultant")
+    """Provide a persisted Clinician for testing."""
+    c = Clinician(
+        name="Dr. Test",
+        user_role="Consultant",
+        primary_guid=str(uuid.uuid4()),
+    )
     db_session.add(c)
     db_session.commit()
     return c
@@ -121,50 +165,38 @@ def pathway_progress(db_session, patient):
     return pp
 
 
-def pytest_configure():
-    """Set global pytest configuration before tests run."""
-    os.environ["TESTING"] = "1"
+@pytest.fixture
+def referral(db_session, patient, clinician):
+    """Create referral"""
+    from app.models.referrals import Referral
+    r = Referral(
+        patient_id=patient.id,
+        clinician_id=clinician.id,
+        referral_date=date.today(),
+        notes="Test referral"
+    )
+    db_session.add(r)
+    db_session.commit()
+    return r
 
 
-# @pytest.fixture(scope="session")
-# def load_models():
-#     """Import model modules to ensure their tables are registered on the Base metadata."""
-#     # Import all model modules that define tables in the metrics DB.
-#     # If your project structure differs, adjust this list accordingly.
-#     import app.models.admissions  # noqa: F401
-#     import app.models.appointments  # noqa: F401
-#     import app.models.clinician  # noqa: F401
-#     import app.models.metrics  # noqa: F401
-#     import app.models.organisation  # noqa: F401
-#     import app.models.pathway  # noqa: F401
-#     import app.models.patient  # noqa: F401
-#     import app.models.referrals  # noqa: F401
-#     import app.models.treatments  # noqa: F401
-#     # Optional modules (only if they exist and define tables)
-#     try:
-#         import app.models.messaging  # noqa: F401
-#     except Exception:  # pragma: no cover
-#         pass
-#     try:
-#         import app.models.mdt  # noqa: F401
-#     except Exception:  # pragma: no cover
-#         pass
+@pytest.fixture
+def treatment(db_session):
+    """Create and persist a Treatment record for reporting tests."""
+    t = Treatment(name="Chemotherapy")
+    db_session.add(t)
+    db_session.commit()
+    return t
 
-@pytest.fixture(scope="session", autouse=True)
-def load_models():
-    """Ensure all models are imported to register with SQLAlchemy."""
-    # Imports here to avoid circular dependency issues
-    try:
-        import app.models.admissions
-        import app.models.appointments
-        import app.models.clinician
-        import app.models.metrics
-        import app.models.organisation
-        import app.models.pathway
-        import app.models.patient
-        import app.models.referrals
-        import app.models.treatments
-        import app.models.messaging
-        import app.models.mdt
-    except Exception:  # noqa: E722
-        pass
+
+@pytest.fixture
+def treatment_slot_booking(db_session, treatment):
+    """Create a TreatmentSlotBooking linked to a Treatment."""
+    slot = TreatmentSlotBooking(
+        treatment_id=treatment.id,
+        patient_id=None,
+        slot_time=datetime(2024, 1, 1, 10, 0)
+    )
+    db_session.add(slot)
+    db_session.commit()
+    return slot

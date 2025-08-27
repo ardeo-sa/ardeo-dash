@@ -241,8 +241,12 @@ cp env.example .env  # Edit DB URIs, secrets
 # 7. Run backend and dashboard
 python run.py
 
-# 8. (Optional) Run background metrics aggregation
-celery -A app.tasks.worker worker --loglevel=info
+# 8. Run background metrics aggregation
+celery -A app.tasks.worker worker --beat --loglevel=info
+
+# 9. Monitor celery tasks
+celery -A app.tasks.worker flower --port=5555
+http://localhost:5555
 
 ```
 ### Docker

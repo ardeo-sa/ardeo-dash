@@ -33,9 +33,9 @@ class PatientMetrics(Base):
     __tablename__ = "patient_metrics"
 
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date)
-    avg_length_of_stay = Column(Float)
-    admission_count = Column(Integer)
+    date = Column(Date, nullable=False)
+    avg_length_of_stay = Column(Float, nullable=False)
+    admission_count = Column(Integer, nullable=False)
 
 
 class OperationalMetrics(Base):
@@ -52,10 +52,10 @@ class OperationalMetrics(Base):
     __tablename__ = "operational_metrics"
 
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date)
-    metric_name = Column(String)
-    value = Column(Float)
-    unit = Column(String)
+    date = Column(Date, nullable=False)
+    metric_name = Column(String, nullable=False)
+    value = Column(Float, nullable=False)
+    unit = Column(String, nullable=False)
 
 
 class MDTMetrics(Base):
@@ -74,7 +74,7 @@ class MDTMetrics(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False, index=True)
-    metric_name = Column(String)
+    metric_name = Column(String, nullable=False)
     meeting_count = Column(Integer, nullable=False)
     avg_attendance = Column(Float, nullable=False)
     avg_wait_time = Column(Float, nullable=False)  # in days
@@ -95,7 +95,7 @@ class PathwayMetrics(Base):
     __tablename__ = "pathway_metrics"
 
     id = Column(Integer, primary_key=True, index=True)
-    metric_name = Column(String)
+    metric_name = Column(String, nullable=False)
     date = Column(Date, nullable=False, index=True)
     avg_admission_to_treatment_days = Column(Float, nullable=False)
     readmission_rate_30d = Column(Float, nullable=False)
@@ -125,7 +125,7 @@ class ReferralMetrics(Base):
     date = Column(Date, index=True, nullable=False)
     metric_name = Column(String, nullable=False)
     value = Column(Float, nullable=False)
-    unit = Column(String, nullable=True)
+    unit = Column(String, nullable=False)
 
 
 class ClinicianMetrics(Base):
@@ -151,7 +151,7 @@ class ClinicianMetrics(Base):
     date = Column(Date, index=True, nullable=False)
     metric_name = Column(String, nullable=False)
     value = Column(Float, nullable=False)
-    unit = Column(String, nullable=True)
+    unit = Column(String, nullable=False)
 
 
 class AdminMetrics(Base):
@@ -171,4 +171,4 @@ class AdminMetrics(Base):
     date = Column(Date, index=True, nullable=False)
     metric_name = Column(String, nullable=False)
     value = Column(Float, nullable=False)
-    unit = Column(String, nullable=True)
+    unit = Column(String, nullable=False)

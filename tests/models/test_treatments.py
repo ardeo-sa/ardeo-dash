@@ -1,22 +1,16 @@
 """
 Test suite for the treatment models.
 """
+from app.models.treatments import Treatment, TreatmentSlotBooking
 
-from app.models.treatments import Treatment
 
-
-def test_create_treatment(db_session, patient, clinician):
-    """
-    Ensure a Treatment can be created and retrieved.
-    """
-    treatment = Treatment(
-        patient_id=patient.id,
-        clinician_id=clinician.id,
-        description="Physical therapy session",
-        status="Completed"
-    )
-    db_session.add(treatment)
-    db_session.commit()
-
+def test_retrieve_treatment(db_session, treatment):
+    """Ensure a Treatment can be retrieved."""
     fetched = db_session.query(Treatment).first()
-    assert fetched.status == "Completed"
+    assert fetched.name == "Chemotherapy"
+
+def test_retrieve_treatment_slot_booking(db_session, treatment_slot_booking):
+    """Ensure a TreatmentSlotBooking can be retrieved and linked to a Treatment."""
+    fetched = db_session.query(TreatmentSlotBooking).first()
+    assert fetched.treatment_id == fetched.treatment.id
+    assert fetched.slot_time.hour == 10

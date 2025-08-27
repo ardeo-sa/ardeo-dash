@@ -5,6 +5,8 @@ within the healthcare system.
 Each appointment is linked to a patient and records key details such as whether
 the appointment was attended or cancelled.
 """
+from email.policy import default
+
 from sqlalchemy import Column, Integer, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
@@ -28,14 +30,15 @@ class Appointment(Base):
     __tablename__ = "appointments"
 
     id = Column(Integer, primary_key=True, index=True)
-    patient_id = Column(Integer, ForeignKey("patients.id"))
-    scheduled_time = Column(DateTime)
-    attended = Column(Boolean)
-    cancelled = Column(Boolean)
+    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
+    clinician_id = Column(Integer, ForeignKey("clinician.id"), nullable=False)
+    scheduled_time = Column(DateTime, nullable=False)
+    attended = Column(Boolean, default=False)
+    cancelled = Column(Boolean, default=False)
 
     # Relationships
-    patient = relationship('Patient', foreign_keys=[patient_id],back_populates="appointments")# Links to Patient model
-    # clinician = relationship('Clinician', back_populates='appointments')  # If Clinician model exists
+    patient = relationship('Patient', back_populates="appointments")
+    clinician = relationship('Clinician', back_populates='appointments')
 
     def __repr__(self):
         return f"<Appointment(id={self.id}, patient_id={self.patient_id}, scheduled_time={self.scheduled_time})>"
