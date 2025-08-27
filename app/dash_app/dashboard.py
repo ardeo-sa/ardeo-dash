@@ -1,21 +1,16 @@
-"""Dash Dashboard"""
-import logging
-from dash import dcc, html
+"""Data loading module"""
 import pandas as pd
-
+import logging
 from sqlalchemy.exc import SQLAlchemyError
-
 from app.database.metrics import MetricsSessionLocal
 from app.models.metrics import PatientMetrics
+from app.dash_app.utils.data_loader import load_data
 
 logger = logging.getLogger(__name__)
 
 
-def get_data():
-    """
-    Fetches patient metrics data from the metrics database and returns it as a pandas DataFrame.
-    """
-    logger.info("Fetching patient metrics data from metrics database.")
+def get_real_data():
+    """Fetch patient metrics data from DB."""
     try:
         with MetricsSessionLocal() as session:
             data = session.query(PatientMetrics).all()
@@ -25,39 +20,24 @@ def get_data():
                 "admission_count": m.admission_count
             } for m in data])
             if df.empty:
-                logger.warning("PatientMetrics data is empty.")
+                logger.warning("DB returned no rows.")
             return df
     except SQLAlchemyError as e:
-        logger.exception("Failed to fetch data from metrics database %s", e)
-        return pd.DataFrame()  # Return empty DataFrame to avoid crashing dashboard
+        logger.exception("DB fetch failed: %s", e)
+        return pd.DataFrame()
 
 
-def create_dashboard():
+def get_synthetic_data():
+    """Load synthetic data from CSV (the existing repo style)."""
+    return load_data("app/dash_app/data/synthetic_metrics.csv")
+
+
+def get_data_loader(source: str):
     """
-    Creates a Dash HTML layout containing a graph of patient metrics over time.
-    If no data is available, displays a placeholder message.
+    Returns a data loader function based on source.
+    Used to inject into callbacks so they don’t care about the backend.
     """
-    logger.info("Creating dashboard layout.")
-    df = get_data()
-    if df.empty:
-        logger.info("No data available. Displaying placeholder message.")
-        return html.Div([
-            html.H1("Patient Metrics Dashboard"),
-            html.P("No data available.")
-        ])
-
-    logger.info("Data available. Generating dashboard graph.")
-    return html.Div([
-        html.H1("Patient Metrics Dashboard"),
-        dcc.Graph(
-            figure={
-                "data": [
-                    {"x": df["date"], "y": df["avg_length_of_stay"],
-                     "type": "line", "name": "Avg LOS"},
-                    {"x": df["date"], "y": df["admission_count"],
-                     "type": "bar", "name": "Admissions"},
-                ],
-                "layout": {"title": "Patient Metrics Over Time"}
-            }
-        )
-    ])
+    if source == "real":
+        return lambda _: get_real_data()
+    else:
+        return lambda file_path: load_data(file_path)
