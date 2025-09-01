@@ -16,9 +16,7 @@ from app import config
 def setup_logging():
     """Setup logging handler"""
     log_level = config.LOG_LEVEL
-    log_file = Path(config.LOG_FILE)
-    # Ensure parent directory exists
-    log_file.parent.mkdir(parents=True, exist_ok=True)
+    log_file = config.LOG_FILE
 
     logger = logging.getLogger()
     logger.setLevel(log_level)

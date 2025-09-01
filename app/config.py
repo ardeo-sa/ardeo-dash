@@ -53,3 +53,14 @@ if ARDEO_DATA_SOURCE not in ("synthetic", "real"):
         f"Invalid ARDEO_DATA_SOURCE={ARDEO_DATA_SOURCE}. "
         "Must be 'synthetic' or 'real'."
     )
+
+# Logging settings
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
+# If the env only provides a filename, put it under ./logs
+log_file_env = os.getenv("LOG_FILE", "app.log")
+if os.path.isabs(log_file_env):
+    LOG_FILE = log_file_env
+else:
+    LOG_FILE = os.path.join(os.path.dirname(__file__), "..", "logs", log_file_env)
+    LOG_FILE = os.path.abspath(LOG_FILE)
