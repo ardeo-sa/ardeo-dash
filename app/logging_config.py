@@ -15,7 +15,11 @@ from pythonjsonlogger import json
 def setup_logging():
     """Setup logging handler"""
     log_level = os.getenv("LOG_LEVEL", "INFO")
-    log_file = os.getenv("LOG_FILE", "app.log")
+
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    default_log_file = os.path.join(project_root, "app.log")
+
+    log_file = os.getenv("LOG_FILE", default_log_file)
 
     logger = logging.getLogger()
     logger.setLevel(log_level)
