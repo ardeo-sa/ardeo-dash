@@ -7,15 +7,20 @@ Initializes and configures JSON-formatted logging using environment variables:
 
 Intended for use with Promtail/Loki log aggregation.
 """
-
 import os
 import logging
 from pythonjsonlogger import json
 
+from app import config
+
 def setup_logging():
     """Setup logging handler"""
-    log_level = os.getenv("LOG_LEVEL", "INFO")
-    log_file = os.getenv("LOG_FILE", "app.log")
+    log_level = config.LOG_LEVEL
+    log_file = config.LOG_FILE
+
+    log_dir = os.path.dirname(log_file)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir, exist_ok=True)
 
     logger = logging.getLogger()
     logger.setLevel(log_level)
