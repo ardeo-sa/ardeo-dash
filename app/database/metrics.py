@@ -6,13 +6,13 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 from sqlalchemy.exc import OperationalError
 
-from app.config import METRICS_DB_URI, BOOTSTRAP_METRICS_DB
+from app.config import METRICS_DB_URI, METRICS_DB_URI_READ, BOOTSTRAP_METRICS_DB
 
 metadata = MetaData(schema="reporting")
 Base = declarative_base(metadata=metadata)
 
-metrics_engine = None
-MetricsSessionLocal = None
+global metrics_engine, MetricsSessionLocal, metrics_read_engine, MetricsReadSessionLocal
+
 
 
 def init_metrics_engine():
@@ -29,8 +29,13 @@ def init_metrics_engine():
     if not METRICS_DB_URI:
         raise ValueError("METRICS_DB_URI is not set.")
 
+    # Full-access engine and session
     metrics_engine = create_engine(METRICS_DB_URI, echo=True, future=True)
     MetricsSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=metrics_engine)
+
+    # Read-only engine and session
+    metrics_read_engine = create_engine(METRICS_DB_URI_READ, echo=False, future=True)
+    MetricsReadSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=metrics_read_engine)
 
     if BOOTSTRAP_METRICS_DB:
         print("BOOTSTRAP_METRICS_DB is enabled — skipping connection test and creating tables.")

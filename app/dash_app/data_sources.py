@@ -2,7 +2,7 @@
 import pandas as pd
 import logging
 from sqlalchemy.exc import SQLAlchemyError
-from app.database.metrics import MetricsSessionLocal
+from app.database.metrics import MetricsReadSessionLocal
 from app.models.reporting.metrics import PatientMetrics
 from app.dash_app.utils.data_loader import load_data
 
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def get_real_data():
     """Fetch patient metrics data from DB."""
     try:
-        with MetricsSessionLocal() as session:
+        with MetricsReadSessionLocal() as session:
             data = session.query(PatientMetrics).all()
             df = pd.DataFrame([{
                 "date": m.date,
