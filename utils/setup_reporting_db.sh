@@ -2,8 +2,20 @@
 # Creates reporting DB, migration/admin user, app user with proper privileges, and read-only user
 # Usage: ./setup_reporting_db.sh
 
+# Load environment variables from .env and .env_migrations if they exist
+ENV_FILE=".env"
+MIGRATIONS_ENV_FILE=".env_migrations"
+
+if [[ -f "$ENV_FILE" ]]; then
+    export $(grep -v '^#' "$ENV_FILE" | xargs)
+fi
+
+if [[ -f "$MIGRATIONS_ENV_FILE" ]]; then
+    export $(grep -v '^#' "$MIGRATIONS_ENV_FILE" | xargs)
+fi
+
 # Environment variables
-DB_NAME="${METRICS_DB_NAME:-ardeo-services}"
+DB_NAME="${METRICS_DB_NAME:-ardeo_services}"
 ADMIN_USER="${METRICS_DB_ADMIN_USER:-ardeo_admin}"
 ADMIN_PASS="${METRICS_DB_ADMIN_PASSWORD:-adminpassword}"
 APP_USER="${METRICS_DB_USER:-processing_user}"

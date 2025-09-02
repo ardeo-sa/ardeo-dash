@@ -29,7 +29,7 @@ DB_USER = os.environ.get("METRICS_DB_ADMIN_USER", "reporting_admin")
 DB_PASSWORD = os.environ.get("METRICS_DB_ADMIN_PASSWORD", "admin_password")
 DB_HOST = os.environ.get("METRICS_DB_HOST", "localhost")
 DB_PORT = os.environ.get("METRICS_DB_PORT", "5432")
-DB_NAME = os.environ.get("METRICS_DB_NAME", "ardeo-services")
+DB_NAME = os.environ.get("METRICS_DB_NAME", "ardeo_services")
 
 METRICS_DB_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
