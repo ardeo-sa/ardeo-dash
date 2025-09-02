@@ -1,21 +1,74 @@
-MIT License
+Ardeo SA‑Open Commons License v1.1
 
-Copyright (c) 2025 Ardeo
+Copyright (c) Ardeo. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ 1. Preamble
+This is a source‑available license designed to maximize adoption while preserving clear inbound rights
+for Ardeo. You may read, use, modify, and create derivative works under the conditions below. External
+contributors grant Ardeo the legal rights necessary to use their contributions commercially. Ardeo
+retains the ability to relicense its own contributions without affecting rights already granted.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+ 2. Definitions
+Work: the code, documentation, and other files in this repository offered under this license.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+You: any individual or legal entity exercising permissions granted by this license.
+
+Contribution: any change intentionally submitted to Ardeo for inclusion in the Work.
+
+Derivative Work: any work that is based on or incorporates the Work, with modifications or additions.
+
+ 3. Grants
+Subject to the Conditions (Section 4), Ardeo grants You a worldwide, royalty‑free, non‑exclusive license to:
+read, use, and internally deploy the Work and Derivative Works;
+modify the Work and create Derivative Works;
+redistribute the Work and Derivative Works in source or object form.
+
+ 4. Conditions
+4.1 Attribution. Retain copyright notices and provide reasonable attribution to Ardeo
+in documentation or product pages when substantial portions of the Work are used.
+
+4.2 Commons Compatibility. If You publicly distribute Derivative Works, You must license Your
+changes on terms no more restrictive than this license.
+
+4.3 Notices & Third‑Party Code. Preserve this license text and any third‑party notices required
+by their licenses.
+
+4.4 No Trademark License. This license does not grant rights to Ardeo’s names, logos, or trademarks.
+
+4.5 Source Availability. If You offer the Work or Derivative Works as a hosted service, make
+the corresponding source for Your modifications reasonably available to recipients under terms
+no more restrictive than this license.
+
+ 5. Inbound Contributions (CLA)
+To contribute to L2 repositories, external contributors must accept Ardeo’s Contributor License
+Agreement (CLA) once. The CLA includes an originality statement and grants Ardeo:
+a copyright license to use, modify, and relicense the contributor’s Contribution; and
+a patent license for patent claims necessarily infringed by the Contribution alone
+or in combination with the unmodified Work.
+
+Contributions may be rejected until the CLA is accepted.
+
+ 6. Ardeo’s Relicensing of Its Own Contributions
+Ardeo may, at its discretion, use, offer, or relicense its own contributions to the Work under
+different terms (including proprietary or BSL). This does not revoke or diminish rights granted
+to You under this license for existing copies and versions.
+
+ 7. No Warranty
+THE WORK IS PROVIDED “AS IS” WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
+WARRANTIES OF TITLE, NON‑INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+
+ 8. Limitation of Liability
+IN NO EVENT SHALL ANY ARDEO OR ANY CONTRIBUTOR BE LIABLE FOR ANY DAMAGES ARISING FROM USE OF THE WORK,
+INCLUDING WITHOUT LIMITATION INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES.
+
+ 9. Termination
+This license terminates automatically if You fail to comply with its terms and do not cure within
+30 days of notice. Termination does not affect rights of recipients of Your compliant copies.
+Your rights may be reinstated upon cure at Ardeo’s discretion.
+
+ 10. Miscellaneous
+This is the entire agreement for the Work. If any provision is unenforceable, the remainder remains
+in effect. Nothing herein grants rights in Ardeo trademarks.
+
+(Non‑legal summary: source‑available with attribution and commons compatibility; CLA for inbound rights;
+Ardeo may relicense its own code in the future without affecting existing grants to You.)
