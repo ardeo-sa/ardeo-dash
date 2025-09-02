@@ -1,12 +1,16 @@
 #!/bin/bash
-# Creates reporting DB, migration/admin user, and app user with proper privileges
+# Creates reporting DB, migration/admin user, app user with proper privileges, and read-only user
 # Usage: ./setup_reporting_db.sh
 
-DB_NAME="ardeo-services"
-ADMIN_USER="ardeo_admin"
-ADMIN_PASS="adminpassword"
-APP_USER="reporting_user"
-APP_PASS="apppassword"
+# Environment variables
+DB_NAME="${METRICS_DB_NAME:-ardeo-services}"
+ADMIN_USER="${METRICS_DB_ADMIN_USER:-ardeo_admin}"
+ADMIN_PASS="${METRICS_DB_ADMIN_PASSWORD:-adminpassword}"
+APP_USER="${METRICS_DB_USER:-processing_user}"
+APP_PASS="${METRICS_DB_PASSWORD:-apppassword}"
+READ_USER="${METRICS_DB_READ_USER:-reporting_user}"
+READ_PASS="${METRICS_DB_READ_PASSWORD:-readonlypassword}"
+SCHEMA_NAME="${METRICS_DB_SCHEMA:-reporting}"
 
 # Check if running as postgres user
 if [[ $EUID -ne 0 ]]; then
@@ -14,31 +18,50 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-# Create DB and Admin User
 sudo -u postgres psql <<EOSQL
--- Drop DB if exists (optional)
+-- Drop DB and users if they exist
 DROP DATABASE IF EXISTS $DB_NAME;
 DROP USER IF EXISTS $ADMIN_USER;
 DROP USER IF EXISTS $APP_USER;
+DROP USER IF EXISTS $READ_USER;
 
+-- Create admin user
 CREATE USER $ADMIN_USER WITH PASSWORD '$ADMIN_PASS';
+
+-- Create database owned by admin
 CREATE DATABASE $DB_NAME OWNER $ADMIN_USER;
 
--- App user
-CREATE USER $APP_USER WITH PASSWORD '$APP_PASS';
-
--- Grant privileges to app user
-GRANT CONNECT ON DATABASE $DB_NAME TO $APP_USER;
+-- Connect to the new DB
 \c $DB_NAME
-GRANT USAGE ON SCHEMA public TO $APP_USER;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO $APP_USER;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO $APP_USER;
 
--- Default privileges for future tables/sequences
-ALTER DEFAULT PRIVILEGES FOR USER $ADMIN_USER IN SCHEMA public
+-- Create schema
+CREATE SCHEMA $SCHEMA_NAME AUTHORIZATION $ADMIN_USER;
+
+-- Create app user (full privileges)
+CREATE USER $APP_USER WITH PASSWORD '$APP_PASS';
+GRANT CONNECT ON DATABASE $DB_NAME TO $APP_USER;
+GRANT USAGE ON SCHEMA $SCHEMA_NAME TO $APP_USER;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA $SCHEMA_NAME TO $APP_USER;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA $SCHEMA_NAME TO $APP_USER;
+
+-- Default privileges for future objects for app user
+ALTER DEFAULT PRIVILEGES FOR USER $ADMIN_USER IN SCHEMA $SCHEMA_NAME
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $APP_USER;
-ALTER DEFAULT PRIVILEGES FOR USER $ADMIN_USER IN SCHEMA public
+ALTER DEFAULT PRIVILEGES FOR USER $ADMIN_USER IN SCHEMA $SCHEMA_NAME
 GRANT USAGE, SELECT ON SEQUENCES TO $APP_USER;
+
+-- Create read-only user
+CREATE USER $READ_USER WITH PASSWORD '$READ_PASS';
+GRANT CONNECT ON DATABASE $DB_NAME TO $READ_USER;
+GRANT USAGE ON SCHEMA $SCHEMA_NAME TO $READ_USER;
+GRANT SELECT ON ALL TABLES IN SCHEMA $SCHEMA_NAME TO $READ_USER;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA $SCHEMA_NAME TO $READ_USER;
+
+-- Default privileges for future objects for read-only user
+ALTER DEFAULT PRIVILEGES FOR USER $ADMIN_USER IN SCHEMA $SCHEMA_NAME
+GRANT SELECT ON TABLES TO $READ_USER;
+ALTER DEFAULT PRIVILEGES FOR USER $ADMIN_USER IN SCHEMA $SCHEMA_NAME
+GRANT USAGE, SELECT ON SEQUENCES TO $READ_USER;
 EOSQL
 
 echo "Reporting database and users created successfully."

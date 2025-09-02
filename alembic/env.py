@@ -33,6 +33,9 @@ DB_NAME = os.environ.get("METRICS_DB_NAME", "ardeo-services")
 
 METRICS_DB_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
+if not all([DB_USER, DB_PASSWORD, DB_HOST, DB_NAME]):
+    raise RuntimeError("Missing required DB env variables for Alembic migrations")
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -68,6 +71,7 @@ def run_migrations_online() -> None:
     connectable = create_engine(
         METRICS_DB_URI,
         poolclass=pool.NullPool,
+        future=True,
     )
 
     with connectable.connect() as connection:

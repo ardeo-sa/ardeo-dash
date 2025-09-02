@@ -2,13 +2,14 @@
 Database setup and initialization for the metrics database using SQLAlchemy.
 """
 # pylint: disable=invalid-name
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 from sqlalchemy.exc import OperationalError
 
 from app.config import METRICS_DB_URI, BOOTSTRAP_METRICS_DB
 
-Base = declarative_base()
+metadata = MetaData(schema="reporting")
+Base = declarative_base(metadata=metadata)
 
 metrics_engine = None
 MetricsSessionLocal = None
