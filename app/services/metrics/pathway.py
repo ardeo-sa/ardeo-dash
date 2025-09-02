@@ -13,7 +13,7 @@ from datetime import date as date_type
 
 from sqlalchemy.orm import Session
 
-from app.models.pathway import PathwayProgress
+from app.models.reporting.pathway import PathwayProgress
 
 logger = logging.getLogger(__name__)
 

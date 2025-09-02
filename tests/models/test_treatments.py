@@ -1,7 +1,7 @@
 """
 Test suite for the treatment models.
 """
-from app.models.treatments import Treatment, TreatmentSlotBooking
+from app.models.reporting.treatments import Treatment, TreatmentSlotBooking
 
 
 def test_retrieve_treatment(db_session, treatment):

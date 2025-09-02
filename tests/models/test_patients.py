@@ -2,12 +2,10 @@
 Test suite for the patient models.
 """
 
-from datetime import date
-
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.models.patient import Patient
+from app.models.reporting.patient import Patient
 
 
 def test_retrieve_patient(db_session, patient):

@@ -9,7 +9,7 @@ from datetime import date
 
 from app.database.primary import PRIMARY_SESSION_LOCAL as PrimarySessionLocal
 from app.database.metrics import MetricsSessionLocal, init_metrics_engine
-from app.models.metrics import (
+from app.models.reporting.metrics import (
     PathwayMetrics,
     OperationalMetrics,
     MDTMetrics,

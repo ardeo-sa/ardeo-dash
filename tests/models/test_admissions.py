@@ -9,7 +9,7 @@ This module contains unit tests for:
 from datetime import datetime, date
 import pytest
 from sqlalchemy.exc import IntegrityError
-from app.models.admissions import ReferralAdmission, ReferralStatusEnum
+from app.models.reporting.admissions import ReferralAdmission, ReferralStatusEnum
 
 
 def test_enum_values():

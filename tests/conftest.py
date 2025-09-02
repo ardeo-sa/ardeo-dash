@@ -18,8 +18,8 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
 from app.database.metrics import Base
-from app.models.clinician import Clinician
-from app.models.treatments import Treatment, TreatmentSlotBooking
+from app.models.reporting.clinician import Clinician
+from app.models.reporting.treatments import Treatment, TreatmentSlotBooking
 
 import app.config
 
@@ -35,17 +35,17 @@ def load_models():
     """Ensure all models are imported to register with SQLAlchemy."""
     # Imports here to avoid circular dependency issues
     try:
-        import app.models.admissions
-        import app.models.appointments
-        import app.models.clinician
-        import app.models.metrics
-        import app.models.organisation
-        import app.models.pathway
-        import app.models.patient
-        import app.models.referrals
-        import app.models.treatments
-        import app.models.messaging
-        import app.models.mdt
+        import app.models.reporting.admissions
+        import app.models.reporting.appointments
+        import app.models.reporting.clinician
+        import app.models.reporting.metrics
+        import app.models.reporting.organisation
+        import app.models.reporting.pathway
+        import app.models.reporting.patient
+        import app.models.reporting.referrals
+        import app.models.reporting.treatments
+        import app.models.reporting.messaging
+        import app.models.reporting.mdt
     except Exception:  # noqa: E722
         pass
 
@@ -106,7 +106,7 @@ def db_session(test_engine, test_tables):  # pylint: disable=unused-argument
 @pytest.fixture
 def patient(db_session):
     """Create and persist a simple Patient record."""
-    from app.models.patient import Patient  # local import keeps top-level imports tidy
+    from app.models.reporting.patient import Patient  # local import keeps top-level imports tidy
     p = Patient(
         primary_guid="guid-123",
         name="Test Patient",
@@ -135,7 +135,7 @@ def clinician(db_session):
 @pytest.fixture
 def organisation(db_session):
     """Create and persist a simple Organisation record."""
-    from app.models.organisation import Organisation
+    from app.models.reporting.organisation import Organisation
     org = Organisation(name="Test Org", code="TEST001")
     db_session.add(org)
     db_session.commit()
@@ -145,7 +145,7 @@ def organisation(db_session):
 @pytest.fixture
 def pathway_progress(db_session, patient):
     """Create and persist a simple PathwayProgress record for a patient."""
-    from app.models.pathway import (
+    from app.models.reporting.pathway import (
         PathwayProgress,
         PathwayStatusEnum,
         PathwayOutcomeEnum,
@@ -168,7 +168,7 @@ def pathway_progress(db_session, patient):
 @pytest.fixture
 def referral(db_session, patient, clinician):
     """Create referral"""
-    from app.models.referrals import Referral
+    from app.models.reporting.referrals import Referral
     r = Referral(
         patient_id=patient.id,
         clinician_id=clinician.id,

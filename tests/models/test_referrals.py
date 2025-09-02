@@ -1,7 +1,7 @@
 """
 Test suite for the referral models.
 """
-from app.models.referrals import Referral
+from app.models.reporting.referrals import Referral
 
 
 def test_retrieve_referral(db_session, referral):

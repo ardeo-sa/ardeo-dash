@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 from sqlalchemy.exc import SQLAlchemyError
 from app.database.metrics import MetricsSessionLocal
-from app.models.metrics import PatientMetrics
+from app.models.reporting.metrics import PatientMetrics
 from app.dash_app.utils.data_loader import load_data
 
 logger = logging.getLogger(__name__)

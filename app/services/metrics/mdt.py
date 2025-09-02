@@ -21,7 +21,7 @@ from datetime import date
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.models.mdt import MDTMeeting, MDTParticipant, MDTAction
+from app.models.reporting.mdt import MDTMeeting, MDTParticipant, MDTAction
 
 
 logger = logging.getLogger(__name__)

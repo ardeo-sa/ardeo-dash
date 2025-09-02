@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, extract
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.models.admissions import ReferralAdmission
+from app.models.reporting.admissions import ReferralAdmission
 
 logger = logging.getLogger(__name__)
 

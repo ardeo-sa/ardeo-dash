@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.models.primary import Organisation as PrimaryOrganisation
-from app.models.organisation import Organisation as MetricOrganisation
+from app.models.reporting.organisation import Organisation as MetricOrganisation
 
 logger = logging.getLogger(__name__)
 

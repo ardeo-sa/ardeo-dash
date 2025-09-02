@@ -268,6 +268,20 @@ sudo systemctl start ardeo-dash.service
 journalctl -u ardeo-dash.service -f 
 ```
 
+## Reporting database migrations
+
+
+```bash
+# Generate initial migration
+alembic revision --autogenerate -m "init reporting models"
+
+# Generate migrations when models change
+alembic revision --autogenerate -m "add new table xyz"
+
+# Apply migrations
+alembic upgrade head
+```
+
 ## Troubleshooting
 * Connection Refused errors? Make sure Redis, Postgres, or other services your app depends on are running.
 * WireGuard traffic not routing correctly? Avoid using the same LAN subnet as the remote peer (e.g., 192.168.0.0/24).

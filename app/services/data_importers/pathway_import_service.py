@@ -13,8 +13,8 @@ from sqlalchemy import func, distinct, or_, and_, literal_column
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.models.admissions import ReferralStatusEnum
-from app.models.pathway import PathwayStatusEnum, PathwayOutcomeEnum, PathwayProgress
+from app.models.reporting.admissions import ReferralStatusEnum
+from app.models.reporting.pathway import PathwayStatusEnum, PathwayOutcomeEnum, PathwayProgress
 from app.models.primary.episode import Episode
 from app.models.primary.subject import Subject
 from app.models.primary.referrals import Referrals

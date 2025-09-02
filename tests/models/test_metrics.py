@@ -6,7 +6,7 @@ Covers: OperationalMetrics, MDTMetrics, PathwayMetrics, ReferralMetrics, Clinici
 import pytest
 from datetime import date
 from sqlalchemy.exc import IntegrityError
-from app.models.metrics import (
+from app.models.reporting.metrics import (
     OperationalMetrics,
     MDTMetrics,
     PathwayMetrics,
