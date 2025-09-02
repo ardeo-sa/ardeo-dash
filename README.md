@@ -268,9 +268,13 @@ sudo systemctl start ardeo-dash.service
 journalctl -u ardeo-dash.service -f 
 ```
 
+## Databse setup
+```bash
+# Run once to create database and users
+./utils/setup_reporting_db.sh
+```
+
 ## Reporting database migrations
-
-
 ```bash
 # Generate initial migration
 alembic revision --autogenerate -m "init reporting models"

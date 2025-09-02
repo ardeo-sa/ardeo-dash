@@ -1,10 +1,16 @@
+import os
 from logging.config import fileConfig
+from dotenv import load_dotenv
 
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import create_engine, pool
 from alembic import context
 
 from app import config as app_config
 from app.database.metrics import Base
+
+# Load Alembic admin env file
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env_migrations")
+load_dotenv(dotenv_path)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -17,6 +23,15 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 target_metadata = Base.metadata
+
+# Build database URL from environment variables
+DB_USER = os.environ.get("METRICS_DB_ADMIN_USER", "reporting_admin")
+DB_PASSWORD = os.environ.get("METRICS_DB_ADMIN_PASSWORD", "admin_password")
+DB_HOST = os.environ.get("METRICS_DB_HOST", "localhost")
+DB_PORT = os.environ.get("METRICS_DB_PORT", "5432")
+DB_NAME = os.environ.get("METRICS_DB_NAME", "ardeo-services")
+
+METRICS_DB_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 
 def run_migrations_offline() -> None:
@@ -31,12 +46,12 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = app_config.METRICS_DB_URI
     context.configure(
-        url=url,
+        url=METRICS_DB_URI,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        version_table_schema="reporting",
     )
 
     with context.begin_transaction():
@@ -50,15 +65,16 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        {"sqlalchemy.url": app_config.METRICS_DB_URI},
-        prefix="sqlalchemy.",
+    connectable = create_engine(
+        METRICS_DB_URI,
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            version_table_schema="reporting",
         )
 
         with context.begin_transaction():
