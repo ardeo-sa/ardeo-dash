@@ -22,6 +22,6 @@ a worldwide, perpetual, irrevocable, non-exclusive, royalty-free licence to use,
 
 **9. Acceptance.** You accept by submitting a Contribution and acknowledging this CLA in the PR template (or via Ardeo’s registration form). A maintainer may apply the `cla-signed` label after verifying acceptance.
 
-**10. Contact.** legal@ardeo.example (replace with a real address).
+**10. Contact.** legal@ardeo.com
 
 *Signed electronically by linking your GitHub account to your Contribution.*
