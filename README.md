@@ -259,7 +259,10 @@ docker compose up -d
 # 1. Create dedicated user
 sudo useradd -r -s /bin/false dash-runner
 
-# 2. enable and start
+2. copy config
+sudo cp ardeo-dash.service /etc/systemd/system/
+
+# 3. enable and start
 sudo systemctl daemon-reload
 sudo systemctl enable ardeo-dash.service
 sudo systemctl start ardeo-dash.service
