@@ -1,7 +1,7 @@
 # Ardeo Entity Contributor Licence Agreement (Corporate CLA) 2025
 **Version:** v1.1 • **Effective on countersignature/acknowledgement**
 
-**Parties.** This Entity CLA (“Agreement”) is between **Ardeo SA** (“Ardeo”, “we”) and **[ENTITY LEGAL NAME]**, company no. [•••], with registered office at [•••] (“Entity”).
+**Parties.** This Entity CLA (“Agreement”) is between **Ardeo Limited** (“Ardeo”, “we”) and **[ENTITY LEGAL NAME]**, company no. [•••], with registered office at [•••] (“Entity”).
 
 **1. Scope.** This Agreement covers Contributions (as defined below) submitted to Projects in the **`ardeo-sa`** GitHub organisation by the Entity’s **Approved Contributors**.
 
