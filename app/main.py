@@ -37,6 +37,11 @@ from app.logging_config import setup_logging
 setup_logging()
 logger = logging.getLogger(__name__)
 
+app = FastAPI()
+app.include_router(metrics.router, prefix="/api")
+
+mount_dash(app)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
@@ -56,17 +61,12 @@ async def lifespan(app: FastAPI):
         init_metrics_engine()
         port_primary_data()
         process_data()
-        mount_dash(app)
         logger.info("Startup completed successfully.")
     except (SQLAlchemyError, RuntimeError) as e:
         logger.error("Startup failure: %s", e, exc_info=True)
     yield
     # Optional: add cleanup/shutdown logic here if needed
     logger.info("Shutdown complete.")
-
-
-app = FastAPI()
-app.include_router(metrics.router, prefix="/api")
 
 
 @app.get("/health")
