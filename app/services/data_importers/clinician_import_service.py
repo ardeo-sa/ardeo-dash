@@ -13,7 +13,7 @@ import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.models.clinician import Clinician
+from app.models.reporting.clinician import Clinician
 from app.models.primary.users import Users
 
 logger = logging.getLogger(__name__)

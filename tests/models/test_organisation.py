@@ -2,7 +2,7 @@
 Test suite for the organisation models.
 """
 import pytest
-from app.models.organisation import Organisation
+from app.models.reporting.organisation import Organisation
 
 
 def test_retrieve_organisation(db_session):

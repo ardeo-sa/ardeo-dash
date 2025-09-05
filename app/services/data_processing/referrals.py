@@ -13,8 +13,8 @@ Each referral record is committed to the database to ensure persistent storage.
 # import logging
 from datetime import date
 
-from app.models.admissions import ReferralAdmission, ReferralStatusEnum
-from app.models.patient import Patient
+from app.models.reporting.admissions import ReferralAdmission, ReferralStatusEnum
+from app.models.reporting.patient import Patient
 
 
 def create_referral_in(patient: Patient, clinician_id: int, session) -> None:

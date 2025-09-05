@@ -19,7 +19,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.models.mdt import MDTMeeting, MDTParticipant, MDTAction, MDTCase
+from app.models.reporting.mdt import MDTMeeting, MDTParticipant, MDTAction, MDTCase
 from app.models.primary.mdt import PrimaryMDTMeeting
 
 logger = logging.getLogger(__name__)

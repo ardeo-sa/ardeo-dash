@@ -7,7 +7,7 @@ from datetime import datetime
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.models.appointments import Appointment
+from app.models.reporting.appointments import Appointment
 
 
 def test_create_appointment(db_session, patient, clinician):

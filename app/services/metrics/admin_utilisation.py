@@ -10,12 +10,12 @@ from typing import Dict, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from app.models.admissions import ReferralAdmission as Admission
-from app.models.clinician import Clinician
+from app.models.reporting.admissions import ReferralAdmission as Admission
+from app.models.reporting.clinician import Clinician
 
-from app.models.imaging import ImagingOrder
-from app.models.lab import LabTestOrder
-from app.models.treatments import TreatmentSlotBooking
+from app.models.reporting.imaging import ImagingOrder
+from app.models.reporting.lab import LabTestOrder
+from app.models.reporting.treatments import TreatmentSlotBooking
 
 logger = logging.getLogger(__name__)
 

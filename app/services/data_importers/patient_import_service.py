@@ -14,8 +14,8 @@ import logging
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.models.admissions import ReferralAdmission, ReferralStatusEnum
-from app.models.patient import Patient
+from app.models.reporting.admissions import ReferralAdmission, ReferralStatusEnum
+from app.models.reporting.patient import Patient
 from app.models.primary.episode import Episode
 # from app.models.primary.subject import Subject
 from app.models.primary.referrals import Referrals

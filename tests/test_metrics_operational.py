@@ -26,7 +26,7 @@ from app.services.metrics.operational import (
     calculate_avg_length_of_stay,
     calculate_readmissions,
 )
-from app.models.admissions import ReferralAdmission
+from app.models.reporting.admissions import ReferralAdmission
 
 
 def make_admission(patient_id, admit_days_ago, discharge_days_ago=None):

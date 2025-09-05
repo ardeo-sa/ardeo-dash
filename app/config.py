@@ -21,6 +21,9 @@ metrics_db_host = os.getenv("METRICS_DB_HOST", "someurl")
 metrics_db_name = os.getenv("METRICS_DB_NAME", "myreportingdb")
 metrics_db_port = os.getenv("METRICS_DB_PORT", "1234")
 
+# Read-only metrics DB user
+metrics_db_read_user = os.getenv("METRICS_DB_READ_USER", "reporting_user")
+metrics_db_read_password = os.getenv("METRICS_DB_READ_PASSWORD", "readonlypassword")
 
 required_vars = {
     "METRICS_DB_USER": metrics_db_user,
@@ -40,6 +43,13 @@ Base = declarative_base()
 
 METRICS_DB_URI = (f"postgresql://{metrics_db_user}:{metrics_db_password}@{metrics_db_host}:"
                   f"{metrics_db_port}/{metrics_db_name}")
+
+# Construct read-only DB URI
+METRICS_DB_URI_READ = (
+    f"postgresql://{metrics_db_read_user}:{metrics_db_read_password}@"
+    f"{metrics_db_host}:{metrics_db_port}/{metrics_db_name}"
+)
+
 
 # Settings for data scraping
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")

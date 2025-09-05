@@ -24,11 +24,11 @@ from sqlalchemy.orm import Session
 # from app.database.primary import PrimarySessionLocal
 # from app.database.metrics import MetricsSessionLocal
 
-from app.models.admissions import ReferralAdmission
-from app.models.appointments import Appointment
-from app.models.mdt import MDTMeeting
+from app.models.reporting.admissions import ReferralAdmission
+from app.models.reporting.appointments import Appointment
+from app.models.reporting.mdt import MDTMeeting
 # from app.models.metrics import OperationalMetrics
-from app.models.treatments import Treatment
+from app.models.reporting.treatments import Treatment
 # from app.models.patient import Patient
 from app.services.metrics.utils import avg_days_between
 

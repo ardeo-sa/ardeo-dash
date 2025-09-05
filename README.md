@@ -259,13 +259,34 @@ docker compose up -d
 # 1. Create dedicated user
 sudo useradd -r -s /bin/false dash-runner
 
-# 2. enable and start
+2. copy config
+sudo cp ardeo-dash.service /etc/systemd/system/
+
+# 3. enable and start
 sudo systemctl daemon-reload
 sudo systemctl enable ardeo-dash.service
 sudo systemctl start ardeo-dash.service
 
 # 3. Check logs
 journalctl -u ardeo-dash.service -f 
+```
+
+## Databse setup
+```bash
+# Run once to create database and users
+./utils/setup_reporting_db.sh
+```
+
+## Reporting database migrations
+```bash
+# Generate initial migration
+alembic revision --autogenerate -m "init reporting models"
+
+# Generate migrations when models change
+alembic revision --autogenerate -m "add new table xyz"
+
+# Apply migrations
+alembic upgrade head
 ```
 
 ## Troubleshooting

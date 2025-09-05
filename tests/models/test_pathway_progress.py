@@ -2,8 +2,6 @@
 Test suite for the pathway progress models.
 """
 
-from app.models.pathway import PathwayProgress
-
 
 def test_create_pathway_progress(pathway_progress):
     """

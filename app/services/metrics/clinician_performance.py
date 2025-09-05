@@ -13,10 +13,10 @@ from sqlalchemy import func
 # from sqlalchemy.types import Float
 
 # from app.models.clinician import Clinician
-from app.models.admissions import ReferralAdmission
+from app.models.reporting.admissions import ReferralAdmission
 # from app.models.pathway import PathwayProgress
-from app.models.clinician import ClinicianTask
-from app.models.appointments import Appointment
+from app.models.reporting.clinician import ClinicianTask
+from app.models.reporting.appointments import Appointment
 
 logger = logging.getLogger(__name__)
 

@@ -3,9 +3,9 @@ Description=Ardeo Dashboard service
 After=network.target
 
 [Service]
-WorkingDirectory=/home/wiktoradmin/ardeo-dash/
+WorkingDirectory=/srv/ardeo-dash/
 User=dash-runner
-ExecStart=/home/wiktoradmin/ardeo-dash/venv/bin/python /home/wiktoradmin/ardeo-dash/run.py
+ExecStart=/srv/ardeo-dash/venv/bin/python /srv/ardeo-dash/run.py
 Restart=always
 RestartSec=5s
 StandardOutput=journal
