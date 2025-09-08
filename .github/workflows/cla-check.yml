@@ -1,0 +1,24 @@
+name: cla-check
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+permissions:
+  issues: read
+  pull-requests: read
+  statuses: write
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const user = pr.user.login;
+            if (user === 'dependabot[bot]') { return; }
+            const q = `repo:ardeo-sa/ardeo-dash is:issue is:closed label:"cla-signed" author:${user} in:title "CLA Signature"`;
+            const res = await github.rest.search.issuesAndPullRequests({ q });
+            if ((res.data.total_count || 0) < 1) {
+              core.setFailed(`@${user} must sign the CLA: open a "CLA Signature" issue using the template at https://github.com/ardeo-sa/ardeo-dash/issues/new?template=cla.yml`);
+            }

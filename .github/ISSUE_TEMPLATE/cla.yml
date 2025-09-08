@@ -1,0 +1,62 @@
+name: CLA Signature
+description: Sign the Contributor Licence Agreement to contribute code.
+title: "CLA Signature: <your GitHub username>"
+labels: ["cla"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please read the Ardeo Limited Contributor Licence Agreements:
+        - **Individual:** https://github.com/ardeo-sa/ardeo-dash/blob/main/CLA/Individual.md
+        - **Entity:** https://github.com/ardeo-sa/ardeo-dash/blob/main/CLA/Entity.md
+
+  - type: dropdown
+    id: cla_type
+    attributes:
+      label: Which CLA are you signing?
+      options:
+        - Individual
+        - Entity (on behalf of an organisation)
+    validations:
+      required: true
+
+  - type: input
+    id: full_name
+    attributes:
+      label: Your full name (or authorised signatory)
+      placeholder: "Jane Doe"
+    validations:
+      required: true
+
+  - type: input
+    id: email
+    attributes:
+      label: Email address
+      placeholder: "jane@example.com"
+    validations:
+      required: true
+
+  - type: input
+    id: entity_name
+    attributes:
+      label: Organisation legal name (Entity signers)
+      description: If you chose 'Entity', provide the organisation's legal name.
+
+  - type: input
+    id: role
+    attributes:
+      label: Your title/role (Entity signers)
+
+  - type: checkboxes
+    id: agree
+    attributes:
+      label: Agreement
+      description: Tick the box to sign the CLA.
+      options:
+        - label: I have read and agree to the Ardeo Contributor Licence Agreement.
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        By submitting, you acknowledge your selection and authorise Ardeo to record your acknowledgement for CLA compliance.
