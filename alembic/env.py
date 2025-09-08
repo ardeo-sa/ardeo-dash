@@ -27,9 +27,9 @@ target_metadata = Base.metadata
 # Build database URL from environment variables
 DB_USER = os.environ.get("METRICS_DB_ADMIN_USER", "ardeo_admin")
 DB_PASSWORD = os.environ.get("METRICS_DB_ADMIN_PASSWORD", "admin_password")
-DB_HOST = os.environ.get("METRICS_DB_HOST", "localhost")
+DB_HOST = os.environ.get("METRICS_DB_HOST", "192.168.0.218")
 DB_PORT = os.environ.get("METRICS_DB_PORT", "5432")
-DB_NAME = os.environ.get("METRICS_DB_NAME", "ardeo_services")
+DB_NAME = os.environ.get("METRICS_DB_NAME", "reporting")
 
 METRICS_DB_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -54,7 +54,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        version_table_schema="reporting",
+        version_table_schema="public",
     )
 
     with context.begin_transaction():
@@ -78,7 +78,7 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            version_table_schema="reporting",
+            version_table_schema="public",
         )
 
         with context.begin_transaction():
