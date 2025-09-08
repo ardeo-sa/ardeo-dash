@@ -13,31 +13,66 @@ jobs:
         with:
           script: |
             const owner = context.repo.owner;
-            const repo = context.repo.repo;
+            const repo  = context.repo.repo;
             const issue = context.payload.issue;
-            if (!issue) { return; }
+            if (!issue) return;
+
+            // Only process our CLA Signature issues
             const titleOk = /^CLA Signature/i.test(issue.title || "");
-            if (!titleOk) { return; }
+            if (!titleOk) return;
+
             const body = issue.body || "";
-            const ok = /\[x\]\s*I have read and agree to the Ardeo Contributor Licence Agreement\./i.test(body);
+
+            // Check the required checkbox (renders as [x] in the issue body)
+            const ok = /\[x\]\s*I have read and agree to the Ardeo Limited Contributor Licence Agreement\./i.test(body);
+
+            // Ensure cla-signed label exists
             async function ensureLabel(name, color, description) {
               try { await github.rest.issues.getLabel({ owner, repo, name }); }
               catch (e) { await github.rest.issues.createLabel({ owner, repo, name, color, description }); }
             }
             await ensureLabel('cla-signed', '0e8a16', 'Contributor has signed the CLA');
-            if (ok) {
-              await github.rest.issues.addLabels({ owner, repo, issue_number: issue.number, labels: ['cla-signed'] });
-              await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: "Thanks! Your CLA acknowledgement has been recorded. You can now submit pull requests." });
-              await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: 'closed' });
-            } else {
-              await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: "Please tick the confirmation checkbox to sign the CLA. Edit this issue and resubmit." });
-            }
-// (Optional) Echo the chosen CLA type if present in the form body
-const m = body.match(/Which CLA are you signing\\?\\s*\\n\\s*\\*\\*(.+?)\\*\\*/i);
-if (m && m[1]) {
-  await github.rest.issues.createComment({
-    owner, repo, issue_number: issue.number,
-    body: `Recorded CLA type: **${m[1].trim()}**`
-  });
-}
 
+            if (ok) {
+              // Add cla-signed
+              await github.rest.issues.addLabels({ owner, repo, issue_number: issue.number, labels: ['cla-signed'] });
+
+              // --- BEGIN: Echo CLA type + optional org details ---
+              // Try to capture the selected CLA type from the issue form
+              let chosen = 'Unspecified';
+              let m = body.match(/Which CLA are you signing\?\s*[\r\n]+\*\*(.+?)\*\*/i) || body.match(/cla_type:\s*(.+)/i);
+              if (m && m[1]) chosen = (m[1] || '').trim();
+
+              // Optional: capture organisation name and role if present
+              const orgMatch  = body.match(/Organisation legal name.*?[\r\n]+(.+)/i);
+              const roleMatch = body.match(/Your title\/role.*?[\r\n]+(.+)/i);
+              const org  = orgMatch  && orgMatch[1]  ? orgMatch[1].trim()  : '';
+              const role = roleMatch && roleMatch[1] ? roleMatch[1].trim() : '';
+
+              let echo = `Recorded CLA type: **${chosen}**`;
+              if (/Entity/i.test(chosen) && (org || role)) {
+                echo += `\n\n**Entity details:**`;
+                if (org)  echo += `\n• Organisation: ${org}`;
+                if (role) echo += `\n• Signatory role: ${role}`;
+              }
+
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: echo
+              });
+              // --- END: Echo block ---
+
+              // Thank and close
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: "Thanks! Your CLA acknowledgement has been recorded. You can now submit pull requests."
+              });
+              await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: 'closed' });
+
+            } else {
+              // Checkbox not ticked -> nudge
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: "Please tick the confirmation checkbox to sign the CLA. Edit this issue and resubmit."
+              });
+            }
