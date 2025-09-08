@@ -33,11 +33,11 @@ DB_NAME = os.environ.get("METRICS_DB_NAME", "reporting")
 
 METRICS_DB_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-print("🔑 DB_USER:", DB_USER)
-print("🔑 DB_PASSWORD:", DB_PASSWORD)
-print("🔑 DB_HOST:", DB_HOST)
-print("🔑 DB_NAME:", DB_NAME)
-print("string:", METRICS_DB_URI)
+# print("🔑 DB_USER:", DB_USER)
+# print("🔑 DB_PASSWORD:", DB_PASSWORD)
+# print("🔑 DB_HOST:", DB_HOST)
+# print("🔑 DB_NAME:", DB_NAME)
+# print("string:", METRICS_DB_URI)
 
 if not all([DB_USER, DB_PASSWORD, DB_HOST, DB_NAME]):
     raise RuntimeError("Missing required DB env variables for Alembic migrations")
