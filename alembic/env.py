@@ -25,7 +25,7 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 # Build database URL from environment variables
-DB_USER = os.environ.get("METRICS_DB_ADMIN_USER", "ardeo_admin")
+DB_USER = os.environ.get("METRICS_DB_ADMIN_USER", "admin_user")
 DB_PASSWORD = os.environ.get("METRICS_DB_ADMIN_PASSWORD", "admin_password")
 DB_HOST = os.environ.get("METRICS_DB_HOST", "192.168.0.218")
 DB_PORT = os.environ.get("METRICS_DB_PORT", "5432")
