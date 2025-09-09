@@ -4,19 +4,21 @@ patient volume, and outstanding tasks.
 Each function returns a per-clinician dictionary of metric values based on data from
 associated tables like admissions, pathway progress, appointments, and task assignments.
 """
+import logging
 from datetime import date, datetime
-from typing import Dict, Any
+from typing import Dict
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from sqlalchemy.types import Float
+# from sqlalchemy.types import Float
 
-from app.models.clinician import Clinician
-from app.models.admissions import ReferralAdmission
-from app.models.pathway import PathwayProgress
-from app.models.clinician import ClinicianTask
-from app.models.appointments import Appointment
+# from app.models.clinician import Clinician
+from app.models.reporting.admissions import ReferralAdmission
+# from app.models.pathway import PathwayProgress
+from app.models.reporting.clinician import ClinicianTask
+from app.models.reporting.appointments import Appointment
 
+logger = logging.getLogger(__name__)
 
 def get_active_clinician_count(session: Session, for_date: date) -> int:
     """
@@ -43,32 +45,72 @@ def get_active_clinician_count(session: Session, for_date: date) -> int:
     )
 
     active_ids = admission_ids.union(appointment_ids).union(task_ids).distinct()
+    count = active_ids.count()
+    logger.debug("Active clinicians on %s: %d", for_date, count)
     return active_ids.count()
 
 
 def avg_patients_admitted(session: Session, for_date: date, clinician_count: int) -> float:
+    """
+    Calculate the average number of patients admitted per clinician on a given date.
+
+    Args:
+        session (Session): SQLAlchemy database session.
+        for_date (date): The date for which to calculate the admissions.
+        clinician_count (int): The number of clinicians available on that date.
+
+    Returns:
+        float: The average number of admitted patients per clinician. Returns 0 if clinician_count is 0.
+    """
     total = session.query(ReferralAdmission).filter(
         func.date(ReferralAdmission.admission_time) == for_date
     ).count()
-    return total / clinician_count if clinician_count else 0
+    avg = total / clinician_count if clinician_count else 0
+    logger.debug("Patients admitted on %s: %d (avg per clinician: %.2f)", for_date, total, avg)
+    return avg
 
 
 def avg_patients_seen(session: Session, for_date: date, clinician_count: int) -> float:
+    """
+    Calculate the average number of patients seen (excluding no-shows) per clinician on a given date.
+
+    Args:
+        session (Session): SQLAlchemy database session.
+        for_date (date): The date for which to calculate the patient visits.
+        clinician_count (int): The number of clinicians available on that date.
+
+    Returns:
+        float: The average number of patients seen per clinician. Returns 0 if clinician_count is 0.
+    """
     total = session.query(Appointment).filter(
         func.date(Appointment.date) == for_date,
-        Appointment.no_show == False
+        Appointment.no_show is False
     ).count()
-    return total / clinician_count if clinician_count else 0
+    avg = total / clinician_count if clinician_count else 0
+    logger.debug("Patients seen on %s: %d (avg per clinician: %.2f)", for_date, total, avg)
+    return avg
 
 
 def avg_outstanding_tasks(session: Session, clinician_count: int) -> float:
+    """
+    Calculate the average number of outstanding (incomplete) tasks per clinician.
+
+    Args:
+        session (Session): SQLAlchemy database session.
+        clinician_count (int): The number of clinicians.
+
+    Returns:
+        float: The average number of outstanding tasks per clinician. Returns 0 if clinician_count is 0.
+    """
     total = session.query(ClinicianTask).filter(
-        ClinicianTask.completed == False
+        ClinicianTask.completed is False
     ).count()
-    return total / clinician_count if clinician_count else 0
+    avg = total / clinician_count if clinician_count else 0
+    logger.debug("Outstanding tasks: %d (avg per clinician: %.2f)", total, avg)
+    return avg
 
 
-def aggregate_clinician_metrics(session: Session, date_: date = None) -> Dict[str, Any]:
+def aggregate_clinician_metrics(session: Session, date_: date = None) -> Dict[str, tuple]:
     """
     Aggregates system-level clinician metrics averaged per active clinician.
 
@@ -77,15 +119,19 @@ def aggregate_clinician_metrics(session: Session, date_: date = None) -> Dict[st
         date_ (date, optional): Date to calculate metrics for. Defaults to today.
 
     Returns:
-        Dict[str, Any]: Dictionary of metric_name -> value.
+        Dict[str, tuple]: Dictionary of metric_name -> (value, unit).
     """
     date_ = date_ or datetime.today().date()
+    logger.info("Aggregating clinician metrics for date: %s", date_)
+
     clinician_count = get_active_clinician_count(session, date_)
 
-    return {
-        "date": date_,
-        "active_clinicians": clinician_count,
-        "avg_patients_admitted": avg_patients_admitted(session, date_, clinician_count),
-        "avg_patients_seen": avg_patients_seen(session, date_, clinician_count),
-        "avg_outstanding_tasks": avg_outstanding_tasks(session, clinician_count),
+    metrics = {
+        "active_clinicians": (clinician_count, "count"),
+        "avg_patients_admitted": (avg_patients_admitted(session, date_, clinician_count), "patients"),
+        "avg_patients_seen": (avg_patients_seen(session, date_, clinician_count), "patients"),
+        "avg_outstanding_tasks": (avg_outstanding_tasks(session, clinician_count), "tasks"),
     }
+
+    logger.debug("Clinician metrics for %s: %s", date_, metrics)
+    return metrics

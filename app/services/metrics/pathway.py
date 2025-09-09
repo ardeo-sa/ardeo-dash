@@ -8,10 +8,31 @@ a dictionary keyed by metric names with associated values and units.
 
 Requires an SQLAlchemy session to interact with the database.
 """
-from sqlalchemy.orm import Session
-from app.models.pathway import PathwayProgress
+import logging
+from datetime import date as date_type
 
-def calculate_pathway_adherence_rate(session: Session) -> float:
+from sqlalchemy.orm import Session
+
+from app.models.reporting.pathway import PathwayProgress
+
+logger = logging.getLogger(__name__)
+
+
+def _filter_by_date(progress_list, for_date: date_type = None, field_name: str = "admission_time"):
+    """
+    Internal helper to filter PathwayProgress entries by a specific date on a given field.
+    """
+    if not for_date:
+        return progress_list
+    filtered = [
+        p for p in progress_list
+        if getattr(p, field_name, None) and getattr(p, field_name).date() == for_date
+    ]
+    logger.debug("Filtered %d entries by %s = %s", len(filtered), field_name, for_date)
+    return filtered
+
+
+def calculate_pathway_adherence_rate(session: Session, for_date: date_type = None) -> float:
     """
     Calculates the average adherence rate to pathways.
 
@@ -19,15 +40,18 @@ def calculate_pathway_adherence_rate(session: Session) -> float:
         float: Average percentage of steps completed by patients.
     """
     progress = session.query(PathwayProgress).all()
+    progress = _filter_by_date(progress, for_date, "admission_time")
     adherence_rates = [
         p.steps_completed / p.steps_total
         for p in progress
         if p.steps_total > 0
     ]
-    return (sum(adherence_rates) / len(adherence_rates) * 100) if adherence_rates else 0
+    value = (sum(adherence_rates) / len(adherence_rates) * 100) if adherence_rates else 0
+    logger.info(f"Calculated pathway adherence rate: {value:.2f}%")
+    return value
 
 
-def calculate_pathway_dropout_rate(session: Session) -> float:
+def calculate_pathway_dropout_rate(session: Session, for_date: date_type = None) -> float:
     """
     Calculates the percentage of patients who dropped out of their pathways.
 
@@ -35,13 +59,16 @@ def calculate_pathway_dropout_rate(session: Session) -> float:
         float: Dropout rate in percentage.
     """
     progress = session.query(PathwayProgress).all()
+    progress = _filter_by_date(progress, for_date, "admission_time")
     if not progress:
         return 0
     dropouts = sum(1 for p in progress if p.status == "dropped")
-    return (dropouts / len(progress)) * 100
+    value = (dropouts / len(progress)) * 100
+    logger.info(f"Calculated pathway dropout rate: {value:.2f}%")
+    return value
 
 
-def calculate_pathway_success_rate(session: Session) -> float:
+def calculate_pathway_success_rate(session: Session, for_date: date_type = None) -> float:
     """
     Calculates the percentage of patients who successfully completed their pathways.
 
@@ -49,13 +76,16 @@ def calculate_pathway_success_rate(session: Session) -> float:
         float: Success rate in percentage.
     """
     progress = session.query(PathwayProgress).all()
+    progress = _filter_by_date(progress, for_date, "admission_time")
     if not progress:
         return 0
     successes = sum(1 for p in progress if p.outcome == "success")
-    return (successes / len(progress)) * 100
+    value = (successes / len(progress)) * 100
+    logger.info(f"Calculated pathway success rate: {value:.2f}%")
+    return value
 
 
-def calculate_pathway_failure_rate(session: Session) -> float:
+def calculate_pathway_failure_rate(session: Session, for_date: date_type = None) -> float:
     """
     Calculates the percentage of patients who failed their pathway.
 
@@ -63,13 +93,16 @@ def calculate_pathway_failure_rate(session: Session) -> float:
         float: Failure rate in percentage.
     """
     progress = session.query(PathwayProgress).all()
+    progress = _filter_by_date(progress, for_date, "admission_time")
     if not progress:
         return 0
     failures = sum(1 for p in progress if p.outcome == "failure")
-    return (failures / len(progress)) * 100
+    value = (failures / len(progress)) * 100
+    logger.info(f"Calculated pathway failure rate: {value:.2f}%")
+    return value
 
 
-def calculate_readmission_rate(session: Session) -> float:
+def calculate_readmission_rate(session: Session, for_date: date_type = None) -> float:
     """
     Calculates the percentage of patients who were readmitted.
 
@@ -77,13 +110,16 @@ def calculate_readmission_rate(session: Session) -> float:
         float: Readmission rate as a percentage (0–100).
     """
     progress = session.query(PathwayProgress).all()
+    progress = _filter_by_date(progress, for_date, "admission_time")
     if not progress:
         return 0
     readmitted = sum(1 for p in progress if getattr(p, "readmitted", False))
-    return (readmitted / len(progress)) * 100
+    value = (readmitted / len(progress)) * 100
+    logger.info(f"Calculated readmission rate: {value:.2f}%")
+    return value
 
 
-def calculate_admit_to_treatment_time(session: Session) -> float:
+def calculate_admit_to_treatment_time(session: Session, for_date: date_type = None) -> float:
     """
     Calculates the average time in days from admission to treatment start.
 
@@ -91,15 +127,18 @@ def calculate_admit_to_treatment_time(session: Session) -> float:
         float: Average duration in days from admission to treatment.
     """
     progress = session.query(PathwayProgress).all()
+    progress = _filter_by_date(progress, for_date, "admission_time")
     time_deltas = [
         (p.treatment_start_time - p.admission_time).days
         for p in progress
         if p.admission_time and p.treatment_start_time
     ]
-    return sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    value = sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    logger.info(f"Calculated admit-to-treatment time: {value:.2f} days")
+    return value
 
 
-def calculate_diagnosis_to_treatment_time(session: Session) -> float:
+def calculate_diagnosis_to_treatment_time(session: Session, for_date: date_type = None) -> float:
     """
     Calculates the average time in days from diagnosis to treatment start.
 
@@ -107,15 +146,18 @@ def calculate_diagnosis_to_treatment_time(session: Session) -> float:
         float: Average duration in days from diagnosis to treatment.
     """
     progress = session.query(PathwayProgress).all()
+    progress = _filter_by_date(progress, for_date, "diagnosis_time")
     time_deltas = [
         (p.treatment_start_time - p.diagnosis_time).days
         for p in progress
         if hasattr(p, "diagnosis_time") and p.diagnosis_time and p.treatment_start_time
     ]
-    return sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    value = sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    logger.info(f"Calculated diagnosis-to-treatment time: {value:.2f} days")
+    return value
 
 
-def calculate_treatment_duration(session: Session) -> float:
+def calculate_treatment_duration(session: Session, for_date: date_type = None) -> float:
     """
     Calculates the average duration in days from treatment start to completion.
 
@@ -123,15 +165,18 @@ def calculate_treatment_duration(session: Session) -> float:
         float: Average treatment duration in days.
     """
     progress = session.query(PathwayProgress).all()
+    progress = _filter_by_date(progress, for_date, "treatment_start_time")
     time_deltas = [
         (p.treatment_end_time - p.treatment_start_time).days
         for p in progress
         if hasattr(p, "treatment_end_time") and p.treatment_start_time and p.treatment_end_time
     ]
-    return sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    value = sum(time_deltas) / len(time_deltas) if time_deltas else 0
+    logger.info(f"Calculated treatment duration: {value:.2f} days")
+    return value
 
 
-def calculate_complication_rate(session: Session) -> float:
+def calculate_complication_rate(session: Session, for_date: date_type = None) -> float:
     """
     Calculates the percentage of patients who experienced complications.
 
@@ -139,14 +184,17 @@ def calculate_complication_rate(session: Session) -> float:
         float: Complication rate in percentage.
     """
     progress = session.query(PathwayProgress).all()
+    progress = _filter_by_date(progress, for_date, "treatment_start_time")
     complications = [
         p for p in progress
         if hasattr(p, "had_complication") and p.had_complication
     ]
-    return (len(complications) / len(progress)) * 100 if progress else 0
+    value = (len(complications) / len(progress)) * 100 if progress else 0
+    logger.info(f"Calculated complication rate: {value:.2f}%")
+    return value
 
 
-def calculate_relapse_rate(session: Session) -> float:
+def calculate_relapse_rate(session: Session, for_date: date_type = None) -> float:
     """
     Calculates the percentage of patients who experienced a relapse.
 
@@ -154,29 +202,40 @@ def calculate_relapse_rate(session: Session) -> float:
         float: Relapse rate in percentage.
     """
     progress = session.query(PathwayProgress).all()
+    progress = _filter_by_date(progress, for_date, "treatment_start_time")
     relapses = [
         p for p in progress
         if hasattr(p, "had_relapse") and p.had_relapse
     ]
-    return (len(relapses) / len(progress)) * 100 if progress else 0
+    value = (len(relapses) / len(progress)) * 100 if progress else 0
+    logger.info(f"Calculated relapse rate: {value:.2f}%")
+    return value
 
 
-def aggregate_pathway_metrics(session: Session) -> dict:
+def aggregate_pathway_metrics(session: Session, for_date: date_type = None) -> dict:
     """
     Aggregates all pathway-related metrics into a structured dictionary.
+
+    Args:
+        session (Session): SQLAlchemy session.
+        for_date (date, optional): If provided, filters metrics for this date.
 
     Returns:
         dict: Dictionary of metric_name -> (value, unit).
     """
-    return {
-        "pathway_adherence_rate": (calculate_pathway_adherence_rate(session), "percent"),
-        "pathway_dropout_rate": (calculate_pathway_dropout_rate(session), "percent"),
-        "pathway_success_rate": (calculate_pathway_success_rate(session), "percent"),
-        "pathway_failure_rate": (calculate_pathway_failure_rate(session), "percent"),
-        "pathway_readmission_rate": (calculate_readmission_rate(session), "percent"),
-        "pathway_admit_to_treatment_time": (calculate_admit_to_treatment_time(session), "days"),
-        "pathway_diagnosis_to_treatment_time": (calculate_diagnosis_to_treatment_time(session), "days"),
-        "pathway_treatment_duration": (calculate_treatment_duration(session), "days"),
-        "pathway_complication_rate": (calculate_complication_rate(session), "percent"),
-        "pathway_relapse_rate": (calculate_relapse_rate(session), "percent"),
+    logger.info("Aggregating pathway metrics for date %s", for_date)
+
+    metrics = {
+        "pathway_adherence_rate": (calculate_pathway_adherence_rate(session, for_date), "percent"),
+        "pathway_dropout_rate": (calculate_pathway_dropout_rate(session, for_date), "percent"),
+        "pathway_success_rate": (calculate_pathway_success_rate(session, for_date), "percent"),
+        "pathway_failure_rate": (calculate_pathway_failure_rate(session, for_date), "percent"),
+        "pathway_readmission_rate": (calculate_readmission_rate(session, for_date), "percent"),
+        "pathway_admit_to_treatment_time": (calculate_admit_to_treatment_time(session, for_date), "days"),
+        "pathway_diagnosis_to_treatment_time": (calculate_diagnosis_to_treatment_time(session, for_date), "days"),
+        "pathway_treatment_duration": (calculate_treatment_duration(session, for_date), "days"),
+        "pathway_complication_rate": (calculate_complication_rate(session, for_date), "percent"),
+        "pathway_relapse_rate": (calculate_relapse_rate(session, for_date), "percent"),
     }
+    logger.info("Pathway metrics aggregation complete for date: %s", for_date)
+    return metrics

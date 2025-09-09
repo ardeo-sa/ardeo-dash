@@ -1,0 +1,84 @@
+#!/bin/bash
+# Creates reporting DB, migration/admin user, app user with proper privileges, and read-only user
+# Usage: ./setup_reporting_db.sh
+
+set -euo pipefail
+
+# Load environment variables from .env and .env_migrations if they exist
+ENV_FILE=".env"
+MIGRATIONS_ENV_FILE=".env_migrations"
+
+if [[ -f "$ENV_FILE" ]]; then
+    export $(grep -v '^#' "$ENV_FILE" | xargs)
+fi
+
+if [[ -f "$MIGRATIONS_ENV_FILE" ]]; then
+    export $(grep -v '^#' "$MIGRATIONS_ENV_FILE" | xargs)
+fi
+
+# Environment variables (with safe defaults)
+DB_NAME="${METRICS_DB_NAME:-ardeo_services}"
+ADMIN_USER="${METRICS_DB_ADMIN_USER:-ardeo_admin}"
+ADMIN_PASS="${METRICS_DB_ADMIN_PASSWORD:-adminpassword}"
+APP_USER="${METRICS_DB_USER:-processing_user}"
+APP_PASS="${METRICS_DB_PASSWORD:-apppassword}"
+READ_USER="${METRICS_DB_READ_USER:-reporting_user}"
+READ_PASS="${METRICS_DB_READ_PASSWORD:-readonlypassword}"
+SCHEMA_NAME="${METRICS_DB_SCHEMA:-reporting}"
+
+# Check if running as postgres user
+if [[ $EUID -ne 0 ]]; then
+   echo "Please run as root or use sudo."
+   exit 1
+fi
+
+sudo -u postgres psql <<EOSQL
+-- Drop DB and users if they exist
+DROP DATABASE IF EXISTS "$DB_NAME";
+DROP ROLE IF EXISTS "$ADMIN_USER";
+DROP ROLE IF EXISTS "$APP_USER";
+DROP ROLE IF EXISTS "$READ_USER";
+
+-- Create admin user with login + createdb (for migrations / management)
+CREATE ROLE "$ADMIN_USER" WITH LOGIN CREATEDB PASSWORD '$ADMIN_PASS';
+
+-- Create database owned by admin
+CREATE DATABASE "$DB_NAME" OWNER "$ADMIN_USER";
+
+-- Allow admin to create schemas inside DB
+GRANT CREATE ON DATABASE "$DB_NAME" TO "$ADMIN_USER";
+
+-- Connect to the new DB
+\c "$DB_NAME"
+
+-- Create schema
+CREATE SCHEMA "$SCHEMA_NAME" AUTHORIZATION "$ADMIN_USER";
+
+-- Create app user (full privileges)
+CREATE ROLE "$APP_USER" WITH LOGIN PASSWORD '$APP_PASS';
+GRANT CONNECT ON DATABASE "$DB_NAME" TO "$APP_USER";
+GRANT USAGE ON SCHEMA "$SCHEMA_NAME" TO "$APP_USER";
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "$SCHEMA_NAME" TO "$APP_USER";
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA "$SCHEMA_NAME" TO "$APP_USER";
+
+-- Default privileges for future objects for app user
+ALTER DEFAULT PRIVILEGES FOR USER "$ADMIN_USER" IN SCHEMA "$SCHEMA_NAME"
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO "$APP_USER";
+ALTER DEFAULT PRIVILEGES FOR USER "$ADMIN_USER" IN SCHEMA "$SCHEMA_NAME"
+GRANT USAGE, SELECT ON SEQUENCES TO "$APP_USER";
+
+-- Create read-only user
+CREATE ROLE "$READ_USER" WITH LOGIN PASSWORD '$READ_PASS';
+GRANT CONNECT ON DATABASE "$DB_NAME" TO "$READ_USER";
+GRANT USAGE ON SCHEMA "$SCHEMA_NAME" TO "$READ_USER";
+GRANT SELECT ON ALL TABLES IN SCHEMA "$SCHEMA_NAME" TO "$READ_USER";
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA "$SCHEMA_NAME" TO "$READ_USER";
+
+-- Default privileges for future objects for read-only user
+ALTER DEFAULT PRIVILEGES FOR USER "$ADMIN_USER" IN SCHEMA "$SCHEMA_NAME"
+GRANT SELECT ON TABLES TO "$READ_USER";
+ALTER DEFAULT PRIVILEGES FOR USER "$ADMIN_USER" IN SCHEMA "$SCHEMA_NAME"
+GRANT USAGE, SELECT ON SEQUENCES TO "$READ_USER";
+EOSQL
+
+echo "✅ Reporting database and users created successfully."
