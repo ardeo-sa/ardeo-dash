@@ -157,6 +157,64 @@ fastapi_dash_metrics/
 
 
 ## Getting Started
+
+### Dashboard: Manual Setup
+1. Create virtual env and install dependencies
+```bash
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+```
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+3. Configure environment variables
+Copy .env.example (if present) to .env and update values as needed (DB connection string, secrets, etc.).
+
+4. Ensure required services are running (e.g., Redis, PostgreSQL)
+Start Redis (use instructions below to enable it)
+
+5. Run backend FastAPI app and dashboard
+```bash
+python run.py
+```
+6. Run background metrics aggregation
+```bash
+# Run celery
+celery -A app.tasks.worker worker --beat --loglevel=info
+```
+
+7. Monitor celery tasks
+```bash
+# Use flower dashboard to monitor 
+# http://localhost:5555
+celery -A app.tasks.worker flower --port=5555
+```
+
+### To run in prod as service
+```bash
+# 1. Create dedicated user
+sudo useradd -r -s /bin/false dash-runner
+
+2. copy config
+sudo cp ardeo-dash.service /etc/systemd/system/
+
+# 3. enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable ardeo-dash.service
+sudo systemctl start ardeo-dash.service
+
+# 3. Check logs
+journalctl -u ardeo-dash.service -f 
+```
+
+### Docker
+```bash
+# Run all services
+docker compose up -d
+```
+
+## Optional setup steps
 ### Install Redis server
 #### Manual Setup (Ubuntu/Debian)
 ```bash
@@ -210,74 +268,14 @@ sudo -u postgres psql
 \q
 ```
 
-### Dashboard: Manual Setup
-```bash
-# 1. (Optional) Generate SSH key for remote access
-ssh-keygen -t ed25519 -C "your_email@example.com"
-# Then add the public key (~/.ssh/id_ed25519.pub) to your server's ~/.ssh/authorized_keys
-
-# 2. Connect via WireGuard (if required)
-# Ensure you're not on the same subnet (192.168.0.0/24) as the remote LAN
-# If needed, switch to a different network (e.g. mobile hotspot)
-
-# 3. Clone the repository and enter the project directory
-git clone git@github.com:your-org/ardeo-dash.git
-cd ardeo-dash
-
-# 4. Create virtual env and install dependencies
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-
-# 5. Set up environment variables
-cp env.example .env  # Edit DB URIs, secrets
-
-# 6. Ensure required services are running (e.g., Redis, PostgreSQL)
-# Start Redis (use instructions above to enable it)
-# redis-server (when redis installed from sources)
-
-# Start PostgreSQL (use instructions above to enable it)
-# sudo systemctl start postgresql
-
-# 7. Run backend and dashboard
-python run.py
-
-# 8. Run background metrics aggregation
-celery -A app.tasks.worker worker --beat --loglevel=info
-
-# 9. Monitor celery tasks
-celery -A app.tasks.worker flower --port=5555
-http://localhost:5555
-
-```
-### Docker
-```bash
-# Start all services with Docker
-docker compose up -d
-```
-### To run in prod
-```bash
-# 1. Create dedicated user
-sudo useradd -r -s /bin/false dash-runner
-
-2. copy config
-sudo cp ardeo-dash.service /etc/systemd/system/
-
-# 3. enable and start
-sudo systemctl daemon-reload
-sudo systemctl enable ardeo-dash.service
-sudo systemctl start ardeo-dash.service
-
-# 3. Check logs
-journalctl -u ardeo-dash.service -f 
-```
-
-## Databse setup
+### Databse setup
 ```bash
 # Run once to create database and users
 ./utils/setup_reporting_db.sh
 ```
 
-## Reporting database migrations
+## Maintainance
+### Reporting database migrations
 ```bash
 # Generate initial migration
 alembic revision --autogenerate -m "init reporting models"
@@ -289,7 +287,7 @@ alembic revision --autogenerate -m "add new table xyz"
 alembic upgrade head
 ```
 
-## Troubleshooting
+### Troubleshooting
 * Connection Refused errors? Make sure Redis, Postgres, or other services your app depends on are running.
 * WireGuard traffic not routing correctly? Avoid using the same LAN subnet as the remote peer (e.g., 192.168.0.0/24).
 * Can't SSH to internal IPs via VPN? Ensure your local IP doesn't conflict and the server allows forwarding.

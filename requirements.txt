@@ -5,15 +5,20 @@ a2wsgi
 sqlalchemy
 pydantic
 python-dotenv
-celery
-redis
+
 dash
 plotly
+
 pytest
 pandas
+
 pymysql
 psycopg2-binary
 httpx
+
+celery
+redis
+flower
 
 python-json-logger
 prometheus-fastapi-instrumentator
