@@ -9,6 +9,13 @@ We welcome contributions! To keep things simple and transparent, we use a lightw
 * CLA text: `CLA/CLA-Individual.md`
 * Sign the CLA: https://github.com/ardeo-sa/ardeo-dash/issues/new?template=cla.yml
 
+
+Here are some other ways to work with us
+
+* [➡️ Communicate with us](https://github.com/ardeo-sa/ardeo-dash/issues/new/choose)
+
+
+
 # eMDT Dash
 
 Management dashboards for enhanced MDT coordination and patient care monitoring in secondary healthcare.
@@ -180,40 +187,49 @@ fastapi_dash_metrics/
 ## Getting Started
 
 ### Dashboard: Manual Setup
+
 1. Create virtual env and install dependencies
 
 ```bash
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 ```
+
 2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+   
+   ```bash
+   pip install -r requirements.txt
+   ```
+
 3. Configure environment variables
-Copy .env.example (if present) to .env and update values as needed (DB connection string, secrets, etc.).
+   Copy .env.example (if present) to .env and update values as needed (DB connection string, secrets, etc.).
 
 4. Ensure required services are running (e.g., Redis, PostgreSQL)
-Start Redis (use instructions below to enable it)
+   Start Redis (use instructions below to enable it)
 
 5. Run backend FastAPI app and dashboard
-```bash
-python run.py
-```
+   
+   ```bash
+   python run.py
+   ```
+
 6. Run background metrics aggregation
-```bash
-# Run celery
-celery -A app.tasks.worker worker --beat --loglevel=info
-```
+   
+   ```bash
+   # Run celery
+   celery -A app.tasks.worker worker --beat --loglevel=info
+   ```
 
 7. Monitor celery tasks
-```bash
-# Use flower dashboard to monitor 
-# http://localhost:5555
-celery -A app.tasks.worker flower --port=5555
-```
+   
+   ```bash
+   # Use flower dashboard to monitor 
+   # http://localhost:5555
+   celery -A app.tasks.worker flower --port=5555
+   ```
 
 ### To run in prod as service
+
 ```bash
 # 1. Create dedicated user
 sudo useradd -r -s /bin/false dash-runner
@@ -231,14 +247,18 @@ journalctl -u ardeo-dash.service -f
 ```
 
 ### Docker
+
 ```bash
 # Run all services
 docker compose up -d
 ```
 
 ## Optional setup steps
+
 ### Install Redis server
+
 #### Manual Setup (Ubuntu/Debian)
+
 ```bash
 # Update package list
 sudo apt update
@@ -255,7 +275,9 @@ sudo systemctl enable redis
 # Verify it's running
 redis-cli ping
 ```
+
 #### Run docker
+
 ```bash
 # Pull the latest lightweight Redis image and starts it on port 6379
 docker run -d \
@@ -268,6 +290,7 @@ docker exec -it redis redis-cli ping
 ```
 
 ### Install PostgreSQL
+
 ```bash
 # Install PostgreSQL
 sudo apt update
@@ -291,13 +314,16 @@ sudo -u postgres psql
 ```
 
 ### Databse setup
+
 ```bash
 # Run once to create database and users
 ./utils/setup_reporting_db.sh
 ```
 
 ## Maintainance
+
 ### Reporting database migrations
+
 ```bash
 # Generate initial migration
 alembic revision --autogenerate -m "init reporting models"
@@ -310,7 +336,7 @@ alembic upgrade head
 ```
 
 ### Troubleshooting
+
 * Connection Refused errors? Make sure Redis, Postgres, or other services your app depends on are running.
 * WireGuard traffic not routing correctly? Avoid using the same LAN subnet as the remote peer (e.g., 192.168.0.0/24).
 * Can't SSH to internal IPs via VPN? Ensure your local IP doesn't conflict and the server allows forwarding.
-
