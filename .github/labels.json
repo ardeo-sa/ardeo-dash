@@ -1,0 +1,17 @@
+[
+  {
+    "name": "cla-signed",
+    "color": "28a745",
+    "description": "CLA signature on file"
+  },
+  {
+    "name": "cla-required",
+    "color": "d73a4a",
+    "description": "CLA required for this PR"
+  },
+  {
+    "name": "dependencies",
+    "color": "0366d6",
+    "description": "Dependency update"
+  }
+]
