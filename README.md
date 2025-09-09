@@ -9,20 +9,15 @@ Management dashboards for enhanced MDT coordination and patient care monitoring 
 This project aggregates patient and operational data to produce real-time dashboards for clinical teams, analysts, and administrators.
 
 
-
-To keep things simple and transparent, we use a lightweight CLA gate.
-
 **To contribute:**
 
+To keep things simple and transparent, we use a lightweight CLA gate.
 1. Open an issue using the **"CLA Signature"** template. Confirm you’ve read and agree to the CLA.
 2. Submit your Pull Request. The `cla-check` status must pass before merging.
-* CLA text: `CLA/CLA-Individual.md`
-* Sign the CLA: https://github.com/ardeo-sa/ardeo-dash/issues/new?template=cla.yml
 
-Here are some other ways to work with us
+* [➡️Click here to sign the CLA:](https://github.com/ardeo-sa/ardeo-dash/issues/new?template=cla.yml)
 
-* [➡️ Communicate with us](https://github.com/ardeo-sa/ardeo-dash/issues/new/choose)
-
+* [➡️ Here are some other ways to work with us](https://github.com/ardeo-sa/ardeo-dash/issues/new/choose)
 
 
 ## 📚 Table of Contents
@@ -342,5 +337,5 @@ alembic upgrade head
 ### Troubleshooting
 
 * Connection Refused errors? Make sure Redis, Postgres, or other services your app depends on are running.
-* WireGuard traffic not routing correctly? Avoid using the same LAN subnet as the remote peer (e.g., 192.168.0.0/24).
+* VPN traffic not routing correctly? Avoid using the same LAN subnet as the remote peer (e.g., 192.168.0.0/24).
 * Can't SSH to internal IPs via VPN? Ensure your local IP doesn't conflict and the server allows forwarding.
