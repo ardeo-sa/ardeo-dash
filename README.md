@@ -9,11 +9,8 @@ Management dashboards for enhanced MDT coordination and patient care monitoring 
 This project aggregates patient and operational data to produce real-time dashboards for clinical teams, analysts, and administrators.
 
 
-
-To keep things simple and transparent, we use a lightweight CLA gate.
-
 **To contribute:**
-
+To keep things simple and transparent, we use a lightweight CLA gate.
 1. Open an issue using the **"CLA Signature"** template. Confirm you’ve read and agree to the CLA.
 2. Submit your Pull Request. The `cla-check` status must pass before merging.
 * CLA text: `CLA/CLA-Individual.md`
