@@ -337,5 +337,5 @@ alembic upgrade head
 ### Troubleshooting
 
 * Connection Refused errors? Make sure Redis, Postgres, or other services your app depends on are running.
-* WireGuard traffic not routing correctly? Avoid using the same LAN subnet as the remote peer (e.g., 192.168.0.0/24).
+* VPN traffic not routing correctly? Avoid using the same LAN subnet as the remote peer (e.g., 192.168.0.0/24).
 * Can't SSH to internal IPs via VPN? Ensure your local IP doesn't conflict and the server allows forwarding.
