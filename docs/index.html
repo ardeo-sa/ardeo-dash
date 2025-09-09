@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ardeo Dash — Start here</title>
+  <meta name="description" content="Welcome to Ardeo Dash. File issues, request features, or sign the CLA." />
+  <style>
+    :root { --bg:#0b132b; --card:#ffffff; --ink:#111827; --brand:#2563eb; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; }
+    .hero { min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg); padding:24px; }
+    .card { background:var(--card); color:var(--ink); max-width:760px; width:100%; padding:28px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.2); }
+    h1 { margin:0 0 10px 0; font-size:28px; }
+    p.lead { margin:0 0 16px 0; font-size:16px; color:#374151; }
+    .actions { margin-top:8px; }
+    .btn { display:inline-block; margin:6px 8px 0 0; padding:10px 14px; border-radius:10px; text-decoration:none; border:1px solid #e5e7eb; color:#111827; background:#fff; }
+    .btn-primary { background:var(--brand); color:#fff; border-color:var(--brand); }
+    .note { margin-top:16px; font-size:13px; color:#6b7280; }
+    .grid { display:grid; gap:12px; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); margin-top:12px; }
+    .tile { border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff; }
+    .tile h3 { margin:0 0 6px 0; font-size:16px; }
+    .tile p { margin:0; font-size:14px; color:#4b5563; }
+  </style>
+</head>
+<body>
+  <main class="hero">
+    <section class="card" aria-labelledby="welcome">
+      <h1 id="welcome">Welcome to Ardeo Dash</h1>
+      <p class="lead">
+        Contribute or report an issue using our guided forms. If you plan to open a PR, please sign the CLA (one‑time).
+      </p>
+      <div class="actions" role="navigation" aria-label="Primary">
+        <a class="btn btn-primary" href="https://github.com/ardeo-sa/ardeo-dash/issues/new/choose">Open issue or sign CLA</a>
+        <a class="btn" href="https://github.com/ardeo-sa/ardeo-dash">View repository</a>
+      </div>
+      <div class="grid" aria-label="Shortcuts">
+        <div class="tile">
+          <h3>🐞 Bug report</h3>
+          <p><a href="https://github.com/ardeo-sa/ardeo-dash/issues/new?template=bug_report.yml">Use the bug form</a> for reproducible reports.</p>
+        </div>
+        <div class="tile">
+          <h3>✨ Feature request</h3>
+          <p><a href="https://github.com/ardeo-sa/ardeo-dash/issues/new?template=feature_request.yml">Suggest an idea</a> with motivation and value.</p>
+        </div>
+        <div class="tile">
+          <h3>✍️ Sign the CLA</h3>
+          <p><a href="https://github.com/ardeo-sa/ardeo-dash/issues/new?template=cla.yml">Sign once</a> to enable PRs.</p>
+        </div>
+        <div class="tile">
+          <h3>🔐 Security</h3>
+          <p><a href="https://github.com/ardeo-sa/ardeo-dash/security/advisories/new">Private advisory</a> to disclose vulnerabilities.</p>
+        </div>
+      </div>
+      <p class="note">This is a static landing page. The source code lives on GitHub.</p>
+    </section>
+  </main>
+</body>
+</html>
