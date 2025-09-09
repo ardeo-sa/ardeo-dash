@@ -17,9 +17,7 @@ To keep things simple and transparent, we use a lightweight CLA gate.
 * CLA text: `CLA/CLA-Individual.md`
 * Sign the CLA: https://github.com/ardeo-sa/ardeo-dash/issues/new?template=cla.yml
 
-Here are some other ways to work with us
-
-* [➡️ Communicate with us](https://github.com/ardeo-sa/ardeo-dash/issues/new/choose)
+* [➡️ Here are some other ways to work with us](https://github.com/ardeo-sa/ardeo-dash/issues/new/choose)
 
 
 ## 📚 Table of Contents
