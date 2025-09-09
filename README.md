@@ -1,6 +1,16 @@
-# Contributing
+# Readme
 
-We welcome contributions! To keep things simple and transparent, we use a lightweight CLA gate.
+Ardeo-dash is one of a series of Repos where we hope you will join us and make a contribution! 
+
+
+# eMDT Dash
+
+Management dashboards for enhanced MDT coordination and patient care monitoring in secondary healthcare.
+This project aggregates patient and operational data to produce real-time dashboards for clinical teams, analysts, and administrators.
+
+
+
+To keep things simple and transparent, we use a lightweight CLA gate.
 
 **To contribute:**
 
@@ -9,17 +19,11 @@ We welcome contributions! To keep things simple and transparent, we use a lightw
 * CLA text: `CLA/CLA-Individual.md`
 * Sign the CLA: https://github.com/ardeo-sa/ardeo-dash/issues/new?template=cla.yml
 
-
 Here are some other ways to work with us
 
 * [➡️ Communicate with us](https://github.com/ardeo-sa/ardeo-dash/issues/new/choose)
 
 
-
-# eMDT Dash
-
-Management dashboards for enhanced MDT coordination and patient care monitoring in secondary healthcare.
-This project aggregates patient and operational data to produce real-time dashboards for clinical teams, analysts, and administrators.
 
 ## 📚 Table of Contents
 
