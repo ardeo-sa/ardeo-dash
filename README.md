@@ -10,6 +10,7 @@ This project aggregates patient and operational data to produce real-time dashbo
 
 
 **To contribute:**
+
 To keep things simple and transparent, we use a lightweight CLA gate.
 1. Open an issue using the **"CLA Signature"** template. Confirm you’ve read and agree to the CLA.
 2. Submit your Pull Request. The `cla-check` status must pass before merging.
@@ -19,7 +20,6 @@ To keep things simple and transparent, we use a lightweight CLA gate.
 Here are some other ways to work with us
 
 * [➡️ Communicate with us](https://github.com/ardeo-sa/ardeo-dash/issues/new/choose)
-
 
 
 ## 📚 Table of Contents
