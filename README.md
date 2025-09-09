@@ -1,4 +1,16 @@
+# Contributing
+
+We welcome contributions! To keep things simple and transparent, we use a lightweight CLA gate.
+
+**To contribute:**
+
+1. Open an issue using the **"CLA Signature"** template. Confirm you’ve read and agree to the CLA.
+2. Submit your Pull Request. The `cla-check` status must pass before merging.
+* CLA text: `CLA/CLA-Individual.md`
+* Sign the CLA: https://github.com/ardeo-sa/ardeo-dash/issues/new?template=cla.yml
+
 # eMDT Dash
+
 Management dashboards for enhanced MDT coordination and patient care monitoring in secondary healthcare.
 This project aggregates patient and operational data to produce real-time dashboards for clinical teams, analysts, and administrators.
 
@@ -16,6 +28,7 @@ This project aggregates patient and operational data to produce real-time dashbo
 - [Getting Started](#getting-started)
 
 ## Features
+
 * Automated aggregation of key healthcare metrics 
 * FastAPI backend for efficient API serving 
 * Dash (by Plotly) for interactive, customizable frontend dashboards 
@@ -23,7 +36,9 @@ This project aggregates patient and operational data to produce real-time dashbo
 * Celery + Redis (optional) for background task scheduling
 
 ## Metrics
+
 ### Patient Flow & Operational Metrics
+
 * Number of admissions/discharges per day/week/month
 * Average Length of Stay (ALOS) per treatment or condition
 * Bed occupancy rate 
@@ -34,6 +49,7 @@ This project aggregates patient and operational data to produce real-time dashbo
 * Patient no-show / cancellation rate for appointments or MDTs
 
 ### Treatment Pathway Metrics
+
 * Pathway adherence rate: Are patients following the recommended pathway steps? 
 * Time to treatment milestones:
   * Diagnosis to treatment start 
@@ -44,6 +60,7 @@ This project aggregates patient and operational data to produce real-time dashbo
   * Complication or relapse rates
 
 ### MDT Coordination Metrics
+
 * Number of MDT meetings held 
 * Attendance rate (clinicians, specialists, etc.)
 * Average time per case discussed 
@@ -51,6 +68,7 @@ This project aggregates patient and operational data to produce real-time dashbo
 * Actions assigned vs. completed (follow-up tracking)
 
 ### Clinician Performance Metrics
+
 * Patients admitted per clinician
 * Average time to treatment start per clinician
 * Readmission rate per clinician
@@ -60,12 +78,14 @@ This project aggregates patient and operational data to produce real-time dashbo
   * Outstanding tasks or follow-ups
 
 ### Referral & Source Metrics
+
 * Referrals by source (e.g., GP, self, ED, internal)
 * Referral conversion rate: % of referrals resulting in admission
 * Referral-to-admission time
 * Referral volume trend (by day/week/month)
 
 ### Administrative & Utilization Metrics
+
 * Patient-to-clinician ratio
 * Resource utilization:
   * Imaging
@@ -73,12 +93,15 @@ This project aggregates patient and operational data to produce real-time dashbo
   * treatment slots 
 
 ### To be added later
+
 #### Patient-Centered Metrics (data not yet available)
+
 * Patient satisfaction scores 
 * Patient-reported outcomes (PROMs)
 * Patient engagement rate (portal logins, form completions, etc.)
 
 ### Predictive or Risk-Based Metrics (Data not available and/or algorithms not developed yet)
+
 * Risk scores (e.g., risk of readmission, deterioration)
 * Early warning flags from lab/vital sign trends 
 * Forecasted resource demands (beds, staff)
@@ -132,7 +155,6 @@ fastapi_dash_metrics/
 └── run.py                       # Entry script to run FastAPI + Dash
 ```
 
-
              ┌───────────────────────┐
              │    Source DB (SQL)    │◀──────────┐
              └───────────────────────┘           │
@@ -155,11 +177,11 @@ fastapi_dash_metrics/
                           │ Dash App (UI frontend) │
                           └────────────────────────┘
 
-
 ## Getting Started
 
 ### Dashboard: Manual Setup
 1. Create virtual env and install dependencies
+
 ```bash
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
@@ -291,3 +313,4 @@ alembic upgrade head
 * Connection Refused errors? Make sure Redis, Postgres, or other services your app depends on are running.
 * WireGuard traffic not routing correctly? Avoid using the same LAN subnet as the remote peer (e.g., 192.168.0.0/24).
 * Can't SSH to internal IPs via VPN? Ensure your local IP doesn't conflict and the server allows forwarding.
+

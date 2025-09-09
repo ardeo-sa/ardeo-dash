@@ -1,0 +1,25 @@
+name: Bug report
+description: Report a problem to help us improve
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us what you expected to happen
+      placeholder: A concise description of the issue...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: 1) ... 2) ... 3) ...
+  - type: input
+    id: version
+    attributes:
+      label: Version/commit
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context

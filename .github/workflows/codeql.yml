@@ -1,0 +1,36 @@
+name: codeql
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 6 * * 1'  # weekly
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          # React JSX/TSX is analyzed under the 'javascript' language.
+          languages: javascript, python
+          # Also include quality rules in addition to security
+          queries: security-and-quality
+
+      # For JS/TS/Python, CodeQL doesn't require a build; this step is a no-op for them.
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
