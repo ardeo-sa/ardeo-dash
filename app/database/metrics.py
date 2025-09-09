@@ -2,35 +2,22 @@
 Database setup and initialization for the metrics database using SQLAlchemy.
 """
 # pylint: disable=invalid-name
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy.orm import Session
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import sessionmaker, declarative_base, Session
+from sqlalchemy.exc import OperationalError
 
-from app.config import METRICS_DB_URI
+from app.config import METRICS_DB_URI, METRICS_DB_URI_READ, BOOTSTRAP_METRICS_DB
 
-Base = declarative_base()
+metadata = MetaData(schema="reporting")
+Base = declarative_base(metadata=metadata)
 
-
-def get_metrics_engine():
-    """
-    Creates and returns a SQLAlchemy engine for connecting to the metrics database.
-
-    Raises:
-        ValueError: If the METRICS_DB_URI is not defined.
-
-    Returns:
-        sqlalchemy.engine.Engine: SQLAlchemy engine instance connected to the metrics database.
-    Use it when real db is set up
-    """
-    if not METRICS_DB_URI:
-        raise ValueError("The METRICS_DB_URI environment variable is not set or is empty.")
-    return create_engine(METRICS_DB_URI, echo=True)
+metrics_engine = None
+metrics_read_engine = None
+MetricsSessionLocal = None
+MetricsReadSessionLocal = None
 
 
-metrics_engine = get_metrics_engine()
-MetricsSessionLocal =sessionmaker(autocommit=False, autoflush=False, bind=metrics_engine)
-
-def init_metrics_db():
+def init_metrics_engine():
     """
     Initializes the metrics database connection by creating the engine and session factory.
 
@@ -40,11 +27,29 @@ def init_metrics_db():
     Raises:
         ValueError: If the METRICS_DB_URI is not defined or the engine could not be initialized.
     """
-    global metrics_engine, MetricsSessionLocal # pylint: disable=global-statement
-    if not metrics_engine:
-        metrics_engine = get_metrics_engine()
-        MetricsSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=metrics_engine)
+    global metrics_engine, metrics_read_engine # pylint: disable=global-statement
+    global MetricsSessionLocal, MetricsReadSessionLocal # pylint: disable=global-statement
 
+    if not METRICS_DB_URI:
+        raise ValueError("METRICS_DB_URI is not set.")
+
+    # Full-access engine and session
+    metrics_engine = create_engine(METRICS_DB_URI, echo=True, future=True)
+    MetricsSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=metrics_engine)
+
+    # Read-only engine and session
+    metrics_read_engine = create_engine(METRICS_DB_URI_READ, echo=False, future=True)
+    MetricsReadSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=metrics_read_engine)
+
+    if BOOTSTRAP_METRICS_DB:
+        print("BOOTSTRAP_METRICS_DB is enabled — skipping connection test and creating tables.")
+        Base.metadata.create_all(bind=metrics_engine)
+    else:
+        try:
+            with metrics_engine.connect() as _:
+                pass  # Test connection
+        except OperationalError as e:
+            raise RuntimeError(f"Error: Cannot connect to metrics database: {e}") from e
 
 def get_db() -> Session:
     """
@@ -55,8 +60,26 @@ def get_db() -> Session:
     Yields:
         Session: A database session instance.
     """
+    if not MetricsSessionLocal:
+        raise RuntimeError("Metrics DB session is not available.")
+
     db = MetricsSessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
+def get_metrics_engine(echo=False):
+    """
+    Returns a SQLAlchemy engine for the metrics database.
+
+    Args:
+        echo (bool): Enable SQL echoing for debugging.
+
+    Returns:
+        sqlalchemy.engine.Engine
+    """
+    if not METRICS_DB_URI:
+        raise ValueError("METRICS_DB_URI is not set.")
+    return create_engine(METRICS_DB_URI, echo=echo)

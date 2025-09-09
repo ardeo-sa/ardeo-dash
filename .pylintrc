@@ -68,7 +68,7 @@ ignored-modules=
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
-#init-hook=
+init-hook='import sys; sys.path.append(".")'
 
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use, and will cap the count on Windows to
@@ -302,7 +302,7 @@ max-bool-expr=5
 max-branches=12
 
 # Maximum number of locals for function / method body.
-max-locals=15
+max-locals=20
 
 # Maximum number of parents for a class (see R0901).
 max-parents=7
@@ -314,7 +314,7 @@ max-positional-arguments=5
 max-public-methods=20
 
 # Maximum number of return / yield for function / method body.
-max-returns=6
+max-returns=8
 
 # Maximum number of statements in function / method body.
 max-statements=50
@@ -438,8 +438,8 @@ disable=raw-checker-failed,
         deprecated-pragma,
         use-symbolic-message-instead,
         use-implicit-booleaness-not-comparison-to-string,
-        use-implicit-booleaness-not-comparison-to-zero
-
+        use-implicit-booleaness-not-comparison-to-zero,
+        W1203
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where

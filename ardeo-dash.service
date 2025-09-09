@@ -1,0 +1,15 @@
+[Unit]
+Description=Ardeo Dashboard service
+After=network.target
+
+[Service]
+WorkingDirectory=/srv/ardeo-dash/
+User=dash-runner
+ExecStart=/srv/ardeo-dash/venv/bin/python /srv/ardeo-dash/run.py
+Restart=always
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
