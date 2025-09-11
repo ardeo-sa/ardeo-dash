@@ -1,12 +1,10 @@
 name: codeql
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  schedule:
-    - cron: '0 6 * * 1'  # weekly
+  workflow_run:
+    workflows: ["cla-check"]
+    types:
+      - completed
 
 permissions:
   contents: read

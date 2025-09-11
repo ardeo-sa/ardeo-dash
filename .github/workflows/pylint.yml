@@ -1,6 +1,10 @@
 name: Pylint
 
-on: [push]
+on:
+  workflow_run:
+    workflows: ["cla-check"]
+    types:
+      - completed
 
 jobs:
   build:
