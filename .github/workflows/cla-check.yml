@@ -20,7 +20,6 @@ jobs:
           echo "Base branch: ${{ github.event.pull_request.base.ref }}"
           echo "Head branch: ${{ github.event.pull_request.head.ref }}"
           echo "PR number: ${{ github.event.pull_request.number }}"
-          echo "PR head repo: ${{ github.event.pull_request.head.repo.full_name }}"
 
       - uses: actions/github-script@v7
         with:
@@ -32,12 +31,6 @@ jobs:
             const prNumber = pr.number;
 
             console.log(`Processing PR #${prNumber} from ${user}`);
-
-            // Block PRs from forks
-            if (pr.head.repo.full_name !== `${owner}/${repo}`) {
-              core.setFailed(`PRs from forks are not allowed in this repository.`);
-              return;
-            }
 
             // Allow trusted bots
             const allowedBots = new Set(['dependabot[bot]']);
