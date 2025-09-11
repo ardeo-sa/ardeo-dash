@@ -1,12 +1,15 @@
 name: cla-check
+
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, reopened]
+
 permissions:
+  contents: read
   issues: write
   pull-requests: read
   statuses: write
-  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -20,11 +23,20 @@ jobs:
             const user = pr.user.login;
             const prNumber = pr.number;
 
+            // Block PRs from forks (shouldn't happen if forking is disabled, but just in case)
+            if (pr.head.repo.full_name !== `${owner}/${repo}`) {
+              core.setFailed(`PRs from forks are not allowed in this repository.`);
+              return;
+            }
+
             // Allow trusted bots
             const allowedBots = new Set(['dependabot[bot]']);
             if (allowedBots.has(user)) {
-              // Clean up label if present
-              try { await github.rest.issues.removeLabel({ owner, repo, issue_number: prNumber, name: 'cla-required' }); } catch (e) {}
+              try {
+                await github.rest.issues.removeLabel({
+                  owner, repo, issue_number: prNumber, name: 'cla-required'
+                });
+              } catch (e) {}
               return;
             }
 
@@ -33,7 +45,7 @@ jobs:
             const res = await github.rest.search.issuesAndPullRequests({ q });
             const signed = (res.data.total_count || 0) > 0;
 
-            // Ensure the 'cla-required' label exists (red)
+            // Ensure the 'cla-required' label exists
             async function ensureLabel(name, color, description) {
               try {
                 await github.rest.issues.getLabel({ owner, repo, name });
@@ -44,14 +56,14 @@ jobs:
             await ensureLabel('cla-required', 'd93f0b', 'CLA signature required before merge');
 
             if (!signed) {
-              // Add the cla-required label to the PR
               await github.rest.issues.addLabels({
                 owner, repo, issue_number: prNumber, labels: ['cla-required']
               });
               core.setFailed(`@${user} must sign the CLA: open the "CLA Signature" issue form → https://github.com/${owner}/${repo}/issues/new?template=cla.yml`);
             } else {
-              // Remove the cla-required label if present
               try {
-                await github.rest.issues.removeLabel({ owner, repo, issue_number: prNumber, name: 'cla-required' });
-              } catch (e) { /* label not present; ignore */ }
+                await github.rest.issues.removeLabel({
+                  owner, repo, issue_number: prNumber, name: 'cla-required'
+                });
+              } catch (e) {}
             }
