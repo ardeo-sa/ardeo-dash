@@ -1,4 +1,20 @@
+"""
+Helper functions for building Dash layouts and Plotly visualizations.
+
+This module provides reusable utilities for:
+
+- Creating consistent Dash HTML blocks for multiple graphs (`build_graph_rows`).
+- Filtering pandas DataFrames by a date range (`filter_by_date`).
+- Generating grouped bar charts by month (`grouped_month_bar`).
+
+These helpers are designed to reduce duplication and standardize
+layout and visualization patterns across the Ardeo Healthcare Dashboard.
+"""
+
+import pandas as pd
+import plotly.express as px
 from dash import html, dcc
+
 
 def build_graph_rows(fig1, fig2=None, fig3=None):
     """

@@ -114,8 +114,6 @@ def register_admin_callbacks(app, data_loader):
                 ], className='kpi-row'),
 
                 # Graph Rows
-                html.Div([
-                    html.Div(dcc.Graph(figure=fig1), className='graph-card'),
-                ], className='graph-row'),
-                ])
+                *build_graph_rows(fig1)
+            ])
         return html.Div()
