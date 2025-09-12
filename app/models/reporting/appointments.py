@@ -5,7 +5,7 @@ within the healthcare system.
 Each appointment is linked to a patient and records key details such as whether
 the appointment was attended or cancelled.
 """
-from email.policy import default
+# from email.policy import default
 
 from sqlalchemy import Column, Integer, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship

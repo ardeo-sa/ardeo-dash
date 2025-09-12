@@ -91,9 +91,8 @@ def _grouped_chart(df, group_col, columns, order=None, title="", labels=None, ba
 
     if len(columns) == 1:
         return px.line(grouped_df, x=group_col, y=columns[0], title=title, labels=labels or {group_col: group_col})
-    else:
-        return px.bar(grouped_df, x=group_col, y=columns, barmode=barmode, title=title,
-                      labels=labels or {group_col: group_col})
+    return px.bar(grouped_df, x=group_col, y=columns, barmode=barmode, title=title,
+                  labels=labels or {group_col: group_col})
 
 def grouped_day_bar(df, columns, title, labels=None, barmode='group'):
     """
