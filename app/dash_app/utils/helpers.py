@@ -10,7 +10,6 @@ This module provides reusable utilities for:
 These helpers are designed to reduce duplication and standardize
 layout and visualization patterns across the Ardeo Healthcare Dashboard.
 """
-
 import pandas as pd
 import plotly.express as px
 from dash import html, dcc
@@ -66,34 +65,76 @@ def filter_by_date(df, start_date, end_date):
     return df
 
 
-def grouped_month_bar(df, columns, month_order=None, title="", labels=None):
+DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+MONTH_ORDER = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
+
+def _grouped_chart(df, group_col, columns, order=None, title="", labels=None, barmode='group'):
     """
-    Create a grouped bar chart by month from specified columns.
+    Generic helper to create a grouped chart by a categorical column (day or month).
 
     Args:
-        df (pd.DataFrame): The dataframe with a 'date' column.
+        df (pd.DataFrame): DataFrame with data.
+        group_col (str): Column to group by.
         columns (list[str]): Columns to aggregate and plot.
-        month_order (list[str], optional): Order of months for sorting.
-        title (str, optional): Title of the figure.
-        labels (dict, optional): Labels for Plotly.
+        order (list[str], optional): Categorical order for sorting.
+        title (str, optional): Title of the chart.
+        labels (dict, optional): Labels for Plotly chart.
+        barmode (str, optional): Barmode for bar charts (ignored for line charts).
 
     Returns:
-        plotly.express.Figure: The resulting grouped bar chart.
+        plotly.express.Figure: The resulting chart.
     """
-    df['month'] = df['date'].dt.strftime('%B')
-    if month_order is None:
-        month_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
+    grouped_df = df.groupby(group_col, as_index=False)[columns].mean()
+    if order:
+        grouped_df[group_col] = pd.Categorical(grouped_df[group_col], categories=order, ordered=True)
+    grouped_df = grouped_df.sort_values(group_col)
 
-    grouped_df = df.groupby('month', as_index=False)[columns].mean()
-    grouped_df['month'] = pd.Categorical(grouped_df['month'], categories=month_order, ordered=True)
-    grouped_df = grouped_df.sort_values('month')
+    if len(columns) == 1:
+        return px.line(grouped_df, x=group_col, y=columns[0], title=title, labels=labels or {group_col: group_col})
+    else:
+        return px.bar(grouped_df, x=group_col, y=columns, barmode=barmode, title=title,
+                      labels=labels or {group_col: group_col})
 
-    fig = px.bar(
-        grouped_df,
-        x='month',
-        y=columns,
-        barmode='group',
-        title=title,
-        labels=labels
-    )
-    return fig
+def grouped_day_bar(df, columns, title, labels=None, barmode='group'):
+    """
+    Create a grouped bar/line chart by day of week.
+    """
+    return _grouped_chart(df, 'day_of_week', columns, order=DAY_ORDER, title=title,
+                          labels=labels, barmode=barmode)
+
+def grouped_month_bar(df, columns, title="", labels=None, month_order=None):
+    """
+    Create a grouped bar/line chart by month.
+    """
+    return _grouped_chart(df, 'month', columns, order=month_order or MONTH_ORDER, title=title, labels=labels)
+
+def load_and_filter(data_loader, filename, start_date, end_date, add_day=False, add_month=False):
+    """
+    Load a CSV via data_loader, filter by date range, and optionally add day/month columns.
+
+    Args:
+        data_loader (Callable): Function to load CSV by filename.
+        filename (str): File to load.
+        start_date (str | datetime): Inclusive start date.
+        end_date (str | datetime): Inclusive end date.
+        add_day (bool): Whether to add 'day_of_week' column.
+        add_month (bool): Whether to add 'month' column.
+
+    Returns:
+        pd.DataFrame | None: Filtered DataFrame, or None if dates are missing.
+    """
+    if not (start_date and end_date):
+        return None
+
+    df = data_loader(filename)
+    df = df[
+        (df['date'] >= pd.to_datetime(start_date)) &
+        (df['date'] <= pd.to_datetime(end_date))
+    ]
+
+    if add_day:
+        df['day_of_week'] = df['date'].dt.day_name()
+    if add_month:
+        df['month'] = df['date'].dt.strftime('%B')
+
+    return df

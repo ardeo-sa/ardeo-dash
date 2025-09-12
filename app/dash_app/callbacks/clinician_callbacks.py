@@ -1,3 +1,4 @@
+# pylint: disable=R0801
 """
 Callbacks for the Clinician Metrics
 
@@ -6,11 +7,11 @@ Clinician Metrics tab content, including KPI cards and graphs, based on
 user-selected date ranges.
 """
 
-from dash import Output, Input, html, dcc
+from dash import Output, Input, html
 import pandas as pd
 import plotly.express as px
 
-from app.dash_app.utils.helpers import build_graph_rows, grouped_month_bar
+from app.dash_app.utils.helpers import build_graph_rows, grouped_month_bar, grouped_day_bar, load_and_filter
 
 
 def register_clinician_callbacks(app, data_loader):
@@ -37,20 +38,17 @@ def register_clinician_callbacks(app, data_loader):
         Returns:
             html.Div: The updated layout containing KPI cards and Plotly graphs.
         """
-        df = data_loader('clinician_metrics_wide.csv')
-
-        if not (start_date and end_date):
+        df = load_and_filter(
+            data_loader,
+            'clinician_metrics_wide.csv',
+            start_date,
+            end_date,
+            add_day=True,
+            add_month=True
+        )
+        if df is None:
             return html.Div()
 
-        # Filter data
-        df = df[
-            (df['date'] >= pd.to_datetime(start_date)) &
-            (df['date'] <= pd.to_datetime(end_date))
-        ]
-
-        # Day and month columns for grouping
-        df['day_of_week'] = df['date'].dt.day_name()
-        df['month'] = df['date'].dt.strftime('%B')
         month_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
         day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
@@ -79,22 +77,15 @@ def register_clinician_callbacks(app, data_loader):
         )
 
         # Figure 3: Patients Admitted, Patients Seen, and Outstanding tasks by day of week
-        grouped_df3 = df.groupby('day_of_week', as_index=False)[
-            ['avg_patients_admitted', 'avg_patients_seen', 'avg_outstanding_tasks']
-        ].mean()
-        grouped_df3['day_of_week'] = pd.Categorical(grouped_df3['day_of_week'], categories=day_order, ordered=True)
-        grouped_df3 = grouped_df3.sort_values('day_of_week')
-        fig3 = px.bar(
-            grouped_df3,
-            x='day_of_week',
-            y=['avg_patients_admitted', 'avg_patients_seen', 'avg_outstanding_tasks'],
-            barmode='group',
+        fig3 = grouped_day_bar(
+            df,
+            columns=['avg_patients_admitted', 'avg_patients_seen', 'avg_outstanding_tasks'],
             title='Patients admitted, patients seen, and outstanding tasks by day of week',
             labels={
                 'day_of_week': 'Day of Week',
                 'avg_patients_admitted': 'Patients admitted',
                 'avg_patients_seen': 'Patients seen',
-                'avg_outstanding_tasks': 'Outstanding tasks',
+                'avg_outstanding_tasks': 'Outstanding tasks'
             }
         )
 

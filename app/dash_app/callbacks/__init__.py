@@ -42,15 +42,15 @@ def register_callbacks(app, data_loader):
         """
         if tab == 'tab-1':
             return operational_layout()
-        elif tab == 'tab-2':
+        if tab == 'tab-2':
             return pathway_layout()
-        elif tab == 'tab-3':
+        if tab == 'tab-3':
             return clinician_layout()
-        elif tab == 'tab-4':
+        if tab == 'tab-4':
             return admin_layout()
-        elif tab == 'tab-5':
+        if tab == 'tab-5':
             return mdt_layout()
-        elif tab == 'tab-6':
+        if tab == 'tab-6':
             return referral_layout()
         return None
 
