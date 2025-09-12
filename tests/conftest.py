@@ -75,6 +75,12 @@ def test_engine():
 @pytest.fixture(scope="session")
 def test_tables(test_engine):
     """Create all tables before tests and drop them afterwards."""
+
+    # Remove schema info from tables for SQLite
+    if test_engine.url.get_backend_name() == "sqlite":
+        for table in Base.metadata.tables.values():
+            table.schema = None
+
     Base.metadata.create_all(bind=test_engine)
     yield
     Base.metadata.drop_all(bind=test_engine)
