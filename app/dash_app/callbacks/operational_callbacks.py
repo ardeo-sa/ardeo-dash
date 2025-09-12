@@ -10,6 +10,7 @@ from dash import Output, Input, html, dcc
 import pandas as pd
 import plotly.express as px
 # from utils.data_loader import load_data
+from app.dash_app.layout import build_graph_rows
 
 
 def register_operational_callbacks(app, data_loader):
@@ -97,20 +98,17 @@ def register_operational_callbacks(app, data_loader):
             return html.Div([
                 # KPI Row
                 html.Div([
-                    html.Div(className='kpi-card', children=[html.H4('Admissions'), html.P(f"{df['daily_admissions'].sum()}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Discharges'), html.P(f"{df['daily_discharges'].sum()}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Bed Occupancy'), html.P(f"{df['bed_occupancy_rate'].mean() / 100:.2%}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Readmission Rate'), html.P(f"{df['readmission_rate_30d'].mean() / 100:.2%}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Admissions'),
+                                                             html.P(f"{df['daily_admissions'].sum()}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Discharges'),
+                                                             html.P(f"{df['daily_discharges'].sum()}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Bed Occupancy'),
+                                                             html.P(f"{df['bed_occupancy_rate'].mean() / 100:.2%}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Readmission Rate'),
+                                                             html.P(f"{df['readmission_rate_30d'].mean() / 100:.2%}")]),
                 ], className='kpi-row'),
 
                 # Graph Rows
-                html.Div([
-                    html.Div(dcc.Graph(figure=fig1), className='graph-card'),
-                    html.Div(dcc.Graph(figure=fig2), className='graph-card'),
-                ], className='graph-row'),
-
-                html.Div([
-                    html.Div(dcc.Graph(figure=fig4), className='graph-card'),
-                    html.Div(dcc.Graph(figure=fig3), className='graph-card'),
-                ], className='graph-row'),
+                *build_graph_rows(fig1, fig2, fig3, fig4)
             ])
+        return html.Div()

@@ -10,6 +10,7 @@ from dash import Output, Input, html, dcc
 import pandas as pd
 import plotly.express as px
 # from utils.data_loader import load_data
+from app.dash_app.layout import build_graph_rows
 
 
 def register_pathway_callbacks(app, data_loader):
@@ -76,7 +77,8 @@ def register_pathway_callbacks(app, data_loader):
             )
 
             # Figure 3: Relapse vs readmission rates by month
-            grouped_df2 = df.groupby('month', as_index=False)[['pathway_relapse_rate', 'pathway_readmission_rate']].mean()
+            grouped_df2 = df.groupby('month', as_index=False)[['pathway_relapse_rate',
+                                                               'pathway_readmission_rate']].mean()
             grouped_df2['month'] = pd.Categorical(grouped_df['month'], categories=month_order, ordered=True)
             grouped_df2 = grouped_df2.sort_values('month')
             fig3 = px.bar(
@@ -92,19 +94,17 @@ def register_pathway_callbacks(app, data_loader):
             return html.Div([
                 # KPI Row
                 html.Div([
-                    html.Div(className='kpi-card', children=[html.H4('Success rate'), html.P(f"{df['pathway_success_rate'].mean() / 100:.2%}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Failure rate'), html.P(f"{df['pathway_failure_rate'].mean() / 100:.2%}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Complication rate'), html.P(f"{df['pathway_complication_rate'].mean() / 100:.2%}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Adherence rate'), html.P(f"{df['pathway_adherence_rate'].mean() / 100:.2%}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Success rate'),
+                                                    html.P(f"{df['pathway_success_rate'].mean() / 100:.2%}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Failure rate'),
+                                                    html.P(f"{df['pathway_failure_rate'].mean() / 100:.2%}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Complication rate'),
+                                                    html.P(f"{df['pathway_complication_rate'].mean() / 100:.2%}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Adherence rate'),
+                                                    html.P(f"{df['pathway_adherence_rate'].mean() / 100:.2%}")]),
                 ], className='kpi-row'),
 
-                # Graph Row
-                html.Div([
-                    html.Div(dcc.Graph(figure=fig1), className='graph-card'),
-                    html.Div(dcc.Graph(figure=fig2), className='graph-card'),
-                ], className='graph-row'),
-
-                html.Div([
-                    html.Div(dcc.Graph(figure=fig3), className='graph-card'),
-                ], className='graph-row'),
+                # Graph Rows
+                *build_graph_rows(fig1, fig2, fig3)
             ])
+        return html.Div()

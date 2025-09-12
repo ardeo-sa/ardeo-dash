@@ -9,7 +9,9 @@ user-selected date ranges.
 from dash import Output, Input, html, dcc
 import pandas as pd
 import plotly.express as px
+
 # from utils.data_loader import load_data
+from app.dash_app.utils.helpers import build_graph_rows
 
 
 def register_clinician_callbacks(app, data_loader):
@@ -85,7 +87,8 @@ def register_clinician_callbacks(app, data_loader):
             )
 
             #Figure 3: Patients Admitted, Patients Seen, and Outstanding tasks by day of week
-            grouped_df3 = df.groupby('day_of_week', as_index=False)[['avg_outstanding_tasks', 'avg_patients_admitted', 'avg_patients_seen']].mean()
+            grouped_df3 = df.groupby('day_of_week', as_index=False)[['avg_outstanding_tasks',
+                                                'avg_patients_admitted', 'avg_patients_seen']].mean()
             grouped_df3['day_of_week'] = pd.Categorical(grouped_df3['day_of_week'], categories=day_order, ordered=True)
             grouped_df3 = grouped_df3.sort_values('day_of_week')
             fig3 = px.bar(
@@ -106,21 +109,17 @@ def register_clinician_callbacks(app, data_loader):
             return html.Div([
                 # KPI Row
                 html.Div([
-                    html.Div(className='kpi-card', children=[html.H4('Patients admitted'), html.P(f"{df['avg_patients_admitted'].sum():.0f}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Patients seen'), html.P(f"{df['avg_patients_seen'].sum():.0f}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Outstanding tasks'), html.P(f"{df['avg_outstanding_tasks'].sum():.0f}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Active clinicians'), html.P(f"{df['active_clinicians'].sum():.0f}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Patients admitted'),
+                                                             html.P(f"{df['avg_patients_admitted'].sum():.0f}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Patients seen'),
+                                                             html.P(f"{df['avg_patients_seen'].sum():.0f}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Outstanding tasks'),
+                                                             html.P(f"{df['avg_outstanding_tasks'].sum():.0f}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Active clinicians'),
+                                                             html.P(f"{df['active_clinicians'].sum():.0f}")]),
                 ], className='kpi-row'),
 
                 # Graph Rows
-                html.Div([
-                    html.Div(dcc.Graph(figure=fig1), className='graph-card'),
-                    html.Div(dcc.Graph(figure=fig2), className='graph-card'),
-                ], className='graph-row'),
-
-                html.Div([
-                    html.Div(dcc.Graph(figure=fig3), className='graph-card'),
-                ], className='graph-row'),
+                *build_graph_rows(fig1, fig2, fig3)
             ])
-
-
+        return html.Div()

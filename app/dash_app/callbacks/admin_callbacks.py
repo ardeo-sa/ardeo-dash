@@ -11,6 +11,7 @@ import pandas as pd
 # import plotly.express as px
 import plotly.graph_objects as go
 # from utils.data_loader import load_data
+from app.dash_app.utils.helpers import filter_by_date, build_graph_rows
 
 
 def register_admin_callbacks(app, data_loader):
@@ -53,7 +54,8 @@ def register_admin_callbacks(app, data_loader):
             month_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
 
             # Figure 1: Metrics Utilisation and Patient to Clinician Ratio
-            grouped_df = df.groupby('month', as_index=False)[['imaging_utilization', 'lab_test_utilization', 'treatment_slot_utilization', 'patient_to_clinician_ratio']].mean()
+            grouped_df = df.groupby('month', as_index=False)[['imaging_utilization', 'lab_test_utilization',
+                            'treatment_slot_utilization', 'patient_to_clinician_ratio']].mean()
             grouped_df['month'] = pd.Categorical(grouped_df['month'], categories=month_order, ordered=True)
             grouped_df = grouped_df.sort_values('month')
             fig1 = go.Figure()
@@ -86,11 +88,11 @@ def register_admin_callbacks(app, data_loader):
                 title='Metrics Utilisation and patient-to-clinician ratio',
                 xaxis_title='Month',
                 yaxis_title='Utilisation (%)',
-                yaxis2=dict(
-                    title='Patient-to-Clinician Ratio',
-                    overlaying='y',
-                    side='right',
-                )
+                yaxis2={
+                    "title": "Patient-to-Clinician Ratio",
+                    "overlaying": "y",
+                    "side": "right",
+                }
             )
 
             # KPI Cards + Graphs
@@ -98,13 +100,17 @@ def register_admin_callbacks(app, data_loader):
                 # KPI Row
                 html.Div([
                     html.Div(className='kpi-card',
-                             children=[html.H4('Imaging utilisation'), html.P(f"{df['imaging_utilization'].mean() / 100:.2%}")]),
+                             children=[html.H4('Imaging utilisation'),
+                                       html.P(f"{df['imaging_utilization'].mean() / 100:.2%}")]),
                     html.Div(className='kpi-card',
-                             children=[html.H4('Lab test utilisation'), html.P(f"{df['lab_test_utilization'].mean() / 100:.2%}")]),
+                             children=[html.H4('Lab test utilisation'),
+                                       html.P(f"{df['lab_test_utilization'].mean() / 100:.2%}")]),
                     html.Div(className='kpi-card',
-                             children=[html.H4('Treatment slot utilisation'), html.P(f"{df['treatment_slot_utilization'].mean() / 100:.2%}")]),
+                             children=[html.H4('Treatment slot utilisation'),
+                                       html.P(f"{df['treatment_slot_utilization'].mean() / 100:.2%}")]),
                     html.Div(className='kpi-card',
-                             children=[html.H4('Patient to clinician ratio'), html.P(f"{df['patient_to_clinician_ratio'].mean() / 100:.2%}")]),
+                             children=[html.H4('Patient to clinician ratio'),
+                                       html.P(f"{df['patient_to_clinician_ratio'].mean() / 100:.2%}")]),
                 ], className='kpi-row'),
 
                 # Graph Rows
@@ -112,3 +118,4 @@ def register_admin_callbacks(app, data_loader):
                     html.Div(dcc.Graph(figure=fig1), className='graph-card'),
                 ], className='graph-row'),
                 ])
+        return html.Div()

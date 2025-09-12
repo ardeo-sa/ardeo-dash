@@ -11,6 +11,7 @@ import pandas as pd
 import plotly.express as px
 # from utils.data_loader import load_data
 
+from app.dash_app.layout import build_graph_rows
 
 def register_referral_callbacks(app, data_loader):
     """
@@ -52,7 +53,8 @@ def register_referral_callbacks(app, data_loader):
             month_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
 
             # Figure 1: Referral Volume and Referral Conversion Rate
-            grouped_df = df.groupby('month', as_index=False)[['referral_volume_daily', 'referral_conversion_rate']].mean()
+            grouped_df = df.groupby('month', as_index=False)[['referral_volume_daily',
+                                                              'referral_conversion_rate']].mean()
             grouped_df['month'] = pd.Categorical(grouped_df['month'], categories=month_order, ordered=True)
             grouped_df = grouped_df.sort_values('month')
             fig1 = px.bar(
@@ -68,13 +70,15 @@ def register_referral_callbacks(app, data_loader):
             return html.Div([
                 # KPI Row
                 html.Div([
-                    html.Div(className='kpi-card', children=[html.H4('Avg referral to admission time (days)'), html.P(f"{df['referral_to_admission_time'].mean():.2f}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Referral volume'), html.P(f"{df['referral_volume_daily'].sum()}")]),
-                    html.Div(className='kpi-card', children=[html.H4('Referral source'), html.P(f"{df['referral_source_count'].sum()}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Avg referral to admission time (days)'),
+                                                             html.P(f"{df['referral_to_admission_time'].mean():.2f}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Referral volume'),
+                                                             html.P(f"{df['referral_volume_daily'].sum()}")]),
+                    html.Div(className='kpi-card', children=[html.H4('Referral source'),
+                                                             html.P(f"{df['referral_source_count'].sum()}")]),
                 ], className='kpi-row'),
 
                 # Graph Rows
-                html.Div([
-                    html.Div(dcc.Graph(figure=fig1), className='graph-card'),
-                ], className='graph-row'),
+                *build_graph_rows(fig1)
             ])
+        return html.Div()

@@ -11,6 +11,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 # from utils.data_loader import load_data
+from app.dash_app.layout import build_graph_rows
 
 
 def register_mdt_callbacks(app, data_loader):
@@ -53,7 +54,8 @@ def register_mdt_callbacks(app, data_loader):
             month_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
 
             # Figure 1: MDT Completion rate and MDT Average Attendance
-            grouped_df = df.groupby('month', as_index=False)[['mdt_action_completion_rate', 'mdt_avg_attendance']].mean()
+            grouped_df = df.groupby('month', as_index=False)[['mdt_action_completion_rate',
+                                                              'mdt_avg_attendance']].mean()
             grouped_df['month'] = pd.Categorical(grouped_df['month'], categories=month_order, ordered=True)
             grouped_df = grouped_df.sort_values('month')
             fig1 = px.bar(
@@ -66,7 +68,8 @@ def register_mdt_callbacks(app, data_loader):
             )
 
             # Figure 2: MDT Meeting Time and Case Discussion Time
-            grouped_df2 = df.groupby('month', as_index=False)[['mdt_avg_case_discussion_time', 'mdt_meeting_count']].mean()
+            grouped_df2 = df.groupby('month', as_index=False)[['mdt_avg_case_discussion_time',
+                                                               'mdt_meeting_count']].mean()
             grouped_df2['month'] = pd.Categorical(grouped_df2['month'], categories=month_order, ordered=True)
             grouped_df2 = grouped_df2.sort_values('month')
             fig2 = go.Figure()
@@ -88,25 +91,26 @@ def register_mdt_callbacks(app, data_loader):
                 title='MDT meeting time and case discussion time',
                 xaxis_title='Month',
                 yaxis_title='MDT meeting count',
-                yaxis2=dict(
-                        title='MDT avg case discussion time',
-                    overlaying='y',
-                    side='right',
-                )
+                yaxis2={
+                    "title": "MDT avg case discussion time",
+                    "overlaying": "y",
+                    "side": "right",
+                }
             )
 
             # KPI cards + Graphs
             return html.Div([
                 # KPI Row
                 html.Div([
-                    html.Div(className='kpi-card', children=[html.H4('MDT meeting count'), html.P(f"{df['mdt_meeting_count'].sum():.0f}")]),
-                    html.Div(className='kpi-card', children=[html.H4('MDT average wait time (days)'), html.P(f"{df['mdt_avg_wait_time'].mean():.2f}")]),
-                    html.Div(className='kpi-card', children=[html.H4('MDT completion rate'),html.P(f"{df['mdt_action_completion_rate'].mean() / 100:.2%}")]),
+                    html.Div(className='kpi-card', children=[html.H4('MDT meeting count'),
+                                                html.P(f"{df['mdt_meeting_count'].sum():.0f}")]),
+                    html.Div(className='kpi-card', children=[html.H4('MDT average wait time (days)'),
+                                                html.P(f"{df['mdt_avg_wait_time'].mean():.2f}")]),
+                    html.Div(className='kpi-card', children=[html.H4('MDT completion rate'),
+                                                html.P(f"{df['mdt_action_completion_rate'].mean() / 100:.2%}")]),
                 ], className='kpi-row'),
 
                 # Graph Rows
-                html.Div([
-                    html.Div(dcc.Graph(figure=fig1), className='graph-card'),
-                    html.Div(dcc.Graph(figure=fig2), className='graph-card'),
-                ], className='graph-row'),
+                *build_graph_rows(fig1, fig2)
             ])
+        return html.Div()
