@@ -27,6 +27,11 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const pr = context.payload.pull_request;
+            
+            if (!pr) {
+              console.log("No pull_request context available (probably workflow_dispatch). Skipping CLA check.");
+              return;
+            }
             const user = pr.user.login;
             const prNumber = pr.number;
 

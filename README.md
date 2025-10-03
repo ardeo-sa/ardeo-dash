@@ -1,10 +1,8 @@
-# Readme
-
+# Ardeo Dash
 Ardeo-dash is one of a series of Repos where we hope you will join us and make a contribution! 
 
-
-# eMDT Dash
-
+This project integrates a Plotly Dash application into a FastAPI backend.
+It provides interactive healthcare dashboards at /dashboard and REST API endpoints under /api.
 Management dashboards for enhanced MDT coordination and patient care monitoring in secondary healthcare.
 This project aggregates patient and operational data to produce real-time dashboards for clinical teams, analysts, and administrators.
 
@@ -111,6 +109,18 @@ To keep things simple and transparent, we use a lightweight CLA gate.
 * Risk scores (e.g., risk of readmission, deterioration)
 * Early warning flags from lab/vital sign trends 
 * Forecasted resource demands (beds, staff)
+
+## How It Works
+
+**FastAPI** 
+* Handles API routes (/api/...) defined in app/api/routes/metrics.
+* Provides monitoring (/metrics) via Prometheus. 
+* Runs startup tasks (DB connections, data import, preprocessing).
+
+**Plotly Dash**
+* Mounted into FastAPI at /dashboard. 
+* Renders interactive visualizations with callbacks. 
+* Layout and callbacks are defined in app/dash_app/layout.py and app/dash_app/callbacks.py.
 
 ## Project Structure
 
@@ -318,6 +328,37 @@ sudo -u postgres psql
 # Run once to create database and users
 ./utils/setup_reporting_db.sh
 ```
+
+## Using Dashboard
+
+### Data Source Modes
+The app supports two modes, configured via the .env file
+```text
+# Choose synthetic (CSV) or real (database) data
+ARDEO_DATA_SOURCE=synthetic
+```
+
+* synthetic → Loads demo data from CSV files. 
+* real → Connects to a live database (secondary schema).
+
+The value is read at startup and passed to the Dash app via get_data_loader().
+
+### Accessing the Services
+* API Health Check → http://localhost:8000/health
+* Dash Dashboard → http://localhost:8000/dashboard
+* Prometheus Metrics → http://localhost:8000/metrics
+
+
+### Documentation
+Interactive Docs
+Once the application is running, you can explore and test all available API endpoints through the following built-in UIs:
+
+* Swagger UI: http://localhost:8000/docs – Interactive documentation with support for live requests and token-based authentication.
+* ReDoc: http://localhost:8000/redoc – Clean, read-only reference-style documentation.
+
+These UIs are automatically generated from the FastAPI routes, response_models, and Pydantic schemas.
+
+
 
 ## Maintainance
 
