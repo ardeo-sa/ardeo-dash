@@ -1,7 +1,9 @@
 """Data loading module"""
-import pandas as pd
 import logging
+
+import pandas as pd
 from sqlalchemy.exc import SQLAlchemyError
+
 from app.database.metrics import MetricsReadSessionLocal
 from app.models.reporting.metrics import PatientMetrics
 from app.dash_app.utils.data_loader import load_data
@@ -35,6 +37,5 @@ def get_data_loader(source: str):
     - In 'synthetic' mode, load CSV from the given file_path.
     """
     if source == "real":
-        return lambda _: get_real_data()
-    else:
-        return lambda file_path: load_data(file_path)
+        return get_real_data
+    return load_data

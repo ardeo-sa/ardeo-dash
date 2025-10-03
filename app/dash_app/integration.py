@@ -6,7 +6,7 @@ import logging
 
 from fastapi import FastAPI
 from a2wsgi import WSGIMiddleware
-from sqlalchemy.exc import SQLAlchemyError
+# from sqlalchemy.exc import SQLAlchemyError
 
 from app.config import ARDEO_DATA_SOURCE
 from app.dash_app.app import create_dash_app

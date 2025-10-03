@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
   issues: write
-  pull-requests: read
+  pull-requests: write
   statuses: write
 
 jobs:
@@ -44,10 +44,26 @@ jobs:
               return;
             }
 
-            // Search for a closed issue with label 'cla-signed' authored by this user
-            const q = `repo:${owner}/${repo} is:issue is:closed label:"cla-signed" author:${user} in:title "CLA Signature"`;
-            const res = await github.rest.search.issuesAndPullRequests({ q });
-            const signed = (res.data.total_count || 0) > 0;
+            // Check CLA
+            async function hasSignedCla(owner, repo, user) {
+              const issues = await github.paginate(
+                github.rest.issues.listForRepo,
+                {
+                  owner,
+                  repo,
+                  state: "closed",
+                  labels: "cla-signed",
+                  per_page: 100
+                }
+              );
+
+              return issues.some(issue =>
+                issue.user?.login === user &&
+                issue.title.includes("CLA Signature")
+              );
+            }
+
+            const signed = await hasSignedCla(owner, repo, user);
             console.log(`CLA signed: ${signed}`);
 
             // Ensure 'cla-required' label exists
@@ -56,7 +72,11 @@ jobs:
                 await github.rest.issues.getLabel({ owner, repo, name });
               } catch (e) {
                 console.log(`Creating label: ${name}`);
-                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+                try {
+                  await github.rest.issues.createLabel({ owner, repo, name, color, description });
+                } catch (createErr) {
+                  console.log(`Could not create label (likely from forked PR): ${createErr.message}`);
+                }
               }
             }
             await ensureLabel('cla-required', 'd93f0b', 'CLA signature required before merge');

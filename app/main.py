@@ -1,3 +1,4 @@
+# pylint: disable=W0621,W0613
 """
 This module sets up the FastAPI application and integrates with Dash.
 

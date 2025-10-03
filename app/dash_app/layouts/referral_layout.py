@@ -2,8 +2,9 @@
 Layout definition for the Referral Metrics tab.
 """
 
-from dash import html, dcc
-from ..utils.data_loader import load_data
+from dash import html
+from app.dash_app.utils.data_loader import load_data
+from app.dash_app.layouts.helpers import date_picker_container
 
 def referral_layout():
     """
@@ -14,17 +15,7 @@ def referral_layout():
     """
     df = load_data('referral_metrics_wide.csv')
     return html.Div([
-        html.Div([
-            html.H3('Select Date Range', className='date-range-title'),
-            dcc.DatePickerRange(
-                id='referral-date-picker-range',
-                min_date_allowed=df['date'].min(),
-                max_date_allowed=df['date'].max(),
-                start_date=df['date'].min(),
-                end_date=df['date'].max(),
-                display_format='YYYY-MM-DD',
-                className='date-picker'
-            ),
-        ], className='date-picker-container'),
+        html.H3('Select Date Range', className='date-range-title'),
+        date_picker_container(df, picker_id='referral-date-picker-range'),
         html.Div(id='referral-content')
     ])
