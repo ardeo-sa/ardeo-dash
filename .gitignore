@@ -172,3 +172,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Mac stuff
+.DS_Store
+
+# IDE files
+.idea/
+.vscode/
+
+# Database files
+dev.db
+
